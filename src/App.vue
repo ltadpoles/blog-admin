@@ -4,7 +4,13 @@
     </div>
 </template>
 
-<style lang="less">
+<script>
+export default {
+    name: 'App'
+}
+</script>
+
+<style lang="less" scoped>
 #app {
     font-family: 'MingChaoTi';
     margin: 0;
