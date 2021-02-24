@@ -1,12 +1,18 @@
 <template>
     <div class="layout">
-        <div>
+        <div class="app-nav">
             <app-nav />
         </div>
-        <div>
-            <app-header />
-            <router-view />
-            <app-footer />
+        <div class="app-content">
+            <div class="app-header">
+                <app-header />
+            </div>
+            <div class="content">
+                <router-view />
+            </div>
+            <div class="app-footer">
+                <app-footer />
+            </div>
         </div>
     </div>
 </template>
@@ -25,4 +31,15 @@ export default {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.layout {
+    // overflow: hidden;
+    display: flex;
+    .app-content {
+        flex: 1;
+        .content {
+            min-height: calc(100% - 120px);
+        }
+    }
+}
+</style>
