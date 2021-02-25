@@ -1,119 +1,52 @@
 <template>
-    <div class="nav" :class="{ 'menu-small': collapsed }">
-        <h1 class="logo">Admin</h1>
-        <div class="menu">
-            <a-menu
-                mode="inline"
-                theme="dark"
-                :inline-collapsed="collapsed"
-                v-model:openKeys="openKeys"
-                v-model:selectedKeys="selectedKeys"
-            >
-                <a-menu-item key="1">
-                    <PieChartOutlined />
-                    <span>Option 1</span>
-                </a-menu-item>
-                <a-sub-menu key="sub1">
-                    <template #title>
-                        <span>
-                            <MailOutlined />
-                            <span>Navigation One</span>
-                        </span>
-                    </template>
-                    <a-menu-item key="5">Option 5</a-menu-item>
-                    <a-menu-item key="6">Option 6</a-menu-item>
-                </a-sub-menu>
-                <a-sub-menu key="sub2">
-                    <template #title>
-                        <span>
-                            <AppstoreOutlined />
-                            <span>Navigation Two</span>
-                        </span>
-                    </template>
-                    <a-menu-item key="9">Option 9</a-menu-item>
-                    <a-menu-item key="10">Option 10</a-menu-item>
-                    <a-sub-menu key="sub3" title="Submenu">
-                        <a-menu-item key="11">Option 11</a-menu-item>
-                        <a-menu-item key="12">Option 12</a-menu-item>
-                    </a-sub-menu>
-                </a-sub-menu>
-            </a-menu>
-        </div>
-        <div class="toogle">
-            <MenuFoldOutlined @click="toggleCollapsed" v-if="collapsed" />
-            <MenuFoldOutlined @click="toggleCollapsed" v-else />
-        </div>
-    </div>
+    <a-layout-sider v-model:collapsed="collapsed" breakpoint="lg" collapsible class="nav">
+        <div class="logo" />
+        <a-menu theme="dark" v-model:selectedKeys="selectedKeys" mode="inline">
+            <a-menu-item v-for="item in list" :key="item.id">
+                <component :is="item.icon" />
+                <span>{{ item.name }}</span>
+            </a-menu-item>
+        </a-menu>
+    </a-layout-sider>
 </template>
 
 <script>
-import { MenuFoldOutlined, PieChartOutlined, MailOutlined, AppstoreOutlined } from '@ant-design/icons-vue'
-import { defineComponent, reactive, toRefs, watch } from 'vue'
+import { PieChartOutlined, DesktopOutlined, UserOutlined, TeamOutlined, FileOutlined } from '@ant-design/icons-vue'
+import { defineComponent, reactive, toRefs } from 'vue'
 export default defineComponent({
     setup() {
         const state = reactive({
-            selectedKeys: ['1'],
-            openKeys: ['sub1'],
-            preOpenKeys: ['sub1'],
-            collapsed: false
+            selectedKeys: [0],
+            collapsed: false,
+            list: [
+                { id: 0, name: '文章', path: '/article', icon: 'PieChartOutlined' },
+                { id: 1, name: '留言管理', path: '/board', icon: 'DesktopOutlined' },
+                { id: 2, name: '关于', path: '/about', icon: 'UserOutlined' }
+            ]
         })
 
-        watch(
-            () => state.openKeys,
-            (val, oldVal) => {
-                state.preOpenKeys = oldVal
-            }
-        )
-
-        const toggleCollapsed = () => {
-            state.collapsed = !state.collapsed
-            state.openKeys = state.collapsed ? [] : state.preOpenKeys
-        }
-
         return {
-            ...toRefs(state),
-            toggleCollapsed
+            ...toRefs(state)
         }
     },
     components: {
-        MenuFoldOutlined,
         PieChartOutlined,
-        MailOutlined,
-        AppstoreOutlined
+        DesktopOutlined,
+        UserOutlined,
+        TeamOutlined,
+        FileOutlined
     }
 })
 </script>
 
 <style lang="less" scoped>
 .nav {
+    overflow: auto;
     height: 100vh;
-    width: 180px;
-    display: flex;
-    flex-direction: column;
-    background-color: @primary-blank;
-    transition: all 0.2s;
     .logo {
-        height: 50px;
-        line-height: 50px;
-        padding-left: 20px;
-        color: @primary-white;
-        margin: 0;
+        height: 32px;
+        margin: 16px;
+        background: rgba(255, 255, 255, 0.3);
     }
-    .menu {
-        height: calc(100vh - 90px);
-        overflow: auto;
-    }
-    .toogle {
-        height: 40px;
-        line-height: 40px;
-        padding-left: 30px;
-        color: @primary-white;
-        cursor: pointer;
-    }
-}
-
-// 菜单切换
-.menu-small {
-    width: 80px;
 }
 </style>

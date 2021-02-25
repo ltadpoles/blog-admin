@@ -1,5 +1,7 @@
 <template>
-    <div class="footer">页脚</div>
+    <a-layout-footer class="footer">
+        Ant Design ©2018 Created by Ant UED
+    </a-layout-footer>
 </template>
 
 <script>
@@ -8,9 +10,7 @@ export default {}
 
 <style lang="less" scoped>
 .footer {
-    height: 60px;
-    line-height: 60px;
-    border-top: 1px solid @border-color;
     text-align: center;
+    background-color: @primary-white;
 }
 </style>

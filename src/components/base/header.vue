@@ -20,6 +20,7 @@ export default defineComponent({
     line-height: 60px;
     padding: 0 10px;
     border-bottom: 1px solid @border-color;
+    background-color: @primary-white;
     display: flex;
     justify-content: space-between;
 }

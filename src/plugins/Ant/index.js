@@ -11,11 +11,20 @@ import {
     Col,
     Icon,
     Checkbox,
-    Switch
+    Switch,
+    Layout,
+    Breadcrumb
 } from 'ant-design-vue'
 
 const ant = {
     install(Vue) {
+        Vue.component(Layout.name, Layout)
+        Vue.component(Layout.Sider.name, Layout.Sider)
+        Vue.component(Layout.Header.name, Layout.Header)
+        Vue.component(Layout.Content.name, Layout.Content)
+        Vue.component(Layout.Footer.name, Layout.Footer)
+        Vue.component(Breadcrumb.name, Breadcrumb)
+        Vue.component(Breadcrumb.Item.name, Breadcrumb.Item)
         Vue.component(Menu.name, Menu)
         Vue.component(Menu.Item.name, Menu.Item)
         Vue.component(Menu.SubMenu.name, Menu.SubMenu)

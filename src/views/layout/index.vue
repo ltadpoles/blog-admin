@@ -1,45 +1,52 @@
 <template>
-    <div class="layout">
-        <div class="app-nav">
-            <app-nav />
-        </div>
-        <div class="app-content">
-            <div class="app-header">
-                <app-header />
-            </div>
-            <div class="content">
+    <a-layout class="layout">
+        <app-nav />
+        <a-layout>
+            <app-header />
+            <a-layout-content class="content">
+                <a-breadcrumb class="content-bread">
+                    <a-breadcrumb-item>User</a-breadcrumb-item>
+                    <a-breadcrumb-item>Bill</a-breadcrumb-item>
+                </a-breadcrumb>
                 <router-view />
-            </div>
-            <div class="app-footer">
-                <app-footer />
-            </div>
-        </div>
-    </div>
+            </a-layout-content>
+            <app-footer />
+        </a-layout>
+    </a-layout>
 </template>
-
 <script>
-import appHeader from '@/components/base/header.vue'
+import { defineComponent, ref } from 'vue'
 import appNav from '@/components/base/nav.vue'
+import appHeader from '@/components/base/header.vue'
 import appFooter from '@/components/base/footer.vue'
-export default {
-    name: 'Layout',
+export default defineComponent({
+    data() {
+        return {
+            collapsed: ref(false),
+            selectedKeys: ref(['1'])
+        }
+    },
     components: {
-        appHeader,
         appNav,
+        appHeader,
         appFooter
     }
-}
+})
 </script>
-
 <style lang="less" scoped>
 .layout {
-    // overflow: hidden;
-    display: flex;
-    .app-content {
-        flex: 1;
-        .content {
-            min-height: calc(100% - 120px);
+    height: 100vh;
+    .content {
+        margin: 0 10px;
+        .content-bread {
+            padding: 16px 0;
         }
     }
+}
+.site-layout .site-layout-background {
+    background: #fff;
+}
+[data-theme='dark'] .site-layout .site-layout-background {
+    background: #141414;
 }
 </style>
