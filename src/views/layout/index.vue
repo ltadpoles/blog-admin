@@ -43,10 +43,4 @@ export default defineComponent({
         }
     }
 }
-.site-layout .site-layout-background {
-    background: #fff;
-}
-[data-theme='dark'] .site-layout .site-layout-background {
-    background: #141414;
-}
 </style>

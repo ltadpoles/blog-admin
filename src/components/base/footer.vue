@@ -11,6 +11,5 @@ export default {}
 <style lang="less" scoped>
 .footer {
     text-align: center;
-    background-color: @primary-white;
 }
 </style>
