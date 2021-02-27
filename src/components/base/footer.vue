@@ -1,6 +1,6 @@
 <template>
     <a-layout-footer class="footer">
-        Ant Design ©2018 Created by Ant UED
+        Copyright © 2021 Created by 游荡de蝌蚪
     </a-layout-footer>
 </template>
 
