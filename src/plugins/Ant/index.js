@@ -32,6 +32,7 @@ const ant = {
         Vue.component(Button.name, Button)
         Vue.component(Input.name, Input)
         Vue.component(Form.name, Form)
+        Vue.component(Form.Item.name, Form.Item)
         Vue.component(Select.name, Select)
         Vue.component(Radio.name, Radio)
         Vue.component(Checkbox.name, Checkbox)
