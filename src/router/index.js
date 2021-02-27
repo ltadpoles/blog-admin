@@ -4,14 +4,15 @@ import BaseRoutes from './base'
 const routes = [
     {
         path: '/',
-        name: 'Layout',
+        redirect: '/dashboard',
         component: () => import(/* webpackChunkName: "layout" */ '@/views/layout'),
         children: [
             {
-                path: '404',
-                name: '404',
-                component: () => import(/* webpackChunkName: "error" */ '@/views/error/404')
+                path: '/dashboard',
+                name: 'Dashboard',
+                component: () => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard')
             },
+            ...BaseRoutes,
             {
                 path: '403',
                 name: '403',
@@ -22,7 +23,11 @@ const routes = [
                 name: '500',
                 component: () => import(/* webpackChunkName: "error" */ '@/views/error/500')
             },
-            ...BaseRoutes
+            {
+                path: '/:catchAll(.*)',
+                name: '404',
+                component: () => import(/* webpackChunkName: "error" */ '@/views/error/404')
+            }
         ]
     },
     {
@@ -34,7 +39,11 @@ const routes = [
 
 const router = createRouter({
     history: createWebHashHistory(),
-    routes
+    routes,
+    scrollBehavior() {
+        // 始终滚动到顶部
+        return { top: 0 }
+    }
 })
 
 export default router

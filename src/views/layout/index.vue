@@ -8,24 +8,20 @@
                     <a-breadcrumb-item>User</a-breadcrumb-item>
                     <a-breadcrumb-item>Bill</a-breadcrumb-item>
                 </a-breadcrumb>
-                <router-view />
+                <div class="content-view">
+                    <router-view />
+                </div>
             </a-layout-content>
             <app-footer />
         </a-layout>
     </a-layout>
 </template>
 <script>
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import appNav from '@/components/base/nav.vue'
 import appHeader from '@/components/base/header.vue'
 import appFooter from '@/components/base/footer.vue'
 export default defineComponent({
-    data() {
-        return {
-            collapsed: ref(false),
-            selectedKeys: ref(['1'])
-        }
-    },
     components: {
         appNav,
         appHeader,
@@ -40,6 +36,12 @@ export default defineComponent({
         margin: 0 10px;
         .content-bread {
             padding: 16px 0;
+        }
+        .content-view {
+            background-color: @primary-white;
+            padding: 20px;
+            min-height: 360px;
+            border-radius: 5px;
         }
     }
 }

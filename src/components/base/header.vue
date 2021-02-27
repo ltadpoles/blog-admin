@@ -15,7 +15,11 @@
                     </div>
                     <template #overlay>
                         <a-menu>
-                            <a-menu-item v-for="item in userMenu" :key="item.id" @click="goPath(item.path)">
+                            <a-menu-item
+                                v-for="item in userMenu"
+                                :key="item.id"
+                                @click="goPath(item.path)"
+                            >
                                 <component :is="item.icon" />
                                 <span>{{ item.name }}</span>
                             </a-menu-item>
@@ -39,8 +43,18 @@ export default defineComponent({
             userName: '游荡de蝌蚪',
             avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
             userMenu: [
-                { id: 0, name: '个人中心', icon: 'UserOutlined', path: '/about' },
-                { id: 0, name: '退出登录', icon: 'ImportOutlined', path: '/login' }
+                {
+                    id: 0,
+                    name: '个人中心',
+                    icon: 'UserOutlined',
+                    path: '/about'
+                },
+                {
+                    id: 0,
+                    name: '退出登录',
+                    icon: 'ImportOutlined',
+                    path: '/login'
+                }
             ]
         })
 

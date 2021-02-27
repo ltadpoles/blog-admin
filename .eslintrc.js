@@ -17,7 +17,7 @@ module.exports = {
                 tabWidth: 4,
                 semi: false,
                 singleQuote: true,
-                printWidth: 120
+                printWidth: 100
             },
             {
                 usePrettierrc: false
