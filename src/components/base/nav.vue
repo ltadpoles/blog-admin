@@ -31,9 +31,11 @@ import {
     FileOutlined
 } from '@ant-design/icons-vue'
 import { defineComponent, reactive, toRefs } from 'vue'
-import { onBeforeRouteUpdate } from 'vue-router'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 export default defineComponent({
     setup() {
+        const route = useRoute()
+
         const state = reactive({
             selectedKeys: [0], // 默认选中菜单
             collapsed: false, // 菜单折叠状态
@@ -60,6 +62,10 @@ export default defineComponent({
                 { id: 3, name: '关于', path: '/about', icon: 'UserOutlined' }
             ]
         })
+
+        state.selectedKeys = state.menu
+            .filter(item => item.path === route.path)
+            .map(item => item.id)
 
         // 监听路由变化设置选中menu
         onBeforeRouteUpdate(to => {
@@ -91,7 +97,6 @@ export default defineComponent({
         height: 32px;
         line-height: 32px;
         margin: 10px 20px;
-        // background: rgba(255, 255, 255, 0.3);
         display: flex;
         transition: all 0.2s;
         > img {

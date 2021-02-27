@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <div class="left">left</div>
+        <div class="left"></div>
         <div class="head-right">
             <div class="message">
                 <a-badge :count="10" dot>

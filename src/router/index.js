@@ -10,22 +10,34 @@ const routes = [
             {
                 path: '/dashboard',
                 name: 'Dashboard',
+                meta: {
+                    text: '首页'
+                },
                 component: () => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard')
             },
             ...BaseRoutes,
             {
                 path: '403',
                 name: '403',
+                meta: {
+                    text: '403'
+                },
                 component: () => import(/* webpackChunkName: "error" */ '@/views/error/403')
             },
             {
                 path: '500',
                 name: '500',
+                meta: {
+                    text: '500'
+                },
                 component: () => import(/* webpackChunkName: "error" */ '@/views/error/500')
             },
             {
                 path: '/:catchAll(.*)',
                 name: '404',
+                meta: {
+                    text: '404'
+                },
                 component: () => import(/* webpackChunkName: "error" */ '@/views/error/404')
             }
         ]
@@ -33,6 +45,9 @@ const routes = [
     {
         path: '/login',
         name: 'Login',
+        meta: {
+            text: '登录'
+        },
         component: () => import(/* webpackChunkName: "login" */ '@/views/login')
     }
 ]
