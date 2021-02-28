@@ -29,13 +29,19 @@
                 <a-form-item has-feedback name="passWord">
                     <a-input
                         v-model:value="formState.passWord"
-                        type="password"
+                        :type="eyeFlag ? 'text' : 'password'"
                         autocomplete="off"
                         placeholder="密码"
                         visibilityToggle
                     >
                         <template #prefix>
                             <LockOutlined />
+                        </template>
+                        <template #suffix>
+                            <component
+                                :is="eyeFlag ? 'EyeOutlined' : 'EyeInvisibleOutlined'"
+                                @click="eyeClick"
+                            />
                         </template>
                     </a-input>
                 </a-form-item>
@@ -47,32 +53,25 @@
     </div>
 </template>
 <script>
-import { defineComponent, reactive, ref } from 'vue'
-import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
+import { defineComponent, reactive, ref, toRefs } from 'vue'
+import {
+    UserOutlined,
+    LockOutlined,
+    EyeOutlined,
+    EyeInvisibleOutlined
+} from '@ant-design/icons-vue'
 export default defineComponent({
     setup() {
         const formRef = ref()
+
+        const state = reactive({
+            eyeFlag: false
+        })
 
         const formState = reactive({
             userName: '',
             passWord: ''
         })
-
-        // let validateUser = async (rule, value) => {
-        //     if (value === '') {
-        //         return Promise.reject('请输入用户名')
-        //     } else {
-        //         return Promise.resolve()
-        //     }
-        // }
-
-        // let validatePass = async (rule, value) => {
-        //     if (value === '') {
-        //         return Promise.reject('请输入密码')
-        //     } else {
-        //         return Promise.resolve()
-        //     }
-        // }
 
         const rules = {
             userName: [
@@ -80,22 +79,25 @@ export default defineComponent({
                     required: true,
                     message: '请输入用户名',
                     trigger: 'blur'
+                },
+                {
+                    // 字母开头且只能使用字母、数字和下划线
+                    pattern: /^[a-zA-Z]\w{6,12}$/,
+                    message: '请输入正确的用户名',
+                    trigger: 'blue'
                 }
-                // {
-                //     validator: validateUser,
-                //     trigger: 'change'
-                // }
             ],
             passWord: [
                 {
                     required: true,
                     message: '请输入密码',
                     trigger: 'blur'
+                },
+                {
+                    pattern: /^[a-zA-Z]\w{6,12}$/,
+                    message: '请输入正确的密码',
+                    trigger: 'blue'
                 }
-                // {
-                //     validator: validatePass,
-                //     trigger: 'change'
-                // }
             ]
         }
 
@@ -104,11 +106,11 @@ export default defineComponent({
         }
 
         const handleFinishFailed = errors => {
-            console.log(errors)
+            console.log(errors, 11223)
         }
 
-        const resetForm = () => {
-            formRef.value.resetFields()
+        const eyeClick = () => {
+            state.eyeFlag = !state.eyeFlag
         }
 
         const layout = {
@@ -118,18 +120,21 @@ export default defineComponent({
         }
 
         return {
+            ...toRefs(state),
             formState,
             formRef,
+            eyeClick,
             rules,
             handleFinishFailed,
             handleFinish,
-            resetForm,
             layout
         }
     },
     components: {
         UserOutlined,
-        LockOutlined
+        LockOutlined,
+        EyeOutlined,
+        EyeInvisibleOutlined
     }
 })
 </script>
@@ -149,7 +154,7 @@ export default defineComponent({
             justify-content: center;
             height: 100px;
             line-height: 100px;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             .title-logo {
                 width: 40px;
