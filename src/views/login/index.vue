@@ -42,8 +42,11 @@
                         </a-form-item>
                     </a-form>
                 </a-tab-pane>
-                <a-tab-pane key="2" tab="手机号登录">Content of Tab Pane 2</a-tab-pane>
+                <!-- <a-tab-pane key="2" tab="手机号登录">Content of Tab Pane 2</a-tab-pane> -->
             </a-tabs>
+        </div>
+        <div class="footer">
+            Copyright © 2021 Created by 游荡de蝌蚪
         </div>
     </div>
 </template>
@@ -143,7 +146,10 @@ export default defineComponent({
     background: url('../../assets/imgs/login.svg') no-repeat;
     background-size: cover;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
     .login-content {
         width: 360px;
         margin-top: 20px;
@@ -159,6 +165,8 @@ export default defineComponent({
                 margin-right: 15px;
             }
         }
+    }
+    .footer {
     }
 }
 </style>

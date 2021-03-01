@@ -3,7 +3,7 @@
         <app-nav />
         <a-layout>
             <app-header />
-            <a-layout-content class="content">
+            <div class="content">
                 <a-breadcrumb class="content-bread">
                     <a-breadcrumb-item>
                         <router-link to="/"><home-outlined /></router-link>
@@ -13,8 +13,7 @@
                 <div class="content-view">
                     <router-view />
                 </div>
-            </a-layout-content>
-            <app-footer />
+            </div>
         </a-layout>
     </a-layout>
 </template>
@@ -24,7 +23,6 @@ import { useRoute } from 'vue-router'
 import { HomeOutlined } from '@ant-design/icons-vue'
 import appNav from '@/components/base/nav.vue'
 import appHeader from '@/components/base/header.vue'
-import appFooter from '@/components/base/footer.vue'
 
 export default defineComponent({
     setup() {
@@ -37,7 +35,6 @@ export default defineComponent({
     components: {
         appNav,
         appHeader,
-        appFooter,
         HomeOutlined
     }
 })
@@ -46,9 +43,10 @@ export default defineComponent({
 .layout {
     height: 100vh;
     .content {
-        margin: 0 10px;
+        margin: 15px 10px;
+        position: relative;
         .content-bread {
-            padding: 16px 0;
+            padding-bottom: 15px;
         }
         .content-view {
             background-color: @primary-white;

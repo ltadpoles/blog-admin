@@ -12,7 +12,11 @@ import {
     Avatar,
     Badge,
     Dropdown,
-    Tabs
+    Tabs,
+    Space,
+    Table,
+    Tag,
+    Divider
 } from 'ant-design-vue'
 
 const ant = {
@@ -23,6 +27,7 @@ const ant = {
         Vue.component(Layout.Content.name, Layout.Content)
         Vue.component(Layout.Footer.name, Layout.Footer)
         Vue.component(Avatar.name, Avatar)
+        Vue.component(Space.name, Space)
         Vue.component(Badge.name, Badge)
         Vue.component(Dropdown.name, Dropdown)
         Vue.component(Breadcrumb.name, Breadcrumb)
@@ -35,12 +40,16 @@ const ant = {
         Vue.component(Input.Password.name, Input.Password)
         Vue.component(Form.name, Form)
         Vue.component(Form.Item.name, Form.Item)
+        Vue.component(Table.name, Table)
+        Vue.component(Divider.name, Divider)
         Vue.component(Tabs.name, Tabs)
         Vue.component(Tabs.TabPane.name, Tabs.TabPane)
+        Vue.component(Tag.name, Tag)
         Vue.component(Select.name, Select)
         Vue.component(Radio.name, Radio)
         Vue.component(Checkbox.name, Checkbox)
         Vue.component(DatePicker.name, DatePicker)
+        Vue.component(DatePicker.RangePicker.name, DatePicker.RangePicker)
     }
 }
 export default ant
