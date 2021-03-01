@@ -11,7 +11,8 @@ import {
     Breadcrumb,
     Avatar,
     Badge,
-    Dropdown
+    Dropdown,
+    Tabs
 } from 'ant-design-vue'
 
 const ant = {
@@ -33,6 +34,8 @@ const ant = {
         Vue.component(Input.name, Input)
         Vue.component(Form.name, Form)
         Vue.component(Form.Item.name, Form.Item)
+        Vue.component(Tabs.name, Tabs)
+        Vue.component(Tabs.TabPane.name, Tabs.TabPane)
         Vue.component(Select.name, Select)
         Vue.component(Radio.name, Radio)
         Vue.component(Checkbox.name, Checkbox)
