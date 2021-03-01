@@ -32,6 +32,7 @@ const ant = {
         Vue.component(Menu.SubMenu.name, Menu.SubMenu)
         Vue.component(Button.name, Button)
         Vue.component(Input.name, Input)
+        Vue.component(Input.Password.name, Input.Password)
         Vue.component(Form.name, Form)
         Vue.component(Form.Item.name, Form.Item)
         Vue.component(Tabs.name, Tabs)

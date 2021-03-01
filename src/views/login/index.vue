@@ -29,23 +29,11 @@
                             </a-input>
                         </a-form-item>
                         <a-form-item has-feedback name="passWord">
-                            <a-input
-                                v-model:value="formState.passWord"
-                                :type="eyeFlag ? 'text' : 'password'"
-                                autocomplete="off"
-                                placeholder="密码"
-                                visibilityToggle
-                            >
+                            <a-input-password v-model:value="formState.passWord" placeholder="密码">
                                 <template #prefix>
                                     <LockOutlined />
                                 </template>
-                                <template #suffix>
-                                    <component
-                                        :is="eyeFlag ? 'EyeOutlined' : 'EyeInvisibleOutlined'"
-                                        @click="eyeClick"
-                                    />
-                                </template>
-                            </a-input>
+                            </a-input-password>
                         </a-form-item>
                         <a-form-item>
                             <a-button block type="primary" html-type="submit" :loading="loading"
@@ -61,12 +49,7 @@
 </template>
 <script>
 import { defineComponent, reactive, ref, toRefs } from 'vue'
-import {
-    UserOutlined,
-    LockOutlined,
-    EyeOutlined,
-    EyeInvisibleOutlined
-} from '@ant-design/icons-vue'
+import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
 import md5 from 'js-md5'
 export default defineComponent({
@@ -76,7 +59,6 @@ export default defineComponent({
         const formRef = ref()
 
         const state = reactive({
-            eyeFlag: false,
             loading: false,
             activeKey: '1',
             tabBarStyle: {
@@ -132,10 +114,6 @@ export default defineComponent({
             console.log(errors)
         }
 
-        const eyeClick = () => {
-            state.eyeFlag = !state.eyeFlag
-        }
-
         const layout = {
             wrapperCol: {
                 span: 24
@@ -146,7 +124,6 @@ export default defineComponent({
             ...toRefs(state),
             formState,
             formRef,
-            eyeClick,
             rules,
             handleFinishFailed,
             handleFinish,
@@ -155,9 +132,7 @@ export default defineComponent({
     },
     components: {
         UserOutlined,
-        LockOutlined,
-        EyeOutlined,
-        EyeInvisibleOutlined
+        LockOutlined
     }
 })
 </script>
