@@ -2,36 +2,42 @@
     <div class="article">
         <div class="article-title">
             <div class="article-title-search">
-                <a-input v-model:value="title" placeholder="文章名称" class="title-input" />
-                <!-- <a-select
-                    v-model:value="type"
-                    class="title-input"
-                    placeholder="是否原创"
-                    allowClear
-                >
-                    <a-select-option value="1">原创</a-select-option>
-                    <a-select-option value="2">转载</a-select-option>
-                </a-select> -->
-                <a-range-picker
-                    v-model:value="date"
-                    :locale="zhCN"
-                    class="title-input title-range"
-                    :placeholder="placeholder"
-                />
-                <a-button type="primary" @click="search">查询</a-button>
+                <div class="search-sty">
+                    <span>文章名称：</span>
+                    <a-input class="title-input" v-model:value="title" placeholder="文章名称" />
+                </div>
+                <div class="search-sty">
+                    <span>文章类型：</span>
+                    <a-select v-model:value="type" class="title-input">
+                        <a-select-option :value="0">全部</a-select-option>
+                        <a-select-option :value="1">原创</a-select-option>
+                        <a-select-option :value="2">转载</a-select-option>
+                    </a-select>
+                </div>
+                <div class="search-sty">
+                    <span>编辑时间：</span>
+                    <a-range-picker
+                        v-model:value="date"
+                        :locale="zhCN"
+                        class="title-input title-range"
+                        :placeholder="placeholder"
+                    />
+                </div>
+                <div><a-button type="primary" @click="search">查询</a-button></div>
             </div>
             <div class="article-title-add">
                 <a-button type="primary" @click="add">
                     <template #icon><PlusOutlined /></template>添加文章
                 </a-button>
-
-                <!-- <a-button type="danger">批量删除</a-button> -->
+                &nbsp;
+                <a-button type="danger" :disabled="isAllDel" @click="delAll">批量删除</a-button>
             </div>
         </div>
         <div class="article-content">
             <a-table
                 class="ant-table-striped"
                 :columns="columns"
+                :row-selection="rowSelection"
                 :dataSource="articleSource"
                 :pagination="pagination"
                 :loading="loading"
@@ -40,6 +46,11 @@
             >
                 <template #image="{ text: image }">
                     <img class="article-image" :src="image" alt="" />
+                </template>
+                <template #type="{ text: type }">
+                    <span>
+                        {{ type === 1 ? '原创' : '转载' }}
+                    </span>
                 </template>
                 <template #tags="{ text: tags }">
                     <span>
@@ -50,11 +61,16 @@
                 </template>
                 <template #action="{ record }">
                     <span>
-                        <span class="base" @click="getInfo(record.key)">详情</span>
-                        <a-divider type="vertical" />
                         <span class="base" @click="modify(record.key)">修改</span>
                         <a-divider type="vertical" />
-                        <span class="base del" @click="del(record.key)">删除</span>
+                        <a-popconfirm
+                            title="提示?"
+                            ok-text="确认"
+                            cancel-text="取消"
+                            @confirm="del(record.key)"
+                        >
+                            <span class="base del">删除</span>
+                        </a-popconfirm>
                     </span>
                 </template>
             </a-table>
@@ -63,17 +79,20 @@
 </template>
 
 <script>
-import { PlusOutlined } from '@ant-design/icons-vue'
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { Modal } from 'ant-design-vue'
+import { computed, createVNode, defineComponent, reactive, toRefs } from 'vue'
+import { useRouter } from 'vue-router'
+
 import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
-import { useRouter } from 'vue-router'
+
 moment.locale('zh-cn')
 
 const columns = [
     {
-        title: '文章图片',
+        title: '图片',
         dataIndex: 'image',
         slots: {
             customRender: 'image'
@@ -82,6 +101,13 @@ const columns = [
     {
         title: '标题',
         dataIndex: 'name'
+    },
+    {
+        title: '类型',
+        dataIndex: 'type',
+        slots: {
+            customRender: 'type'
+        }
     },
     {
         title: '标签',
@@ -99,17 +125,17 @@ const columns = [
         dataIndex: 'modifyDate'
     },
     {
-        title: '浏览量',
+        title: '浏览',
         dataIndex: 'pvCount'
     },
     {
-        title: '点赞数',
+        title: '点赞',
         dataIndex: 'likeCount'
     },
     {
         title: '操作',
         key: 'action',
-        width: 160,
+        width: 110,
         align: 'center',
         slots: { customRender: 'action' }
     }
@@ -121,15 +147,18 @@ export default defineComponent({
 
         const state = reactive({
             title: '',
-            type: '',
+            type: 0,
+            isAllDel: true,
             date: [],
             placeholder: ['开始时间', '结束时间'],
             loading: false,
+            selectedRows: [],
             articleSource: [
                 {
                     key: 0,
                     image: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
                     name: '我的第一篇文章',
+                    type: 1,
                     tags: [
                         { id: 0, name: 'JavaScript' },
                         { id: 1, name: 'Vue' },
@@ -143,6 +172,7 @@ export default defineComponent({
                 {
                     key: 1,
                     name: '我的第二篇文章',
+                    type: 2,
                     tags: [
                         { id: 0, name: 'JavaScript' },
                         { id: 1, name: 'Vue' }
@@ -155,6 +185,7 @@ export default defineComponent({
                 {
                     key: 2,
                     name: '这是测试用的',
+                    type: 2,
                     tags: [
                         { id: 1, name: 'Vue' },
                         { id: 2, name: 'React' }
@@ -167,6 +198,7 @@ export default defineComponent({
                 {
                     key: 3,
                     name: 'JavaScript测试用例',
+                    type: 2,
                     tags: [{ id: 0, name: 'JavaScript' }],
                     publishDate: '2021-3-1 10:00:02',
                     modifyDate: '2021-3-1 17:20:24',
@@ -176,6 +208,7 @@ export default defineComponent({
                 {
                     key: 4,
                     name: 'Vue测试实例',
+                    type: 2,
                     tags: [{ id: 1, name: 'Vue' }],
                     publishDate: '2021-3-1 10:00:02',
                     modifyDate: '2021-3-1 17:20:24',
@@ -185,6 +218,7 @@ export default defineComponent({
                 {
                     key: 5,
                     name: '我的第一篇文章',
+                    type: 1,
                     tags: [
                         { id: 0, name: 'JavaScript' },
                         { id: 1, name: 'Vue' }
@@ -203,6 +237,14 @@ export default defineComponent({
             pageSize: 10
         }))
 
+        const rowSelection = {
+            onChange: (selectedRowKeys, selectedRows) => {
+                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+                state.selectedRows = selectedRows
+                state.isAllDel = selectedRows.length < 1
+            }
+        }
+
         const search = () => {
             console.log(state.title, moment(state.date[0]).valueOf(), state.date[1])
         }
@@ -211,9 +253,29 @@ export default defineComponent({
             console.log(pag)
         }
 
+        const delAll = () => {
+            Modal.confirm({
+                title: '提示',
+                icon: createVNode(ExclamationCircleOutlined),
+                content: '确认删除所选文章?',
+                cancelText: '取消',
+                okText: '确认',
+                centered: true,
+                onOk() {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
+                    }).catch(() => console.log('Oops errors!'))
+                },
+
+                onCancel() {}
+            })
+            console.log(state.selectedRows)
+        }
+
         const add = () => {
             router.push('article-publish')
         }
+
         // 删除文章
         const del = id => {
             console.log('删除文章', id)
@@ -229,8 +291,10 @@ export default defineComponent({
             ...toRefs(state),
             search,
             columns,
+            rowSelection,
             pagination,
             handleTableChange,
+            delAll,
             add,
             del,
             modify
@@ -247,12 +311,17 @@ export default defineComponent({
 .article {
     .article-title {
         .article-title-search {
-            .title-input {
+            display: flex;
+            flex-wrap: wrap;
+            .search-sty {
                 margin-right: 10px;
-                width: 200px;
-            }
-            .title-range {
-                width: 400px;
+                margin-bottom: 10px;
+                .title-input {
+                    width: 200px;
+                }
+                .title-range {
+                    width: 360px;
+                }
             }
         }
         .article-title-add {

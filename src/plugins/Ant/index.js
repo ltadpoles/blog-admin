@@ -18,11 +18,13 @@ import {
     Tag,
     Divider,
     Popover,
-    Upload
+    Upload,
+    Popconfirm
 } from 'ant-design-vue'
 
 const ant = {
     install(Vue) {
+        Vue.use(Select)
         Vue.component(Layout.name, Layout)
         Vue.component(Layout.Sider.name, Layout.Sider)
         Vue.component(Layout.Header.name, Layout.Header)
@@ -48,7 +50,7 @@ const ant = {
         Vue.component(Tabs.TabPane.name, Tabs.TabPane)
         Vue.component(Tag.name, Tag)
         Vue.component(Popover.name, Popover)
-        Vue.component(Select.name, Select)
+        Vue.component(Popconfirm.name, Popconfirm)
         Vue.component(Radio.name, Radio)
         Vue.component(Radio.Group.name, Radio.Group)
         Vue.component(Upload.name, Upload)
