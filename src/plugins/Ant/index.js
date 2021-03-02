@@ -16,7 +16,9 @@ import {
     Space,
     Table,
     Tag,
-    Divider
+    Divider,
+    Popover,
+    Upload
 } from 'ant-design-vue'
 
 const ant = {
@@ -45,8 +47,11 @@ const ant = {
         Vue.component(Tabs.name, Tabs)
         Vue.component(Tabs.TabPane.name, Tabs.TabPane)
         Vue.component(Tag.name, Tag)
+        Vue.component(Popover.name, Popover)
         Vue.component(Select.name, Select)
         Vue.component(Radio.name, Radio)
+        Vue.component(Radio.Group.name, Radio.Group)
+        Vue.component(Upload.name, Upload)
         Vue.component(Checkbox.name, Checkbox)
         Vue.component(DatePicker.name, DatePicker)
         Vue.component(DatePicker.RangePicker.name, DatePicker.RangePicker)

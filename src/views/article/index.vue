@@ -3,6 +3,15 @@
         <div class="article-title">
             <div class="article-title-search">
                 <a-input v-model:value="title" placeholder="文章名称" class="title-input" />
+                <!-- <a-select
+                    v-model:value="type"
+                    class="title-input"
+                    placeholder="是否原创"
+                    allowClear
+                >
+                    <a-select-option value="1">原创</a-select-option>
+                    <a-select-option value="2">转载</a-select-option>
+                </a-select> -->
                 <a-range-picker
                     v-model:value="date"
                     :locale="zhCN"
@@ -12,9 +21,11 @@
                 <a-button type="primary" @click="search">查询</a-button>
             </div>
             <div class="article-title-add">
-                <a-button type="primary">
+                <a-button type="primary" @click="add">
                     <template #icon><PlusOutlined /></template>添加文章
                 </a-button>
+
+                <!-- <a-button type="danger">批量删除</a-button> -->
             </div>
         </div>
         <div class="article-content">
@@ -32,16 +43,18 @@
                 </template>
                 <template #tags="{ text: tags }">
                     <span>
-                        <a-tag v-for="tag in tags" :key="tag" :color="tag.color">
+                        <a-tag v-for="tag in tags" :key="tag" color="blue">
                             {{ tag.name }}
                         </a-tag>
                     </span>
                 </template>
                 <template #action="{ record }">
                     <span>
-                        <span class="modify" @click="del(record.key)">修改</span>
+                        <span class="base" @click="getInfo(record.key)">详情</span>
                         <a-divider type="vertical" />
-                        <span class="del" @click="del(record.key)">删除</span>
+                        <span class="base" @click="modify(record.key)">修改</span>
+                        <a-divider type="vertical" />
+                        <span class="base del" @click="del(record.key)">删除</span>
                     </span>
                 </template>
             </a-table>
@@ -55,6 +68,7 @@ import { computed, defineComponent, reactive, toRefs } from 'vue'
 import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
+import { useRouter } from 'vue-router'
 moment.locale('zh-cn')
 
 const columns = [
@@ -95,14 +109,19 @@ const columns = [
     {
         title: '操作',
         key: 'action',
+        width: 160,
+        align: 'center',
         slots: { customRender: 'action' }
     }
 ]
 
 export default defineComponent({
     setup() {
+        const router = useRouter()
+
         const state = reactive({
             title: '',
+            type: '',
             date: [],
             placeholder: ['开始时间', '结束时间'],
             loading: false,
@@ -112,18 +131,9 @@ export default defineComponent({
                     image: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
                     name: '我的第一篇文章',
                     tags: [
-                        {
-                            name: 'JavaScript',
-                            color: 'geekblue'
-                        },
-                        {
-                            name: 'Vue',
-                            color: 'blue'
-                        },
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
+                        { id: 0, name: 'JavaScript' },
+                        { id: 1, name: 'Vue' },
+                        { id: 2, name: 'React' }
                     ],
                     publishDate: '2021-3-1 10:00:02',
                     modifyDate: '2021-3-1 17:20:24',
@@ -134,18 +144,8 @@ export default defineComponent({
                     key: 1,
                     name: '我的第二篇文章',
                     tags: [
-                        {
-                            name: 'JavaScript',
-                            color: 'geekblue'
-                        },
-                        {
-                            name: 'Vue',
-                            color: 'blue'
-                        },
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
+                        { id: 0, name: 'JavaScript' },
+                        { id: 1, name: 'Vue' }
                     ],
                     publishDate: '2021-3-1 10:00:02',
                     modifyDate: '2021-3-1 17:20:24',
@@ -156,14 +156,8 @@ export default defineComponent({
                     key: 2,
                     name: '这是测试用的',
                     tags: [
-                        {
-                            name: 'JavaScript',
-                            color: 'geekblue'
-                        },
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
+                        { id: 1, name: 'Vue' },
+                        { id: 2, name: 'React' }
                     ],
                     publishDate: '2021-3-1 10:00:02',
                     modifyDate: '2021-3-1 17:20:24',
@@ -173,16 +167,7 @@ export default defineComponent({
                 {
                     key: 3,
                     name: 'JavaScript测试用例',
-                    tags: [
-                        {
-                            name: 'Vue',
-                            color: 'blue'
-                        },
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
-                    ],
+                    tags: [{ id: 0, name: 'JavaScript' }],
                     publishDate: '2021-3-1 10:00:02',
                     modifyDate: '2021-3-1 17:20:24',
                     likeCount: 959,
@@ -191,12 +176,7 @@ export default defineComponent({
                 {
                     key: 4,
                     name: 'Vue测试实例',
-                    tags: [
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
-                    ],
+                    tags: [{ id: 1, name: 'Vue' }],
                     publishDate: '2021-3-1 10:00:02',
                     modifyDate: '2021-3-1 17:20:24',
                     likeCount: 45,
@@ -206,117 +186,8 @@ export default defineComponent({
                     key: 5,
                     name: '我的第一篇文章',
                     tags: [
-                        {
-                            name: 'JavaScript',
-                            color: 'geekblue'
-                        },
-
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 99,
-                    pvCount: 923
-                },
-                {
-                    key: 6,
-                    name: '我的第一篇文章',
-                    tags: [
-                        {
-                            name: 'JavaScript',
-                            color: 'geekblue'
-                        },
-                        {
-                            name: 'Vue',
-                            color: 'blue'
-                        },
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 99,
-                    pvCount: 923
-                },
-                {
-                    key: 7,
-                    name: '我的第一篇文章',
-                    tags: [
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 99,
-                    pvCount: 923
-                },
-                {
-                    key: 8,
-                    name: '我的第一篇文章',
-                    tags: [
-                        {
-                            name: 'JavaScript',
-                            color: 'geekblue'
-                        },
-                        {
-                            name: 'Vue',
-                            color: 'blue'
-                        },
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 9,
-                    pvCount: 923
-                },
-                {
-                    key: 9,
-                    name: '我的第一篇文章',
-                    tags: [
-                        {
-                            name: 'JavaScript',
-                            color: 'geekblue'
-                        },
-                        {
-                            name: 'Vue',
-                            color: 'blue'
-                        },
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 99,
-                    pvCount: 923
-                },
-                {
-                    key: 10,
-                    name: '我的第一篇文章',
-                    tags: [
-                        {
-                            name: 'JavaScript',
-                            color: 'geekblue'
-                        },
-                        {
-                            name: 'Vue',
-                            color: 'blue'
-                        },
-                        {
-                            name: 'React',
-                            color: 'red'
-                        }
+                        { id: 0, name: 'JavaScript' },
+                        { id: 1, name: 'Vue' }
                     ],
                     publishDate: '2021-3-1 10:00:02',
                     modifyDate: '2021-3-1 17:20:24',
@@ -339,6 +210,10 @@ export default defineComponent({
         const handleTableChange = pag => {
             console.log(pag)
         }
+
+        const add = () => {
+            router.push('article-publish')
+        }
         // 删除文章
         const del = id => {
             console.log('删除文章', id)
@@ -356,6 +231,7 @@ export default defineComponent({
             columns,
             pagination,
             handleTableChange,
+            add,
             del,
             modify
         }
@@ -388,8 +264,9 @@ export default defineComponent({
             width: 50px;
             height: 50px;
         }
-        .modify {
+        .base {
             color: @link-color;
+            cursor: pointer;
         }
         .del {
             color: @danger-color;
