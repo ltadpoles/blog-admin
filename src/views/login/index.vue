@@ -166,7 +166,5 @@ export default defineComponent({
             }
         }
     }
-    .footer {
-    }
 }
 </style>
