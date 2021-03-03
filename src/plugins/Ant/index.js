@@ -19,7 +19,8 @@ import {
     Divider,
     Popover,
     Upload,
-    Popconfirm
+    Popconfirm,
+    Modal
 } from 'ant-design-vue'
 
 const ant = {
@@ -51,6 +52,7 @@ const ant = {
         Vue.component(Tag.name, Tag)
         Vue.component(Popover.name, Popover)
         Vue.component(Popconfirm.name, Popconfirm)
+        Vue.component(Modal.name, Modal)
         Vue.component(Radio.name, Radio)
         Vue.component(Radio.Group.name, Radio.Group)
         Vue.component(Upload.name, Upload)

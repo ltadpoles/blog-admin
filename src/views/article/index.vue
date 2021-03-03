@@ -260,7 +260,7 @@ export default defineComponent({
                 content: '确认删除所选文章?',
                 cancelText: '取消',
                 okText: '确认',
-                centered: true,
+                center: true,
                 onOk() {
                     return new Promise((resolve, reject) => {
                         setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)

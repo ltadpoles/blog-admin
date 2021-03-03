@@ -73,7 +73,7 @@
                             <span>还可以添加{{ tagLength - article.tags.length }}个标签</span>
                             <span
                                 >找不到标签？
-                                <a>创建</a>
+                                <a @click="addTag">创建</a>
                             </span>
                         </div>
                         <div class="tag-search">
@@ -119,6 +119,28 @@
             :include-level="[1, 2, 3, 4]"
             height="500px"
         ></v-md-editor>
+
+        <!-- 新增标签 -->
+        <a-modal
+            v-model:visible="tagVisible"
+            title="创建标签"
+            @ok="tagAdd"
+            class="tag-modal"
+            okText="确认"
+            cancelText="取消"
+        >
+            <div class="tag-modal-input">
+                <p>标签名：</p>
+                <a-input
+                    placeholder="标签名(10个字符以内,不支持特殊字符)"
+                    v-model:value="newTags.tagName"
+                ></a-input>
+            </div>
+            <div class="tag-modal-input">
+                <p>标签描述：</p>
+                <a-input placeholder="标签描述" v-model:value="newTags.dec"></a-input>
+            </div>
+        </a-modal>
     </div>
 </template>
 
@@ -144,6 +166,7 @@ export default defineComponent({
             visible: false,
             publishVisible: false,
             resultTagList: [], // 搜索而来的标签列表
+            tagVisible: false,
             baseTagList: [
                 {
                     id: 0,
@@ -164,6 +187,10 @@ export default defineComponent({
             type: '1'
         })
 
+        const newTags = reactive({
+            tagName: '',
+            dec: ''
+        })
         const handleChange = info => {
             if (info.file.status === 'uploading') {
                 state.loading = true
@@ -213,6 +240,32 @@ export default defineComponent({
             }
         }
 
+        // 创建标签
+        const addTag = () => {
+            state.visible = false // 关闭添加标签弹窗
+            state.tagVisible = true
+        }
+        const tagAdd = () => {
+            const pattern = new RegExp(
+                "[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]"
+            )
+            if (!newTags.tagName || !newTags.dec) {
+                message.warning('请完善标签信息')
+                return
+            }
+            if (pattern.test(newTags.tagName)) {
+                message.warning('标签不能包含特殊字符')
+                return
+            }
+            if (newTags.tagName.length > 10) {
+                message.warning('标签长度不合法')
+                return
+            }
+            newTags.tagName = ''
+            newTags.dec = ''
+            state.tagVisible = false
+        }
+
         const searchChange = () => {
             console.log(state.search)
             if (state.search) {
@@ -229,9 +282,12 @@ export default defineComponent({
         return {
             ...toRefs(state),
             article,
+            newTags,
             handleChange,
             beforeUpload,
             tagClose,
+            addTag,
+            tagAdd,
             choiceTag,
             searchChange,
             confirm
@@ -296,6 +352,13 @@ export default defineComponent({
     .base-tag {
         margin-bottom: 5px;
         cursor: pointer;
+    }
+}
+
+.tag-modal-input {
+    margin-bottom: 10px;
+    > p {
+        margin-bottom: 10px;
     }
 }
 </style>

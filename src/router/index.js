@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { Modal } from 'ant-design-vue'
 import BaseRoutes from './base'
 
 const routes = [
@@ -59,6 +60,11 @@ const router = createRouter({
         // 始终滚动到顶部
         return { top: 0 }
     }
+})
+
+router.beforeEach((to, from, next) => {
+    Modal.destroyAll()
+    next()
 })
 
 export default router
