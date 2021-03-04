@@ -20,7 +20,8 @@ import {
     Popover,
     Upload,
     Popconfirm,
-    Modal
+    Modal,
+    Switch
 } from 'ant-design-vue'
 
 const ant = {
@@ -43,8 +44,10 @@ const ant = {
         Vue.component(Button.name, Button)
         Vue.component(Input.name, Input)
         Vue.component(Input.Password.name, Input.Password)
+        Vue.component(Input.TextArea.name, Input.TextArea)
         Vue.component(Form.name, Form)
         Vue.component(Form.Item.name, Form.Item)
+        Vue.component(Switch.name, Switch)
         Vue.component(Table.name, Table)
         Vue.component(Divider.name, Divider)
         Vue.component(Tabs.name, Tabs)
