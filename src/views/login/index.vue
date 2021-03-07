@@ -5,7 +5,7 @@
                 <img class="title-logo" src="@/assets/imgs/logo.svg" alt="" />
                 <span>Blog Admin</span>
             </div>
-            <a-tabs v-model:activeKey="activeKey" :tabBarStyle="tabBarStyle">
+            <a-tabs :activeKey="activeKey" :tabBarStyle="tabBarStyle">
                 <a-tab-pane key="1" tab="账号密码登录">
                     <a-form
                         name="custom-validation"

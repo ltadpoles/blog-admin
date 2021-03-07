@@ -21,7 +21,8 @@ import {
     Upload,
     Popconfirm,
     Modal,
-    Switch
+    Switch,
+    Cascader
 } from 'ant-design-vue'
 
 const ant = {
@@ -61,6 +62,7 @@ const ant = {
         Vue.component(Upload.name, Upload)
         Vue.component(Checkbox.name, Checkbox)
         Vue.component(DatePicker.name, DatePicker)
+        Vue.component(Cascader.name, Cascader)
         Vue.component(DatePicker.RangePicker.name, DatePicker.RangePicker)
     }
 }
