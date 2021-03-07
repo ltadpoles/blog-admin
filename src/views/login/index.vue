@@ -51,9 +51,10 @@
     </div>
 </template>
 <script>
-import { defineComponent, reactive, ref, toRefs } from 'vue'
+import { defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
+import { getUsers } from '@/api'
 import md5 from 'js-md5'
 export default defineComponent({
     setup() {
@@ -122,6 +123,10 @@ export default defineComponent({
                 span: 24
             }
         }
+
+        onMounted(() => {
+            getUsers()
+        })
 
         return {
             ...toRefs(state),

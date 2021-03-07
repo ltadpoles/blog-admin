@@ -16,15 +16,15 @@ module.exports = {
             warnings: false,
             errors: true
         },
-        progress: false
-        // proxy: {
-        //     // 设置代理
-        //     '/api': {
-        //         target: '',
-        //         changeOrigin: true,
-        //         ws: true
-        //     }
-        // }
+        progress: false,
+        proxy: {
+            // 设置代理
+            '/': {
+                target: 'http://localhost:4000',
+                changeOrigin: true,
+                ws: true
+            }
+        }
     },
     pluginOptions: {
         'style-resources-loader': {
