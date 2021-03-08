@@ -51,10 +51,10 @@
     </div>
 </template>
 <script>
-import { defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
+import { defineComponent, reactive, ref, toRefs } from 'vue'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
-import { getUsers } from '@/api'
+import { login } from '@/api'
 import md5 from 'js-md5'
 export default defineComponent({
     setup() {
@@ -107,11 +107,17 @@ export default defineComponent({
         const handleFinish = values => {
             // 前端密码加密可以做混淆
             console.log(md5(values.passWord))
-            state.loading = true
-            setTimeout(() => {
-                state.loading = false
-                router.push('/')
-            }, 2000)
+            // state.loading = true
+            // setTimeout(() => {
+            //     state.loading = false
+            //     router.push('/')
+            // }, 2000)
+            login({
+                username: values.userName,
+                password: md5(values.passWord)
+            }).then(res => {
+                console.log(res)
+            })
         }
 
         const handleFinishFailed = errors => {
@@ -123,10 +129,6 @@ export default defineComponent({
                 span: 24
             }
         }
-
-        onMounted(() => {
-            getUsers()
-        })
 
         return {
             ...toRefs(state),
