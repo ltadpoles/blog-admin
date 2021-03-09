@@ -54,6 +54,7 @@
 import { defineComponent, reactive, ref, toRefs } from 'vue'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
 import { login } from '@/api'
 import md5 from 'js-md5'
 export default defineComponent({
@@ -95,15 +96,20 @@ export default defineComponent({
 
         const handleFinish = values => {
             // 前端密码加密可以做混淆
-            console.log(md5(values.passWord))
             state.loading = true
             login({
                 username: values.userName,
                 password: md5(values.passWord)
             }).then(res => {
-                localStorage.setItem('token', res.token)
                 state.loading = false
-                router.push('/')
+
+                if (res.code === 0) {
+                    localStorage.setItem('token', res.token)
+                    message.success(res.message)
+                    router.push('/')
+                } else {
+                    message.warning(res.message)
+                }
             })
         }
 

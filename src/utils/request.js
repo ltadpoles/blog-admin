@@ -2,7 +2,6 @@
     封装axios请求
 */
 import axios from 'axios'
-import { message } from 'ant-design-vue'
 
 const instance = axios.create({
     baseURL: '/',
@@ -14,19 +13,20 @@ function baseRequest(options) {
     const headers = options.headers || {}
     const token = localStorage.getItem('token')
     if (token) {
-        headers['Authorization'] = token
+        headers['x-access-token'] = token
     }
     headers['Content-Type'] = 'application/json'
     options.headers = headers
     return instance(options).then(res => {
+        console.log(res)
         const data = res.data || {}
         if (res.status !== 200) {
             return Promise.reject({ message: '请求失败', res, data })
         }
-        if (data.code !== 0) {
-            message.warning(data.message)
-            return Promise.reject({ message: data.message })
-        }
+        // if (data.code !== 0) {
+        //     message.warning(data.message)
+        //     return Promise.reject({ message: data.message })
+        // }
         return Promise.resolve(data, res)
     })
 }

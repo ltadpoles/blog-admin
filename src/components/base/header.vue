@@ -35,6 +35,8 @@
 import { defineComponent, reactive, toRefs } from 'vue'
 import { BellOutlined, UserOutlined, ImportOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
+import { logout } from '@/api'
+import { message } from 'ant-design-vue'
 export default defineComponent({
     setup() {
         const router = useRouter()
@@ -59,7 +61,17 @@ export default defineComponent({
         })
 
         const goPath = path => {
-            router.push(path)
+            if (path === '/login') {
+                logout().then(res => {
+                    if (res.code === 0) {
+                        localStorage.clear()
+                        router.push(path)
+                        message.success(res.message)
+                    } else {
+                        message.warning(res.message)
+                    }
+                })
+            }
         }
 
         return {
