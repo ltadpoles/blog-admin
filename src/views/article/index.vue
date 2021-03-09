@@ -64,7 +64,7 @@
                         <span class="base" @click="modify(record.key)">修改</span>
                         <a-divider type="vertical" />
                         <a-popconfirm
-                            title="提示?"
+                            title="确认删除这篇文章？"
                             ok-text="确认"
                             cancel-text="取消"
                             @confirm="del(record.key)"
