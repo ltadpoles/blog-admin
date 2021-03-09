@@ -82,23 +82,12 @@ export default defineComponent({
                     required: true,
                     message: '请输入用户名',
                     trigger: 'blur'
-                },
-                {
-                    // 字母开头且只能使用字母、数字和下划线
-                    pattern: /^[a-zA-Z]{4,12}$/,
-                    message: '请输入正确的用户名',
-                    trigger: 'blur'
                 }
             ],
             passWord: [
                 {
                     required: true,
                     message: '请输入密码',
-                    trigger: 'blur'
-                },
-                {
-                    pattern: /^[a-zA-Z]\w{6,12}$/,
-                    message: '请输入正确的密码',
                     trigger: 'blur'
                 }
             ]
@@ -107,16 +96,14 @@ export default defineComponent({
         const handleFinish = values => {
             // 前端密码加密可以做混淆
             console.log(md5(values.passWord))
-            // state.loading = true
-            // setTimeout(() => {
-            //     state.loading = false
-            //     router.push('/')
-            // }, 2000)
+            state.loading = true
             login({
                 username: values.userName,
                 password: md5(values.passWord)
             }).then(res => {
-                console.log(res)
+                localStorage.setItem('token', res.token)
+                state.loading = false
+                router.push('/')
             })
         }
 
