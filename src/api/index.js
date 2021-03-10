@@ -4,6 +4,6 @@ export const login = params => {
     return request.post('/admin/login', params)
 }
 
-export const logout = () => {
-    return request.get('/admin/logout')
+export const getUserInfo = () => {
+    return request.get('/admin/info')
 }
