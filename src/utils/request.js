@@ -2,6 +2,8 @@
     封装axios请求
 */
 import axios from 'axios'
+import { message } from 'ant-design-vue'
+import router from '../router'
 
 const instance = axios.create({
     baseURL: '/',
@@ -17,18 +19,31 @@ function baseRequest(options) {
     }
     headers['Content-Type'] = 'application/json'
     options.headers = headers
-    return instance(options).then(res => {
-        console.log(res)
-        const data = res.data || {}
-        if (res.status !== 200) {
-            return Promise.reject({ message: '请求失败', res, data })
-        }
-        // if (data.code !== 0) {
-        //     message.warning(data.message)
-        //     return Promise.reject({ message: data.message })
-        // }
-        return Promise.resolve(data, res)
-    })
+    return instance(options)
+        .then(res => {
+            const data = res.data || {}
+
+            if (res.status !== 200) {
+                return Promise.reject({ message: '请求失败', res, data })
+            }
+            if (data.code !== 0) {
+                message.warning(data.message)
+                return Promise.reject({ message: data.message })
+            }
+            return Promise.resolve(data, res)
+        })
+        .catch(err => {
+            switch (err.response.status) {
+                case 403:
+                    message.error('登录态失效，即将跳转到登录页...')
+                    setTimeout(() => {
+                        router.push('/login')
+                    }, 2000)
+                    return Promise.reject({ message: '请求失败' })
+                default:
+                    return Promise.reject({ message: '请求失败' })
+            }
+        })
 }
 
 /**

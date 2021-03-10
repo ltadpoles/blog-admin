@@ -15,7 +15,6 @@
                         :rules="rules"
                         v-bind="layout"
                         @finish="handleFinish"
-                        @finishFailed="handleFinishFailed"
                     >
                         <a-form-item has-feedback name="userName">
                             <a-input
@@ -100,21 +99,16 @@ export default defineComponent({
             login({
                 username: values.userName,
                 password: md5(values.passWord)
-            }).then(res => {
-                state.loading = false
-
-                if (res.code === 0) {
+            })
+                .then(res => {
+                    state.loading = false
                     localStorage.setItem('token', res.token)
                     message.success(res.message)
                     router.push('/')
-                } else {
-                    message.warning(res.message)
-                }
-            })
-        }
-
-        const handleFinishFailed = errors => {
-            console.log(errors)
+                })
+                .catch(() => {
+                    state.loading = false
+                })
         }
 
         const layout = {
@@ -128,7 +122,6 @@ export default defineComponent({
             formState,
             formRef,
             rules,
-            handleFinishFailed,
             handleFinish,
             layout
         }
