@@ -20,7 +20,7 @@ module.exports = {
         proxy: {
             // 设置代理
             '/': {
-                target: 'http://localhost:4000',
+                target: 'http://192.168.3.159:4000',
                 changeOrigin: true,
                 ws: true
             }

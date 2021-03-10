@@ -100,7 +100,7 @@ const columns = [
     },
     {
         title: '标题',
-        dataIndex: 'name'
+        dataIndex: 'title'
     },
     {
         title: '类型',
