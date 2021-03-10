@@ -10,8 +10,8 @@
             <div class="avatar">
                 <a-dropdown>
                     <div>
-                        <a-avatar :src="avatar" />
-                        <span>{{ userName }}</span>
+                        <span class="nick_name">{{ info.nickName }}</span>
+                        <a-avatar :src="info.avatar" />
                     </div>
                     <template #overlay>
                         <a-menu>
@@ -42,8 +42,10 @@ export default defineComponent({
         const router = useRouter()
 
         const state = reactive({
-            userName: '游荡de蝌蚪',
-            avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+            info: {
+                nickName: 'admin',
+                avatar: ''
+            },
             userMenu: [
                 {
                     id: 0,
@@ -68,8 +70,15 @@ export default defineComponent({
             }
         }
 
+        const getInfo = () => {
+            getUserInfo().then(res => {
+                localStorage.setItem('info', JSON.stringify(res.data))
+                state.info = res.data
+            })
+        }
+
         onMounted(() => {
-            getUserInfo()
+            getInfo()
         })
 
         return {
@@ -102,6 +111,9 @@ export default defineComponent({
         }
         .avatar {
             cursor: pointer;
+            .nick_name {
+                margin-right: 10px;
+            }
         }
     }
 }
