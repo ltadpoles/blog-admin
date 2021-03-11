@@ -113,6 +113,10 @@ const columns = [
         dataIndex: 'title'
     },
     {
+        title: '作者',
+        dataIndex: 'author'
+    },
+    {
         title: '类型',
         dataIndex: 'type',
         slots: {
@@ -195,7 +199,7 @@ export default defineComponent({
                           moment(state.pubDate[0])
                               .startOf('day')
                               .format('x'),
-                          moment(state.pubDate[0])
+                          moment(state.pubDate[1])
                               .endOf('day')
                               .format('x')
                       ]
@@ -205,7 +209,7 @@ export default defineComponent({
                           moment(state.changeDate[0])
                               .startOf('day')
                               .format('x'),
-                          moment(state.changeDate[0])
+                          moment(state.changeDate[1])
                               .endOf('day')
                               .format('x')
                       ]
