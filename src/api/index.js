@@ -7,3 +7,7 @@ export const login = params => {
 export const getUserInfo = () => {
     return request.get('/admin/info')
 }
+
+export const getUserMenu = () => {
+    return request.get('/admin/menu')
+}

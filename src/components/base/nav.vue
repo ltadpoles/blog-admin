@@ -30,8 +30,9 @@ import {
     TeamOutlined,
     FileOutlined
 } from '@ant-design/icons-vue'
-import { defineComponent, reactive, toRefs } from 'vue'
+import { defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
+import { getUserMenu } from '@/api'
 export default defineComponent({
     setup() {
         const route = useRoute()
@@ -40,38 +41,28 @@ export default defineComponent({
             selectedKeys: [0], // 默认选中菜单
             collapsed: false, // 菜单折叠状态
             theme: 'dark', // 主题颜色
-            menu: [
-                {
-                    id: 0,
-                    name: '仪表盘',
-                    path: '/dashboard',
-                    icon: 'HomeOutlined'
-                },
-                {
-                    id: 1,
-                    name: '文章',
-                    path: '/article',
-                    icon: 'PieChartOutlined'
-                },
-                {
-                    id: 2,
-                    name: '留言管理',
-                    path: '/board',
-                    icon: 'DesktopOutlined'
-                },
-                { id: 3, name: '关于', path: '/about', icon: 'UserOutlined' }
-            ]
+            menu: []
         })
 
-        state.selectedKeys = state.menu
-            .filter(item => item.path === route.path)
-            .map(item => item.id)
+        const getMenu = () => {
+            getUserMenu().then(res => {
+                state.menu = res.data
 
+                state.selectedKeys = state.menu
+                    .filter(item => item.path === route.path)
+                    .map(item => item.id)
+            })
+        }
         // 监听路由变化设置选中menu
         onBeforeRouteUpdate(to => {
             state.selectedKeys = state.menu
                 .filter(item => item.path === to.path)
                 .map(item => item.id)
+        })
+
+        onMounted(() => {
+            console.log(111)
+            getMenu()
         })
 
         return {
