@@ -61,7 +61,6 @@ export default defineComponent({
         })
 
         onMounted(() => {
-            console.log(111)
             getMenu()
         })
 

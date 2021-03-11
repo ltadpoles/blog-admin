@@ -15,9 +15,18 @@
                     </a-select>
                 </div>
                 <div class="search-sty">
+                    <span>发布时间：</span>
+                    <a-range-picker
+                        v-model:value="pubDate"
+                        :locale="zhCN"
+                        class="title-input title-range"
+                        :placeholder="placeholder"
+                    />
+                </div>
+                <div class="search-sty">
                     <span>编辑时间：</span>
                     <a-range-picker
-                        v-model:value="date"
+                        v-model:value="changeDate"
                         :locale="zhCN"
                         class="title-input title-range"
                         :placeholder="placeholder"
@@ -54,20 +63,20 @@
                 </template>
                 <template #tags="{ text: tags }">
                     <span>
-                        <a-tag v-for="tag in tags" :key="tag" color="blue">
-                            {{ tag.name }}
+                        <a-tag v-for="(tag, index) in tags" :key="index" color="blue">
+                            {{ tag }}
                         </a-tag>
                     </span>
                 </template>
                 <template #action="{ record }">
                     <span>
-                        <span class="base" @click="modify(record.key)">修改</span>
+                        <span class="base" @click="modify(record.id)">修改</span>
                         <a-divider type="vertical" />
                         <a-popconfirm
                             title="确认删除这篇文章？"
                             ok-text="确认"
                             cancel-text="取消"
-                            @confirm="del(record.key)"
+                            @confirm="del(record.id)"
                         >
                             <span class="base del">删除</span>
                         </a-popconfirm>
@@ -81,8 +90,9 @@
 <script>
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { Modal } from 'ant-design-vue'
-import { computed, createVNode, defineComponent, reactive, toRefs } from 'vue'
+import { computed, createVNode, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
+import { getList } from '@/api/article'
 
 import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import moment from 'moment'
@@ -118,19 +128,19 @@ const columns = [
     },
     {
         title: '发布时间',
-        dataIndex: 'publishDate'
+        dataIndex: 'publishTime'
     },
     {
         title: '修改时间',
-        dataIndex: 'modifyDate'
+        dataIndex: 'changeTime'
     },
     {
         title: '浏览',
-        dataIndex: 'pvCount'
+        dataIndex: 'pv'
     },
     {
         title: '点赞',
-        dataIndex: 'likeCount'
+        dataIndex: 'like'
     },
     {
         title: '操作',
@@ -149,92 +159,22 @@ export default defineComponent({
             title: '',
             type: 0,
             isAllDel: true,
-            date: [],
+            pubDate: [],
+            changeDate: [],
             placeholder: ['开始时间', '结束时间'],
             loading: false,
             selectedRows: [],
-            articleSource: [
-                {
-                    key: 0,
-                    image: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-                    name: '我的第一篇文章',
-                    type: 1,
-                    tags: [
-                        { id: 0, name: 'JavaScript' },
-                        { id: 1, name: 'Vue' },
-                        { id: 2, name: 'React' }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 99,
-                    pvCount: 923
-                },
-                {
-                    key: 1,
-                    name: '我的第二篇文章',
-                    type: 2,
-                    tags: [
-                        { id: 0, name: 'JavaScript' },
-                        { id: 1, name: 'Vue' }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 99,
-                    pvCount: 923
-                },
-                {
-                    key: 2,
-                    name: '这是测试用的',
-                    type: 2,
-                    tags: [
-                        { id: 1, name: 'Vue' },
-                        { id: 2, name: 'React' }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 45,
-                    pvCount: 67
-                },
-                {
-                    key: 3,
-                    name: 'JavaScript测试用例',
-                    type: 2,
-                    tags: [{ id: 0, name: 'JavaScript' }],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 959,
-                    pvCount: 9213
-                },
-                {
-                    key: 4,
-                    name: 'Vue测试实例',
-                    type: 2,
-                    tags: [{ id: 1, name: 'Vue' }],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 45,
-                    pvCount: 1234
-                },
-                {
-                    key: 5,
-                    name: '我的第一篇文章',
-                    type: 1,
-                    tags: [
-                        { id: 0, name: 'JavaScript' },
-                        { id: 1, name: 'Vue' }
-                    ],
-                    publishDate: '2021-3-1 10:00:02',
-                    modifyDate: '2021-3-1 17:20:24',
-                    likeCount: 99,
-                    pvCount: 923
-                }
-            ]
+            articleSource: [],
+            count: 0
         })
 
         const pagination = computed(() => ({
-            total: state.articleSource.length,
             current: 1,
-            pageSize: 10
+            pageSize: 10,
+            total: state.count,
+            showTotal: total => {
+                return `共 ${total} 条`
+            }
         }))
 
         const rowSelection = {
@@ -245,12 +185,42 @@ export default defineComponent({
             }
         }
 
+        const getParams = () => {
+            return {
+                title: state.title,
+                type: state.type,
+                // 选择的当天0点时间戳和23：59时间戳
+                publish_time: state.pubDate.length
+                    ? [
+                          moment(state.pubDate[0])
+                              .startOf('day')
+                              .format('x'),
+                          moment(state.pubDate[0])
+                              .endOf('day')
+                              .format('x')
+                      ]
+                    : null,
+                change_time: state.changeDate.length
+                    ? [
+                          moment(state.changeDate[0])
+                              .startOf('day')
+                              .format('x'),
+                          moment(state.changeDate[0])
+                              .endOf('day')
+                              .format('x')
+                      ]
+                    : null
+            }
+        }
+
         const search = () => {
-            console.log(state.title, moment(state.date[0]).valueOf(), state.date[1])
+            const { current, pageSize } = pagination.value
+            getArtList(Object.assign({ page: current, pageSize }, { params: getParams() }))
         }
 
         const handleTableChange = pag => {
-            console.log(pag)
+            const { current, pageSize } = pag
+            getArtList(Object.assign({ page: current, pageSize }, { params: getParams() }))
         }
 
         const delAll = () => {
@@ -285,6 +255,24 @@ export default defineComponent({
         const modify = id => {
             console.log('编辑文章', id)
         }
+
+        const getArtList = query => {
+            getList(query).then(res => {
+                res.data.rows.forEach(item => {
+                    item.key = item.id
+                    item.publishTime = moment(item.publishTime).format('YYYY-MM-DD HH:mm')
+                    item.changeTime = moment(item.changeTime).format('YYYY-MM-DD HH:mm')
+                    item.tags = item.tags.split(',')
+                })
+                state.articleSource = res.data.rows
+                state.count = res.data.count
+            })
+        }
+
+        onMounted(() => {
+            const { current, pageSize } = pagination.value
+            getArtList({ page: current, pageSize })
+        })
 
         return {
             zhCN,
