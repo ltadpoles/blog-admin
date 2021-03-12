@@ -89,10 +89,10 @@
 
 <script>
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
-import { Modal } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import { computed, createVNode, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
-import { getList } from '@/api/article'
+import { getList, delArticle } from '@/api/article'
 
 import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import moment from 'moment'
@@ -252,7 +252,11 @@ export default defineComponent({
 
         // 删除文章
         const del = id => {
-            console.log('删除文章', id)
+            delArticle(id).then(res => {
+                message.success(res.message)
+                const { current, pageSize } = pagination.value
+                getArtList(Object.assign({ page: current, pageSize }, { params: getParams() }))
+            })
         }
 
         // 编辑文章
