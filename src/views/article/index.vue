@@ -183,7 +183,6 @@ export default defineComponent({
 
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
-                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
                 state.selectedRows = selectedRows
                 state.isAllDel = selectedRows.length < 1
             }
@@ -218,6 +217,7 @@ export default defineComponent({
         }
 
         const search = () => {
+            pagination.value.current = 1
             const { current, pageSize } = pagination.value
             getArtList(Object.assign({ page: current, pageSize }, { params: getParams() }))
         }
@@ -227,6 +227,7 @@ export default defineComponent({
             getArtList(Object.assign({ page: current, pageSize }, { params: getParams() }))
         }
 
+        // 批量删除
         const delAll = () => {
             Modal.confirm({
                 title: '提示',
@@ -236,14 +237,18 @@ export default defineComponent({
                 okText: '确认',
                 center: true,
                 onOk() {
-                    return new Promise((resolve, reject) => {
-                        setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
-                    }).catch(() => console.log('Oops errors!'))
+                    let id = state.selectedRows.map(item => item.id).join(',')
+                    delArticle(id).then(res => {
+                        message.success(res.message)
+                        const { current, pageSize } = pagination.value
+                        getArtList(
+                            Object.assign({ page: current, pageSize }, { params: getParams() })
+                        )
+                    })
                 },
 
                 onCancel() {}
             })
-            console.log(state.selectedRows)
         }
 
         const add = () => {
