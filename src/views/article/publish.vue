@@ -148,6 +148,8 @@
 import { defineComponent, reactive, toRefs } from 'vue'
 import { message } from 'ant-design-vue'
 import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
+import { addArticle } from '@/api/article'
+import { useRouter } from 'vue-router'
 
 function getBase64(img, callback) {
     const reader = new FileReader()
@@ -157,6 +159,8 @@ function getBase64(img, callback) {
 
 export default defineComponent({
     setup() {
+        const router = useRouter()
+
         const state = reactive({
             search: '',
             isSearch: false,
@@ -277,6 +281,14 @@ export default defineComponent({
 
         const confirm = () => {
             console.log(article)
+            let tags = article.tags.map(item => item.id).join(',')
+            let image =
+                'https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/38ad29cc69d52044086f52bdcf71236c~300x300.image'
+            let author = '游荡de蝌蚪'
+            addArticle({ ...article, tags, image, author }).then(res => {
+                message.success(res.message)
+                router.push('/article')
+            })
         }
 
         return {
