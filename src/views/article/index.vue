@@ -132,11 +132,11 @@ const columns = [
     },
     {
         title: '发布时间',
-        dataIndex: 'publishTime'
+        dataIndex: 'publish_time'
     },
     {
         title: '修改时间',
-        dataIndex: 'changeTime'
+        dataIndex: 'change_time'
     },
     {
         title: '浏览',
@@ -273,12 +273,13 @@ export default defineComponent({
             getList(query).then(res => {
                 res.data.rows.forEach(item => {
                     item.key = item.id
-                    item.publishTime = moment(item.publishTime).format('YYYY-MM-DD HH:mm')
-                    item.changeTime = moment(item.changeTime).format('YYYY-MM-DD HH:mm')
+                    item.publish_time = moment(item.publish_time).format('YYYY-MM-DD HH:mm')
+                    item.change_time = moment(item.change_time).format('YYYY-MM-DD HH:mm')
                     item.tags = item.tags.split(',')
                 })
                 state.articleSource = res.data.rows
                 state.count = res.data.count
+                state.selectedRows = []
             })
         }
 
