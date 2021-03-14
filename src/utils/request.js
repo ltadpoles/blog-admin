@@ -43,7 +43,7 @@ function baseRequest(options) {
             if (err.request.readyState == 4 && err.request.status == 0) {
                 //重新请求或者返回登录页
                 router.push('/login')
-                message.error('请求超时，即将跳转到登录页...')
+                message.error('请求超时...')
                 return Promise.reject({ message: '请求超时' })
             }
             switch (err.response.status) {
