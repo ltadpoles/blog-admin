@@ -280,6 +280,7 @@ export default defineComponent({
                 state.articleSource = res.data.rows
                 state.count = res.data.count
                 state.selectedRows = []
+                state.isAllDel = true
             })
         }
 
