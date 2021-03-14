@@ -136,6 +136,7 @@
             v-model:visible="tagVisible"
             title="创建标签"
             @ok="tagAdd"
+            @cancel="tagCancel"
             class="tag-modal"
             okText="确认"
             cancelText="取消"
@@ -144,12 +145,12 @@
                 <p>标签名：</p>
                 <a-input
                     placeholder="标签名(10个字符以内,不支持特殊字符)"
-                    v-model:value="newTags.tagName"
+                    v-model:value="newTags.name"
                 ></a-input>
             </div>
             <div class="tag-modal-input">
                 <p>标签描述：</p>
-                <a-input placeholder="标签描述" v-model:value="newTags.dec"></a-input>
+                <a-input placeholder="标签描述(可选)" v-model:value="newTags.dec"></a-input>
             </div>
         </a-modal>
     </div>
@@ -161,6 +162,7 @@ import { message } from 'ant-design-vue'
 import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
 import { addArticle } from '@/api/article'
 import { useRouter } from 'vue-router'
+import { addTag as addTags, getTags } from '@/api/tag'
 
 function getBase64(img, callback) {
     const reader = new FileReader()
@@ -204,7 +206,7 @@ export default defineComponent({
         })
 
         const newTags = reactive({
-            tagName: '',
+            name: '',
             dec: ''
         })
         const handleChange = info => {
@@ -222,9 +224,9 @@ export default defineComponent({
             })
             // }
 
-            // if (info.file.status === 'error') {
+            // if (info.file.status === 'warning') {
             //     state.loading = false
-            //     message.error('上传失败')
+            //     message.warning('上传失败')
             // }
         }
 
@@ -232,13 +234,13 @@ export default defineComponent({
             const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
 
             if (!isJpgOrPng) {
-                message.error('You can only upload JPG file!')
+                message.warning('You can only upload JPG file!')
             }
 
             const isLt2M = file.size / 1024 / 1024 < 2
 
             if (!isLt2M) {
-                message.error('Image must smaller than 2MB!')
+                message.warning('Image must smaller than 2MB!')
             }
 
             return isJpgOrPng && isLt2M
@@ -253,6 +255,9 @@ export default defineComponent({
         const choiceTag = item => {
             if (!article.tags.some(res => res.id == item.id)) {
                 article.tags.push(item)
+                state.search = ''
+                state.resultTagList = []
+                state.isSearch = false
             }
         }
 
@@ -265,19 +270,27 @@ export default defineComponent({
             const pattern = new RegExp(
                 "[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]"
             )
-            if (!newTags.tagName || !newTags.dec) {
+            console.log(newTags)
+            if (!newTags.name || !newTags.dec) {
                 message.warning('请完善标签信息')
                 return
             }
-            if (pattern.test(newTags.tagName)) {
+            if (pattern.test(newTags.name)) {
                 message.warning('标签不能包含特殊字符')
                 return
             }
-            if (newTags.tagName.length > 10) {
+            if (newTags.name.length > 10) {
                 message.warning('标签长度不合法')
                 return
             }
-            newTags.tagName = ''
+            addTags(newTags).then(res => {
+                message.success(res.message)
+                tagCancel()
+            })
+        }
+
+        const tagCancel = () => {
+            newTags.name = ''
             newTags.dec = ''
             state.tagVisible = false
         }
@@ -285,19 +298,26 @@ export default defineComponent({
         const searchChange = () => {
             if (state.search) {
                 state.isSearch = true
+                const query = {
+                    params: { name: state.search }
+                }
+                getTags(query).then(res => {
+                    state.resultTagList = res.data.rows
+                })
             } else {
                 state.isSearch = false
+                state.resultTagList = []
             }
         }
 
         const confirm = () => {
             const { title, tags, type, link, content } = article
             if (!title || tags.length < 1 || !type || !content) {
-                message.error('请完善文章信息')
+                message.warning('请完善文章信息')
                 return
             }
             if (type && type === 2 && !link) {
-                message.error('请完善原文链接')
+                message.warning('请完善原文链接')
                 return
             }
             let tagsIds = tags.map(item => item.id).join(',')
@@ -318,6 +338,7 @@ export default defineComponent({
             tagClose,
             addTag,
             tagAdd,
+            tagCancel,
             choiceTag,
             searchChange,
             confirm
