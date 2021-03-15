@@ -76,6 +76,7 @@
                 trigger="click"
                 placement="bottomLeft"
                 overlayClassName="tag-pop"
+                @visibleChange="popoverChange(visible)"
                 v-if="article.tags.length < tagLength"
             >
                 <template #content>
@@ -98,9 +99,9 @@
                             <div>
                                 常用标签：
                             </div>
-                            <div>
+                            <div class="base-tag">
                                 <a-tag
-                                    class="base-tag"
+                                    class="base-tag-sty"
                                     v-for="item in baseTagList"
                                     :key="item.id"
                                     @click="choiceTag(item)"
@@ -124,6 +125,8 @@
                 <a-button size="small">添加标签</a-button>
             </a-popover>
         </div>
+
+        <!-- markdown 输入区域 -->
         <v-md-editor
             v-model="article.content"
             left-toolbar="undo redo clear | h emoji bold italic strikethrough quote | tip table hr | link todo-list code | image"
@@ -184,16 +187,7 @@ export default defineComponent({
             publishVisible: false,
             resultTagList: [], // 搜索而来的标签列表
             tagVisible: false,
-            baseTagList: [
-                {
-                    id: 0,
-                    name: 'Vue'
-                },
-                {
-                    id: 1,
-                    name: 'JavaScript'
-                }
-            ]
+            baseTagList: [] // 常用标签列表
         })
 
         const article = reactive({
@@ -209,6 +203,7 @@ export default defineComponent({
             name: '',
             dec: ''
         })
+
         const handleChange = info => {
             if (info.file.status === 'uploading') {
                 state.loading = true
@@ -295,18 +290,25 @@ export default defineComponent({
             state.tagVisible = false
         }
 
-        const searchChange = () => {
+        const searchChange = async () => {
             if (state.search) {
                 state.isSearch = true
                 const query = {
                     params: { name: state.search }
                 }
-                getTags(query).then(res => {
-                    state.resultTagList = res.data.rows
-                })
+                const result = await getTags(query)
+                state.resultTagList = result.data.rows
             } else {
                 state.isSearch = false
                 state.resultTagList = []
+            }
+        }
+
+        const popoverChange = async visible => {
+            // 点击添加标签即更新标签
+            if (visible) {
+                const initTags = await getTags()
+                state.baseTagList = initTags.data.rows
             }
         }
 
@@ -320,8 +322,8 @@ export default defineComponent({
                 message.warning('请完善原文链接')
                 return
             }
-            let tagsIds = tags.map(item => item.id).join(',')
-            let image =
+            const tagsIds = tags.map(item => item.id).join(',')
+            const image =
                 'https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/38ad29cc69d52044086f52bdcf71236c~300x300.image'
             addArticle({ ...article, tags: tagsIds, image }).then(res => {
                 message.success(res.message)
@@ -340,6 +342,7 @@ export default defineComponent({
             tagAdd,
             tagCancel,
             choiceTag,
+            popoverChange,
             searchChange,
             confirm
         }
@@ -411,8 +414,11 @@ export default defineComponent({
         margin: 10px 0;
     }
     .base-tag {
-        margin-bottom: 5px;
-        cursor: pointer;
+        margin-top: 5px;
+        .base-tag-sty {
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+        }
     }
 }
 
