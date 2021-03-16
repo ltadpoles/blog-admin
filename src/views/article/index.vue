@@ -61,10 +61,10 @@
                         {{ type === 1 ? '原创' : '转载' }}
                     </span>
                 </template>
-                <template #tags="{ text: tags }">
+                <template #tag="{ text: tag }">
                     <span>
-                        <a-tag v-for="(tag, index) in tags" :key="index" color="blue">
-                            {{ tag }}
+                        <a-tag v-for="item in tag" :key="item.id" color="blue">
+                            {{ item.name }}
                         </a-tag>
                     </span>
                 </template>
@@ -125,9 +125,9 @@ const columns = [
     },
     {
         title: '标签',
-        dataIndex: 'tags',
+        dataIndex: 'tag',
         slots: {
-            customRender: 'tags'
+            customRender: 'tag'
         }
     },
     {
@@ -275,7 +275,6 @@ export default defineComponent({
                     item.key = item.id
                     item.publish_time = moment(item.publish_time).format('YYYY-MM-DD HH:mm')
                     item.change_time = moment(item.change_time).format('YYYY-MM-DD HH:mm')
-                    item.tags = item.tags.split(',')
                 })
                 state.articleSource = res.data.rows
                 state.count = res.data.count
