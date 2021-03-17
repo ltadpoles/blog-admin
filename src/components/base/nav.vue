@@ -28,6 +28,7 @@ import {
     DesktopOutlined,
     UserOutlined,
     TeamOutlined,
+    TagOutlined,
     FileOutlined
 } from '@ant-design/icons-vue'
 import { defineComponent, onMounted, reactive, toRefs } from 'vue'
@@ -72,6 +73,7 @@ export default defineComponent({
         HomeOutlined,
         PieChartOutlined,
         DesktopOutlined,
+        TagOutlined,
         UserOutlined,
         TeamOutlined,
         FileOutlined

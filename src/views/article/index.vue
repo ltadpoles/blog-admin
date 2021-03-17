@@ -278,17 +278,23 @@ export default defineComponent({
         }
 
         const getArtList = query => {
-            getList(query).then(res => {
-                res.data.rows.forEach(item => {
-                    item.key = item.id
-                    item.publish_time = moment(item.publish_time).format('YYYY-MM-DD HH:mm')
-                    item.change_time = moment(item.change_time).format('YYYY-MM-DD HH:mm')
+            state.loading = true
+            getList(query)
+                .then(res => {
+                    res.data.rows.forEach(item => {
+                        item.key = item.id
+                        item.publish_time = moment(item.publish_time).format('YYYY-MM-DD HH:mm')
+                        item.change_time = moment(item.change_time).format('YYYY-MM-DD HH:mm')
+                    })
+                    state.articleSource = res.data.rows
+                    state.count = res.data.count
+                    state.selectedRows = []
+                    state.isAllDel = true
+                    state.loading = false
                 })
-                state.articleSource = res.data.rows
-                state.count = res.data.count
-                state.selectedRows = []
-                state.isAllDel = true
-            })
+                .catch(() => {
+                    state.loading = false
+                })
         }
 
         onMounted(() => {

@@ -8,6 +8,14 @@ const routes = [
         component: () => import(/* webpackChunkName: "board" */ '@/views/board')
     },
     {
+        path: 'tag',
+        name: 'Tag',
+        meta: {
+            text: '标签管理'
+        },
+        component: () => import(/* webpackChunkName: "tag" */ '@/views/tag')
+    },
+    {
         path: 'article',
         name: 'Article',
         meta: {
