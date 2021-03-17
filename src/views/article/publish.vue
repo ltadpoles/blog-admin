@@ -323,9 +323,11 @@ export default defineComponent({
                 return
             }
             const tagsIds = tags.map(item => item.id).join(',')
+
+            const userId = JSON.parse(localStorage.getItem('info')).id
             const image =
                 'https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/38ad29cc69d52044086f52bdcf71236c~300x300.image'
-            addArticle({ ...article, tags: tagsIds, image }).then(res => {
+            addArticle({ ...article, tags: tagsIds, image, userId }).then(res => {
                 message.success(res.message)
                 router.push('/article')
             })

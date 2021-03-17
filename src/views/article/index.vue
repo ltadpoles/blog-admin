@@ -56,6 +56,11 @@
                 <template #image="{ text: image }">
                     <img class="article-image" :src="image" alt="" />
                 </template>
+                <template #user="{ text: user }">
+                    <span>
+                        {{ user.nickName }}
+                    </span>
+                </template>
                 <template #type="{ text: type }">
                     <span>
                         {{ type === 1 ? '原创' : '转载' }}
@@ -114,7 +119,10 @@ const columns = [
     },
     {
         title: '作者',
-        dataIndex: 'author'
+        dataIndex: 'user',
+        slots: {
+            customRender: 'user'
+        }
     },
     {
         title: '类型',
