@@ -177,6 +177,8 @@ export default defineComponent({
     setup() {
         const router = useRouter()
 
+        const userId = JSON.parse(localStorage.getItem('info')).id
+
         const state = reactive({
             search: '',
             isSearch: false,
@@ -265,7 +267,6 @@ export default defineComponent({
             const pattern = new RegExp(
                 "[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]"
             )
-            console.log(newTags)
             if (!newTags.name || !newTags.dec) {
                 message.warning('请完善标签信息')
                 return
@@ -278,7 +279,7 @@ export default defineComponent({
                 message.warning('标签长度不合法')
                 return
             }
-            addTags(newTags).then(res => {
+            addTags({ ...newTags, userId }).then(res => {
                 message.success(res.message)
                 tagCancel()
             })
@@ -324,7 +325,6 @@ export default defineComponent({
             }
             const tagsIds = tags.map(item => item.id).join(',')
 
-            const userId = JSON.parse(localStorage.getItem('info')).id
             const image =
                 'https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/38ad29cc69d52044086f52bdcf71236c~300x300.image'
             addArticle({ ...article, tags: tagsIds, image, userId }).then(res => {

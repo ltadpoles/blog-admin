@@ -33,7 +33,7 @@
                 </template>
                 <template #user="{ text: user }">
                     <span>
-                        {{ user.nickName }}
+                        {{ user.nick_name }}
                     </span>
                 </template>
                 <template #type="{ text: type }">

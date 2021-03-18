@@ -10,7 +10,7 @@
             <div class="avatar">
                 <a-dropdown>
                     <div>
-                        <span class="nick_name">{{ info.nickName }}</span>
+                        <span class="nick_name">{{ info.nick_name }}</span>
                         <a-avatar :src="info.avatar" />
                     </div>
                     <template #overlay>
@@ -43,7 +43,7 @@ export default defineComponent({
 
         const state = reactive({
             info: {
-                nickName: 'admin',
+                nick_name: 'admin',
                 avatar: ''
             },
             userMenu: [
