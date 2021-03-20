@@ -48,7 +48,7 @@
                 :columns="columns"
                 :row-selection="rowSelection"
                 :dataSource="articleSource"
-                :pagination="pagination"
+                :pagination="false"
                 :loading="loading"
                 :rowClassName="(record, index) => (index % 2 === 1 ? 'table-striped' : null)"
                 @change="handleTableChange"
@@ -88,6 +88,16 @@
                     </span>
                 </template>
             </a-table>
+
+            <div class="pagination">
+                <a-pagination
+                    :current="pagination.page"
+                    :pageSize="pagination.pageSize"
+                    :total="pagination.total"
+                    :show-total="total => `共 ${total} 条`"
+                    @change="handleTableChange"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -95,7 +105,7 @@
 <script>
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { message, Modal } from 'ant-design-vue'
-import { computed, createVNode, defineComponent, onMounted, reactive, toRefs } from 'vue'
+import { createVNode, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { getList, delArticle } from '@/api/article'
 
@@ -176,18 +186,14 @@ export default defineComponent({
             placeholder: ['开始时间', '结束时间'],
             loading: false,
             selectedRows: [],
-            articleSource: [],
-            count: 0
+            articleSource: []
         })
 
-        const pagination = computed(() => ({
-            current: 1,
-            pageSize: 10,
-            total: state.count,
-            showTotal: total => {
-                return `共 ${total} 条`
-            }
-        }))
+        const pagination = reactive({
+            page: 1,
+            pageSize: 2,
+            total: 0
+        })
 
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
@@ -225,14 +231,15 @@ export default defineComponent({
         }
 
         const search = () => {
-            pagination.value.current = 1
-            const { current, pageSize } = pagination.value
-            getArtList({ page: current, pageSize, params: getParams() })
+            pagination.page = 1
+            const { page, pageSize } = pagination
+            getArtList({ page, pageSize, params: getParams() })
         }
 
         const handleTableChange = pag => {
-            const { current, pageSize } = pag
-            getArtList({ page: current, pageSize, params: getParams() })
+            pagination.page = pag
+            const { page, pageSize } = pagination
+            getArtList({ page, pageSize, params: getParams() })
         }
 
         // 批量删除
@@ -248,8 +255,8 @@ export default defineComponent({
                     let id = state.selectedRows.map(item => item.id).join(',')
                     delArticle(id).then(res => {
                         message.success(res.message)
-                        const { current, pageSize } = pagination.value
-                        getArtList({ page: current, pageSize, params: getParams() })
+                        const { page, pageSize } = pagination
+                        getArtList({ page, pageSize, params: getParams() })
                     })
                 },
 
@@ -265,8 +272,8 @@ export default defineComponent({
         const del = id => {
             delArticle(id).then(res => {
                 message.success(res.message)
-                const { current, pageSize } = pagination.value
-                getArtList({ page: current, pageSize, params: getParams() })
+                const { page, pageSize } = pagination
+                getArtList({ page, pageSize, params: getParams() })
             })
         }
 
@@ -285,7 +292,7 @@ export default defineComponent({
                         item.change_time = moment(item.change_time).format('YYYY-MM-DD HH:mm')
                     })
                     state.articleSource = res.data.rows
-                    state.count = res.data.count
+                    pagination.total = res.data.count
                     state.selectedRows = []
                     state.isAllDel = true
                     state.loading = false
@@ -296,8 +303,8 @@ export default defineComponent({
         }
 
         onMounted(() => {
-            const { current, pageSize } = pagination.value
-            getArtList({ page: current, pageSize })
+            const { page, pageSize } = pagination
+            getArtList({ page, pageSize })
         })
 
         return {
@@ -353,6 +360,11 @@ export default defineComponent({
         }
         .del {
             color: @danger-color;
+        }
+
+        .pagination {
+            text-align: right;
+            margin-top: 15px;
         }
 
         // 斑马纹
