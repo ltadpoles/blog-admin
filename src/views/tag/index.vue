@@ -4,7 +4,7 @@
             <div class="tag-title-search">
                 <div class="search-sty">
                     <span>标签名称：</span>
-                    <a-input class="title-input" v-model:value="title" placeholder="标签名称" />
+                    <a-input class="title-input" v-model:value="name" placeholder="标签名称" />
                 </div>
                 <div><a-button type="primary" @click="search">查询</a-button></div>
             </div>
@@ -17,35 +17,19 @@
             </div>
         </div>
 
-        <div class="article-content">
+        <div class="tag-content">
             <a-table
                 class="ant-table-striped"
                 :columns="columns"
                 :row-selection="rowSelection"
                 :dataSource="tagSource"
-                :pagination="pagination"
+                :pagination="false"
                 :loading="loading"
                 :rowClassName="(record, index) => (index % 2 === 1 ? 'table-striped' : null)"
-                @change="handleTableChange"
             >
-                <template #image="{ text: image }">
-                    <img class="article-image" :src="image" alt="" />
-                </template>
-                <template #user="{ text: user }">
+                <template #create_time="{ text: create_time }">
                     <span>
-                        {{ user.nick_name }}
-                    </span>
-                </template>
-                <template #type="{ text: type }">
-                    <span>
-                        {{ type === 1 ? '原创' : '转载' }}
-                    </span>
-                </template>
-                <template #tag="{ text: tag }">
-                    <span>
-                        <a-tag v-for="item in tag" :key="item.id" color="blue">
-                            {{ item.name }}
-                        </a-tag>
+                        {{ moment(create_time).format('YYYY-MM-DD') }}
                     </span>
                 </template>
                 <template #action="{ record }">
@@ -63,17 +47,28 @@
                     </span>
                 </template>
             </a-table>
+            <div class="pagination">
+                <a-pagination
+                    :current="pagination.page"
+                    :pageSize="pagination.pageSize"
+                    :total="pagination.total"
+                    :show-total="total => `共 ${total} 条`"
+                    @change="handleTableChange"
+                />
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, computed } from 'vue'
+import { defineComponent, reactive, toRefs, onMounted } from 'vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
+import { getTags } from '@/api/tag'
+import moment from 'moment'
 
 const columns = [
     {
-        name: '标签名称',
+        title: '标签名称',
         dataIndex: 'name'
     },
     {
@@ -82,11 +77,14 @@ const columns = [
     },
     {
         title: '创建时间',
-        dataIndex: 'create_time'
+        dataIndex: 'create_time',
+        slots: {
+            customRender: 'create_time'
+        }
     },
     {
         title: '使用次数',
-        dataIndex: 'use_count'
+        dataIndex: 'count'
     },
     {
         title: '操作',
@@ -100,14 +98,17 @@ const columns = [
 export default defineComponent({
     setup() {
         const state = reactive({
-            title: '',
+            name: '',
             isAllDel: '',
             selectedRows: [],
             tagSource: [],
-            count: 0,
             loading: false
         })
-        const search = () => {}
+        const search = () => {
+            pagination.page = 1
+            const { page, pageSize } = pagination
+            getList({ page, pageSize, params: { name: state.name } })
+        }
         const add = () => {}
         const delAll = () => {}
 
@@ -118,21 +119,36 @@ export default defineComponent({
             }
         }
 
-        const pagination = computed(() => ({
-            current: 1,
-            pageSize: 10,
-            total: state.count,
-            showTotal: total => {
-                return `共 ${total} 条`
-            }
-        }))
+        const pagination = reactive({
+            page: 1,
+            pageSize: 2,
+            total: 0
+        })
 
-        const handleTableChange = pag => {
-            const { current, pageSize } = pag
+        const handleTableChange = current => {
+            pagination.page = current
+            const { page, pageSize } = pagination
+            getList({ page, pageSize, params: { name: state.name } })
         }
+
+        const getList = params => {
+            getTags(params).then(data => {
+                data.data.rows.forEach(item => {
+                    item.key = item.id
+                })
+                state.tagSource = data.data.rows
+                pagination.total = data.data.count
+            })
+        }
+
+        onMounted(() => {
+            const { page, pageSize } = pagination
+            getList({ page, pageSize })
+        })
 
         return {
             ...toRefs(state),
+            moment,
             search,
             add,
             delAll,
@@ -168,16 +184,17 @@ export default defineComponent({
         }
     }
     .tag-content {
-        .tag-image {
-            width: 50px;
-            height: 50px;
-        }
         .base {
             color: @link-color;
             cursor: pointer;
         }
         .del {
             color: @danger-color;
+        }
+
+        .pagination {
+            text-align: right;
+            margin-top: 15px;
         }
 
         // 斑马纹

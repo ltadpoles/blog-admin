@@ -227,12 +227,12 @@ export default defineComponent({
         const search = () => {
             pagination.value.current = 1
             const { current, pageSize } = pagination.value
-            getArtList(Object.assign({ page: current, pageSize }, { params: getParams() }))
+            getArtList({ page: current, pageSize, params: getParams() })
         }
 
         const handleTableChange = pag => {
             const { current, pageSize } = pag
-            getArtList(Object.assign({ page: current, pageSize }, { params: getParams() }))
+            getArtList({ page: current, pageSize, params: getParams() })
         }
 
         // 批量删除
@@ -249,9 +249,7 @@ export default defineComponent({
                     delArticle(id).then(res => {
                         message.success(res.message)
                         const { current, pageSize } = pagination.value
-                        getArtList(
-                            Object.assign({ page: current, pageSize }, { params: getParams() })
-                        )
+                        getArtList({ page: current, pageSize, params: getParams() })
                     })
                 },
 
@@ -268,7 +266,7 @@ export default defineComponent({
             delArticle(id).then(res => {
                 message.success(res.message)
                 const { current, pageSize } = pagination.value
-                getArtList(Object.assign({ page: current, pageSize }, { params: getParams() }))
+                getArtList({ page: current, pageSize, params: getParams() })
             })
         }
 

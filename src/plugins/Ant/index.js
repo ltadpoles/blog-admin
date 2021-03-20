@@ -22,7 +22,8 @@ import {
     Popconfirm,
     Modal,
     Switch,
-    Cascader
+    Cascader,
+    Pagination
 } from 'ant-design-vue'
 
 const ant = {
@@ -63,6 +64,7 @@ const ant = {
         Vue.component(Checkbox.name, Checkbox)
         Vue.component(DatePicker.name, DatePicker)
         Vue.component(Cascader.name, Cascader)
+        Vue.component(Pagination.name, Pagination)
         Vue.component(DatePicker.RangePicker.name, DatePicker.RangePicker)
     }
 }
