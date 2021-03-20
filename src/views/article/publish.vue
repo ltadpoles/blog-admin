@@ -308,7 +308,8 @@ export default defineComponent({
         const popoverChange = async visible => {
             // 点击添加标签即更新标签
             if (visible) {
-                const initTags = await getTags()
+                // 按使用次数排序
+                const initTags = await getTags({ params: { order: 1 } })
                 state.baseTagList = initTags.data.rows
             }
         }

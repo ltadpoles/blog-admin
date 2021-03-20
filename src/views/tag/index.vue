@@ -57,13 +57,37 @@
                 />
             </div>
         </div>
+
+        <!-- 新增标签 -->
+        <a-modal
+            v-model:visible="tagVisible"
+            title="创建标签"
+            @ok="tagAdd"
+            @cancel="tagCancel"
+            class="tag-modal"
+            okText="确认"
+            cancelText="取消"
+        >
+            <div class="tag-modal-input">
+                <p>标签名：</p>
+                <a-input
+                    placeholder="标签名(10个字符以内,不支持特殊字符)"
+                    v-model:value="newTags.name"
+                ></a-input>
+            </div>
+            <div class="tag-modal-input">
+                <p>标签描述：</p>
+                <a-input placeholder="标签描述(可选)" v-model:value="newTags.dec"></a-input>
+            </div>
+        </a-modal>
     </div>
 </template>
 
 <script>
 import { defineComponent, reactive, toRefs, onMounted } from 'vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { getTags } from '@/api/tag'
+import { addTag as addTags, getTags } from '@/api/tag'
+import { message } from 'ant-design-vue'
 import moment from 'moment'
 
 const columns = [
@@ -97,19 +121,23 @@ const columns = [
 
 export default defineComponent({
     setup() {
+        const userId = JSON.parse(localStorage.getItem('info')).id
         const state = reactive({
             name: '',
             isAllDel: '',
             selectedRows: [],
             tagSource: [],
-            loading: false
+            loading: false,
+            tagVisible: false
         })
         const search = () => {
             pagination.page = 1
             const { page, pageSize } = pagination
             getList({ page, pageSize, params: { name: state.name } })
         }
-        const add = () => {}
+        const add = () => {
+            state.tagVisible = true
+        }
         const delAll = () => {}
 
         const rowSelection = {
@@ -121,8 +149,13 @@ export default defineComponent({
 
         const pagination = reactive({
             page: 1,
-            pageSize: 2,
+            pageSize: 10,
             total: 0
+        })
+
+        const newTags = reactive({
+            name: '',
+            dec: ''
         })
 
         const handleTableChange = current => {
@@ -132,13 +165,48 @@ export default defineComponent({
         }
 
         const getList = params => {
-            getTags(params).then(data => {
-                data.data.rows.forEach(item => {
-                    item.key = item.id
+            state.loading = true
+            getTags(params)
+                .then(data => {
+                    data.data.rows.forEach(item => {
+                        item.key = item.id
+                    })
+                    state.loading = false
+                    state.tagSource = data.data.rows
+                    pagination.total = data.data.count
                 })
-                state.tagSource = data.data.rows
-                pagination.total = data.data.count
+                .catch(() => {
+                    state.loading = false
+                })
+        }
+
+        const tagAdd = () => {
+            const pattern = new RegExp(
+                "[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]"
+            )
+            if (!newTags.name || !newTags.dec) {
+                message.warning('请完善标签信息')
+                return
+            }
+            if (pattern.test(newTags.name)) {
+                message.warning('标签不能包含特殊字符')
+                return
+            }
+            if (newTags.name.length > 10) {
+                message.warning('标签长度不合法')
+                return
+            }
+            addTags({ ...newTags, userId }).then(res => {
+                message.success(res.message)
+                tagCancel()
+                search()
             })
+        }
+
+        const tagCancel = () => {
+            newTags.name = ''
+            newTags.dec = ''
+            state.tagVisible = false
         }
 
         onMounted(() => {
@@ -148,6 +216,7 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
+            newTags,
             moment,
             search,
             add,
@@ -155,7 +224,9 @@ export default defineComponent({
             columns,
             rowSelection,
             pagination,
-            handleTableChange
+            handleTableChange,
+            tagAdd,
+            tagCancel
         }
     },
     components: { PlusOutlined }
