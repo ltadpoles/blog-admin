@@ -32,6 +32,14 @@ const routes = [
         component: () => import(/* webpackChunkName: "article-publish" */ '@/views/article/publish')
     },
     {
+        path: 'article-info',
+        name: 'ArticleInfo',
+        meta: {
+            text: '文章详情'
+        },
+        component: () => import(/* webpackChunkName: "article-info" */ '@/views/article/info')
+    },
+    {
         path: 'about',
         name: 'About',
         meta: {

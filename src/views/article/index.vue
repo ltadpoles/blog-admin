@@ -52,12 +52,18 @@
                 :rowClassName="(record, index) => (index % 2 === 1 ? 'table-striped' : null)"
                 @change="handleTableChange"
             >
+                <a-table-column key="title" title="标题" data-index="title" :ellipsis="true">
+                    <template #default="{ record }">
+                        <router-link :to="{ path: '/article-info', query: { id: record.id } }">{{
+                            record.title
+                        }}</router-link>
+                    </template>
+                </a-table-column>
                 <a-table-column key="image" title="图片" data-index="image">
                     <template #default="{ record }">
                         <img class="article-image" :src="record.image" alt="" />
                     </template>
                 </a-table-column>
-                <a-table-column key="title" title="标题" data-index="title" :ellipsis="true" />
                 <a-table-column key="user" title="作者" :ellipsis="true">
                     <template #default="{ record }">
                         <span>
