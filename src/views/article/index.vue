@@ -45,7 +45,6 @@
         <div class="article-content">
             <a-table
                 class="ant-table-striped"
-                :columns="columns"
                 :row-selection="rowSelection"
                 :dataSource="articleSource"
                 :pagination="false"
@@ -53,40 +52,55 @@
                 :rowClassName="(record, index) => (index % 2 === 1 ? 'table-striped' : null)"
                 @change="handleTableChange"
             >
-                <template #image="{ text: image }">
-                    <img class="article-image" :src="image" alt="" />
-                </template>
-                <template #user="{ text: user }">
-                    <span>
-                        {{ user.nick_name }}
-                    </span>
-                </template>
-                <template #type="{ text: type }">
-                    <span>
-                        {{ type === 1 ? '原创' : '转载' }}
-                    </span>
-                </template>
-                <template #tag="{ text: tag }">
-                    <span>
-                        <a-tag v-for="item in tag" :key="item.id" color="blue">
-                            {{ item.name }}
-                        </a-tag>
-                    </span>
-                </template>
-                <template #action="{ record }">
-                    <span>
-                        <span class="base" @click="modify(record.id)">修改</span>
-                        <a-divider type="vertical" />
-                        <a-popconfirm
-                            title="确认删除这篇文章？"
-                            ok-text="确认"
-                            cancel-text="取消"
-                            @confirm="del(record.id)"
-                        >
-                            <span class="base del">删除</span>
-                        </a-popconfirm>
-                    </span>
-                </template>
+                <a-table-column key="image" title="图片" data-index="image">
+                    <template #default="{ record }">
+                        <img class="article-image" :src="record.image" alt="" />
+                    </template>
+                </a-table-column>
+                <a-table-column key="title" title="标题" data-index="title" :ellipsis="true" />
+                <a-table-column key="user" title="作者" :ellipsis="true">
+                    <template #default="{ record }">
+                        <span>
+                            {{ record.user.nick_name }}
+                        </span>
+                    </template>
+                </a-table-column>
+                <a-table-column key="type" title="类型">
+                    <template #default="{ record }">
+                        <span>
+                            {{ record.type === 1 ? '原创' : '转载' }}
+                        </span>
+                    </template>
+                </a-table-column>
+                <a-table-column key="tag" title="标签">
+                    <template #default="{ record }">
+                        <div>
+                            <a-tag v-for="item in record.tag" :key="item.id" color="blue">
+                                {{ item.name }}
+                            </a-tag>
+                        </div>
+                    </template>
+                </a-table-column>
+                <a-table-column key="publish_time" title="发布时间" data-index="publish_time" />
+                <a-table-column key="change_time" title="修改时间" data-index="change_time" />
+                <a-table-column key="pv" title="浏览" data-index="pv" align="center" />
+                <a-table-column title="点赞" data-index="like" align="center" />
+                <a-table-column key="action" title="操作" align="center" :width="100">
+                    <template #default="{ record }">
+                        <span>
+                            <span class="base" @click="modify(record.id)"><FormOutlined /></span>
+                            <a-divider type="vertical" />
+                            <a-popconfirm
+                                title="确认删除这篇文章？"
+                                ok-text="确认"
+                                cancel-text="取消"
+                                @confirm="del(record.id)"
+                            >
+                                <span class="base del"><DeleteOutlined /></span>
+                            </a-popconfirm>
+                        </span>
+                    </template>
+                </a-table-column>
             </a-table>
 
             <div class="pagination">
@@ -103,7 +117,12 @@
 </template>
 
 <script>
-import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import {
+    PlusOutlined,
+    ExclamationCircleOutlined,
+    FormOutlined,
+    DeleteOutlined
+} from '@ant-design/icons-vue'
 import { message, Modal } from 'ant-design-vue'
 import { createVNode, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
@@ -114,64 +133,6 @@ import moment from 'moment'
 import 'moment/locale/zh-cn'
 
 moment.locale('zh-cn')
-
-const columns = [
-    {
-        title: '图片',
-        dataIndex: 'image',
-        slots: {
-            customRender: 'image'
-        }
-    },
-    {
-        title: '标题',
-        dataIndex: 'title'
-    },
-    {
-        title: '作者',
-        dataIndex: 'user',
-        slots: {
-            customRender: 'user'
-        }
-    },
-    {
-        title: '类型',
-        dataIndex: 'type',
-        slots: {
-            customRender: 'type'
-        }
-    },
-    {
-        title: '标签',
-        dataIndex: 'tag',
-        slots: {
-            customRender: 'tag'
-        }
-    },
-    {
-        title: '发布时间',
-        dataIndex: 'publish_time'
-    },
-    {
-        title: '修改时间',
-        dataIndex: 'change_time'
-    },
-    {
-        title: '浏览',
-        dataIndex: 'pv'
-    },
-    {
-        title: '点赞',
-        dataIndex: 'like'
-    },
-    {
-        title: '操作',
-        key: 'action',
-        width: 110,
-        align: 'center',
-        slots: { customRender: 'action' }
-    }
-]
 
 export default defineComponent({
     setup() {
@@ -255,11 +216,9 @@ export default defineComponent({
                     let id = state.selectedRows.map(item => item.id).join(',')
                     delArticle(id).then(res => {
                         message.success(res.message)
-                        const { page, pageSize } = pagination
-                        getArtList({ page, pageSize, params: getParams() })
+                        search()
                     })
                 },
-
                 onCancel() {}
             })
         }
@@ -272,8 +231,7 @@ export default defineComponent({
         const del = id => {
             delArticle(id).then(res => {
                 message.success(res.message)
-                const { page, pageSize } = pagination
-                getArtList({ page, pageSize, params: getParams() })
+                search()
             })
         }
 
@@ -311,7 +269,6 @@ export default defineComponent({
             zhCN,
             ...toRefs(state),
             search,
-            columns,
             rowSelection,
             pagination,
             handleTableChange,
@@ -323,7 +280,9 @@ export default defineComponent({
     },
 
     components: {
-        PlusOutlined
+        PlusOutlined,
+        FormOutlined,
+        DeleteOutlined
     }
 })
 </script>

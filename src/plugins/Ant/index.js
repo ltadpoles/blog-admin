@@ -51,6 +51,7 @@ const ant = {
         Vue.component(Form.Item.name, Form.Item)
         Vue.component(Switch.name, Switch)
         Vue.component(Table.name, Table)
+        Vue.component(Table.Column.name, Table.Column)
         Vue.component(Divider.name, Divider)
         Vue.component(Tabs.name, Tabs)
         Vue.component(Tabs.TabPane.name, Tabs.TabPane)

@@ -19,37 +19,32 @@
         <div class="tag-content">
             <a-table
                 class="ant-table-striped"
-                :columns="columns"
-                :row-selection="rowSelection"
                 :dataSource="tagSource"
                 :pagination="false"
                 :loading="loading"
                 :rowClassName="(record, index) => (index % 2 === 1 ? 'table-striped' : null)"
             >
-                <template #create_time="{ text: create_time }">
-                    <span>
-                        {{ moment(create_time).format('YYYY-MM-DD') }}
-                    </span>
-                </template>
-                <template #change_time="{ text: change_time }">
-                    <span>
-                        {{ moment(change_time).format('YYYY-MM-DD') }}
-                    </span>
-                </template>
-                <template #action="{ record }">
-                    <span>
-                        <span class="base" @click="modify(record)">修改</span>
-                        <a-divider type="vertical" />
-                        <a-popconfirm
-                            title="确认删除此标签？"
-                            ok-text="确认"
-                            cancel-text="取消"
-                            @confirm="del(record.id)"
-                        >
-                            <span class="base del">删除</span>
-                        </a-popconfirm>
-                    </span>
-                </template>
+                <a-table-column key="name" title="标签名称" data-index="name" :ellipsis="true" />
+                <a-table-column key="dec" title="描述" data-index="dec" :ellipsis="true" />
+                <a-table-column key="create_time" title="创建时间" data-index="create_time" />
+                <a-table-column key="change_time" title="修改时间" data-index="change_time" />
+                <a-table-column key="count" title="使用次数" data-index="count" align="center" />
+                <a-table-column key="action" title="操作" align="center" :width="100">
+                    <template #default="{ record }">
+                        <span>
+                            <span class="base" @click="modify(record)"><FormOutlined /></span>
+                            <a-divider type="vertical" />
+                            <a-popconfirm
+                                title="确认删除此标签？"
+                                ok-text="确认"
+                                cancel-text="取消"
+                                @confirm="del(record.id)"
+                            >
+                                <span class="base del"><DeleteOutlined /></span>
+                            </a-popconfirm>
+                        </span>
+                    </template>
+                </a-table-column>
             </a-table>
             <div class="pagination">
                 <a-pagination
@@ -89,46 +84,10 @@
 
 <script>
 import { defineComponent, reactive, toRefs, onMounted } from 'vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { addTag as addTags, getTags, modifyTags, delTags } from '@/api/tag'
 import { message } from 'ant-design-vue'
 import moment from 'moment'
-
-const columns = [
-    {
-        title: '标签名称',
-        dataIndex: 'name'
-    },
-    {
-        title: '描述',
-        dataIndex: 'dec'
-    },
-    {
-        title: '创建时间',
-        dataIndex: 'create_time',
-        slots: {
-            customRender: 'create_time'
-        }
-    },
-    {
-        title: '修改时间',
-        dataIndex: 'change_time',
-        slots: {
-            customRender: 'change_time'
-        }
-    },
-    {
-        title: '使用次数',
-        dataIndex: 'count'
-    },
-    {
-        title: '操作',
-        key: 'action',
-        width: 110,
-        align: 'center',
-        slots: { customRender: 'action' }
-    }
-]
 
 export default defineComponent({
     setup() {
@@ -136,7 +95,6 @@ export default defineComponent({
         const state = reactive({
             name: '',
             isAllDel: '',
-            selectedRows: [],
             tagSource: [],
             loading: false,
             tagVisible: false,
@@ -157,26 +115,6 @@ export default defineComponent({
                 search()
             })
         }
-        // const delAll = () => {
-        //     Modal.confirm({
-        //         title: '提示',
-        //         icon: createVNode(ExclamationCircleOutlined),
-        //         content: '确认删除所选标签?',
-        //         cancelText: '取消',
-        //         okText: '确认',
-        //         center: true,
-        //         onOk() {},
-
-        //         onCancel() {}
-        //     })
-        // }
-
-        const rowSelection = {
-            onChange: (selectedRowKeys, selectedRows) => {
-                state.selectedRows = selectedRows
-                state.isAllDel = selectedRows.length < 1
-            }
-        }
 
         const pagination = reactive({
             page: 1,
@@ -196,6 +134,8 @@ export default defineComponent({
                 .then(data => {
                     data.data.rows.forEach(item => {
                         item.key = item.id
+                        item.create_time = moment(item.create_time).format('YYYY-MM-DD')
+                        item.change_time = moment(item.change_time).format('YYYY-MM-DD')
                     })
                     state.loading = false
                     state.tagSource = data.data.rows
@@ -265,15 +205,13 @@ export default defineComponent({
             add,
             modify,
             del,
-            columns,
-            rowSelection,
             pagination,
             handleTableChange,
             tagAdd,
             tagCancel
         }
     },
-    components: { PlusOutlined }
+    components: { PlusOutlined, FormOutlined, DeleteOutlined }
 })
 </script>
 
