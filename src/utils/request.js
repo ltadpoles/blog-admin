@@ -54,6 +54,10 @@ function baseRequest(options) {
                         router.push('/login')
                     }, 2000)
                     return Promise.reject({ message: '请求失败' })
+                case 500:
+                    message.error('服务器错误...')
+                    router.push('/500')
+                    return Promise.reject({ message: '请求失败' })
                 default:
                     return Promise.reject({ message: '请求失败' })
             }

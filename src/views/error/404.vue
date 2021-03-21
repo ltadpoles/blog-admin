@@ -1,5 +1,11 @@
 <template>
-    <div>
-        404
+    <div class="err-view">
+        <img src="@/assets/imgs/404.svg" alt="" />
     </div>
 </template>
+
+<style lang="less" scoped>
+.err-view {
+    text-align: center;
+}
+</style>

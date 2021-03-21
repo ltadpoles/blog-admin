@@ -18,14 +18,6 @@ const routes = [
             },
             ...BaseRoutes,
             {
-                path: '403',
-                name: '403',
-                meta: {
-                    text: '403'
-                },
-                component: () => import(/* webpackChunkName: "error" */ '@/views/error/403')
-            },
-            {
                 path: '500',
                 name: '500',
                 meta: {

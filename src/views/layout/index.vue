@@ -51,7 +51,7 @@ export default defineComponent({
         .content-view {
             background-color: @primary-white;
             padding: 20px;
-            min-height: 360px;
+            min-height: calc(100vh - 127px);
             border-radius: 5px;
         }
     }
