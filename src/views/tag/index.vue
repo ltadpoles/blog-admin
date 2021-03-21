@@ -12,8 +12,7 @@
                 <a-button type="primary" @click="add">
                     <template #icon><PlusOutlined /></template>添加标签
                 </a-button>
-                &nbsp;
-                <a-button type="danger" :disabled="isAllDel" @click="delAll">批量删除</a-button>
+                <!-- <a-button type="danger" :disabled="isAllDel" @click="delAll">批量删除</a-button> -->
             </div>
         </div>
 
@@ -32,12 +31,17 @@
                         {{ moment(create_time).format('YYYY-MM-DD') }}
                     </span>
                 </template>
+                <template #change_time="{ text: change_time }">
+                    <span>
+                        {{ moment(change_time).format('YYYY-MM-DD') }}
+                    </span>
+                </template>
                 <template #action="{ record }">
                     <span>
-                        <span class="base" @click="modify(record.id)">修改</span>
+                        <span class="base" @click="modify(record)">修改</span>
                         <a-divider type="vertical" />
                         <a-popconfirm
-                            title="确认删除这篇文章？"
+                            title="确认删除此标签？"
                             ok-text="确认"
                             cancel-text="取消"
                             @confirm="del(record.id)"
@@ -86,7 +90,7 @@
 <script>
 import { defineComponent, reactive, toRefs, onMounted } from 'vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { addTag as addTags, getTags } from '@/api/tag'
+import { addTag as addTags, getTags, modifyTags, delTags } from '@/api/tag'
 import { message } from 'ant-design-vue'
 import moment from 'moment'
 
@@ -104,6 +108,13 @@ const columns = [
         dataIndex: 'create_time',
         slots: {
             customRender: 'create_time'
+        }
+    },
+    {
+        title: '修改时间',
+        dataIndex: 'change_time',
+        slots: {
+            customRender: 'change_time'
         }
     },
     {
@@ -128,7 +139,8 @@ export default defineComponent({
             selectedRows: [],
             tagSource: [],
             loading: false,
-            tagVisible: false
+            tagVisible: false,
+            newTags: {}
         })
         const search = () => {
             pagination.page = 1
@@ -138,7 +150,26 @@ export default defineComponent({
         const add = () => {
             state.tagVisible = true
         }
-        const delAll = () => {}
+
+        const del = id => {
+            delTags(id).then(res => {
+                message.success(res.message)
+                search()
+            })
+        }
+        // const delAll = () => {
+        //     Modal.confirm({
+        //         title: '提示',
+        //         icon: createVNode(ExclamationCircleOutlined),
+        //         content: '确认删除所选标签?',
+        //         cancelText: '取消',
+        //         okText: '确认',
+        //         center: true,
+        //         onOk() {},
+
+        //         onCancel() {}
+        //     })
+        // }
 
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
@@ -151,11 +182,6 @@ export default defineComponent({
             page: 1,
             pageSize: 10,
             total: 0
-        })
-
-        const newTags = reactive({
-            name: '',
-            dec: ''
         })
 
         const handleTableChange = current => {
@@ -180,32 +206,50 @@ export default defineComponent({
                 })
         }
 
-        const tagAdd = () => {
+        // 校验标签信息
+        const isFllow = () => {
             const pattern = new RegExp(
                 "[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]"
             )
-            if (!newTags.name || !newTags.dec) {
+            if (!state.newTags.name || !state.newTags.dec) {
                 message.warning('请完善标签信息')
                 return
             }
-            if (pattern.test(newTags.name)) {
+            if (pattern.test(state.newTags.name)) {
                 message.warning('标签不能包含特殊字符')
                 return
             }
-            if (newTags.name.length > 10) {
+            if (state.newTags.name.length > 10) {
                 message.warning('标签长度不合法')
                 return
             }
-            addTags({ ...newTags, userId }).then(res => {
-                message.success(res.message)
-                tagCancel()
-                search()
-            })
+            return true
+        }
+
+        const modify = row => {
+            state.tagVisible = true
+            state.newTags = JSON.parse(JSON.stringify(row))
+        }
+
+        const tagAdd = () => {
+            if (!isFllow) return
+            if (state.newTags.id) {
+                modifyTags({ ...state.newTags, userId }).then(res => {
+                    message.success(res.message)
+                    tagCancel()
+                    search()
+                })
+            } else {
+                addTags({ ...state.newTags, userId }).then(res => {
+                    message.success(res.message)
+                    tagCancel()
+                    search()
+                })
+            }
         }
 
         const tagCancel = () => {
-            newTags.name = ''
-            newTags.dec = ''
+            state.newTags = {}
             state.tagVisible = false
         }
 
@@ -216,11 +260,11 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
-            newTags,
             moment,
             search,
             add,
-            delAll,
+            modify,
+            del,
             columns,
             rowSelection,
             pagination,
@@ -271,6 +315,13 @@ export default defineComponent({
         // 斑马纹
         .ant-table-striped :deep(.table-striped) {
             background-color: #fafafa;
+        }
+    }
+
+    .tag-modal-input {
+        margin-bottom: 10px;
+        > p {
+            margin-bottom: 10px;
         }
     }
 }
