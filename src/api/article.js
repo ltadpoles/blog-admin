@@ -11,3 +11,7 @@ export const delArticle = id => {
 export const addArticle = params => {
     return request.post('/v1/article/add', params)
 }
+
+export const getArticleInfo = id => {
+    return request.get('/v1/article/info', { id })
+}

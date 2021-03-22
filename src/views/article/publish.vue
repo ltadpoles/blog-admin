@@ -132,6 +132,7 @@
             left-toolbar="undo redo clear | h emoji bold italic strikethrough quote | tip table hr | link todo-list code | image"
             :include-level="[1, 2, 3, 4]"
             height="500px"
+            @change="mdChange"
         ></v-md-editor>
 
         <!-- 新增标签 -->
@@ -160,11 +161,11 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs } from 'vue'
+import { defineComponent, reactive, toRefs, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
 import { addArticle } from '@/api/article'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { addTag as addTags, getTags } from '@/api/tag'
 
 function getBase64(img, callback) {
@@ -176,6 +177,7 @@ function getBase64(img, callback) {
 export default defineComponent({
     setup() {
         const router = useRouter()
+        const route = useRoute()
 
         const userId = JSON.parse(localStorage.getItem('info')).id
 
@@ -189,16 +191,16 @@ export default defineComponent({
             publishVisible: false,
             resultTagList: [], // 搜索而来的标签列表
             tagVisible: false,
-            baseTagList: [] // 常用标签列表
-        })
-
-        const article = reactive({
-            title: '',
-            tags: [], // 已选中的标签列表
-            content: '',
-            image: '',
-            type: 1,
-            link: ''
+            baseTagList: [], // 常用标签列表
+            article: {
+                title: '',
+                html: '',
+                tags: [], // 已选中的标签列表
+                content: '',
+                image: '',
+                type: 1,
+                link: ''
+            }
         })
 
         const newTags = reactive({
@@ -216,7 +218,7 @@ export default defineComponent({
             // Get this url from response in real world.
             console.log(11223344)
             getBase64(info.file.originFileObj, base64Url => {
-                article.image = base64Url
+                state.article.image = base64Url
                 state.loading = false
             })
             // }
@@ -245,13 +247,13 @@ export default defineComponent({
 
         // 关闭选中标签
         const tagClose = id => {
-            article.tags = article.tags.filter(item => item.id !== id)
+            state.article.tags = state.article.tags.filter(item => item.id !== id)
         }
 
         // 标签选中
         const choiceTag = item => {
-            if (!article.tags.some(res => res.id == item.id)) {
-                article.tags.push(item)
+            if (!state.article.tags.some(res => res.id == item.id)) {
+                state.article.tags.push(item)
                 state.search = ''
                 state.resultTagList = []
                 state.isSearch = false
@@ -291,6 +293,11 @@ export default defineComponent({
             state.tagVisible = false
         }
 
+        const mdChange = (text, html) => {
+            state.article.content = text
+            state.article.html = html
+        }
+
         const searchChange = async () => {
             if (state.search) {
                 state.isSearch = true
@@ -315,7 +322,7 @@ export default defineComponent({
         }
 
         const confirm = () => {
-            const { title, tags, type, link, content } = article
+            const { title, tags, type, link, content } = state.article
             if (!title || tags.length < 1 || !type || !content) {
                 message.warning('请完善文章信息')
                 return
@@ -324,19 +331,25 @@ export default defineComponent({
                 message.warning('请完善原文链接')
                 return
             }
+
             const tagsIds = tags.map(item => item.id).join(',')
 
             const image =
                 'https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/38ad29cc69d52044086f52bdcf71236c~300x300.image'
-            addArticle({ ...article, tags: tagsIds, image, userId }).then(res => {
+            addArticle({ ...state.article, tags: tagsIds, image, userId }).then(res => {
                 message.success(res.message)
                 router.push('/article')
             })
         }
 
+        onMounted(() => {
+            if (route.query.id) {
+                console.log(route.query)
+            }
+        })
+
         return {
             ...toRefs(state),
-            article,
             newTags,
             handleChange,
             beforeUpload,
@@ -347,7 +360,8 @@ export default defineComponent({
             choiceTag,
             popoverChange,
             searchChange,
-            confirm
+            confirm,
+            mdChange
         }
     },
     components: {
