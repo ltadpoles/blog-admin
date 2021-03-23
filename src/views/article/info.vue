@@ -8,15 +8,13 @@
                     <div class="author">{{ info.user.nick_name }}</div>
                     <div class="publish_time">{{ info.publish_time }}</div>
                 </div>
-                <div class="modify" @click="toModdify">编辑</div>
+                <div class="modify" @click="toModdify" v-if="getState(info.userId)">编辑</div>
             </div>
         </div>
         <div class="content">
             <v-md-preview model="preview" v-html="info.html" height="500px"></v-md-preview>
             <div class="tag">
-                <a-tag v-for="item in info.tag" :key="item.id" color='cyan'>{{
-                    item.name
-                }}</a-tag>
+                <a-tag v-for="item in info.tag" :key="item.id" color="cyan">{{ item.name }}</a-tag>
             </div>
         </div>
         <div class="footer"></div>
@@ -27,6 +25,7 @@
 import { onMounted, reactive, toRefs } from 'vue'
 import { getArticleInfo } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
+import { getState } from '@/utils'
 import moment from 'moment'
 export default {
     setup() {
@@ -63,6 +62,7 @@ export default {
 
         return {
             ...toRefs(state),
+            getState,
             toModdify
         }
     }

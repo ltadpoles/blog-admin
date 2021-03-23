@@ -31,18 +31,20 @@
                 <a-table-column key="count" title="使用次数" data-index="count" align="center" />
                 <a-table-column key="action" title="操作" align="center" :width="100">
                     <template #default="{ record }">
-                        <span>
+                        <div>
                             <span class="base" @click="modify(record)"><FormOutlined /></span>
-                            <a-divider type="vertical" />
-                            <a-popconfirm
-                                title="确认删除此标签？"
-                                ok-text="确认"
-                                cancel-text="取消"
-                                @confirm="del(record.id)"
-                            >
-                                <span class="base del"><DeleteOutlined /></span>
-                            </a-popconfirm>
-                        </span>
+                            <span>
+                                <a-divider type="vertical" />
+                                <a-popconfirm
+                                    title="确认删除此标签？"
+                                    ok-text="确认"
+                                    cancel-text="取消"
+                                    @confirm="del(record.id)"
+                                >
+                                    <span class="base del"><DeleteOutlined /></span>
+                                </a-popconfirm>
+                            </span>
+                        </div>
                     </template>
                 </a-table-column>
             </a-table>
@@ -87,11 +89,12 @@ import { defineComponent, reactive, toRefs, onMounted } from 'vue'
 import { PlusOutlined, FormOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { addTag as addTags, getTags, modifyTags, delTags } from '@/api/tag'
 import { message } from 'ant-design-vue'
+import { getUserId } from '@/utils'
 import moment from 'moment'
 
 export default defineComponent({
     setup() {
-        const userId = JSON.parse(localStorage.getItem('info')).id
+        const userId = getUserId()
         const state = reactive({
             name: '',
             isAllDel: '',

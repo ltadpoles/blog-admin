@@ -36,7 +36,11 @@
                         <div class="publish-sty">
                             <div class="title-sty">文章类型：</div>
                             <div class="padding-sty">
-                                <a-radio-group name="typeGroup" v-model:value="article.type">
+                                <a-radio-group
+                                    name="typeGroup"
+                                    v-model:value="article.type"
+                                    @change="typeChange"
+                                >
                                     <a-radio :value="1">原创</a-radio>
                                     <a-radio :value="2">转载</a-radio>
                                 </a-radio-group>
@@ -167,6 +171,7 @@ import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
 import { addArticle, getArticleInfo, modifyArticle } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
 import { addTag as addTags, getTags } from '@/api/tag'
+import { getUserId } from '@/utils'
 
 function getBase64(img, callback) {
     const reader = new FileReader()
@@ -179,7 +184,7 @@ export default defineComponent({
         const router = useRouter()
         const route = useRoute()
 
-        const userId = JSON.parse(localStorage.getItem('info')).id
+        const userId = getUserId()
 
         const state = reactive({
             search: '',
@@ -248,6 +253,11 @@ export default defineComponent({
         // 关闭选中标签
         const tagClose = id => {
             state.article.tag = state.article.tag.filter(item => item.id !== id)
+        }
+
+        // 类型更改
+        const typeChange = () => {
+            state.article.link = ''
         }
 
         // 标签选中
@@ -376,7 +386,8 @@ export default defineComponent({
             popoverChange,
             searchChange,
             confirm,
-            mdChange
+            mdChange,
+            typeChange
         }
     },
     components: {

@@ -52,16 +52,17 @@
                 :rowClassName="(record, index) => (index % 2 === 1 ? 'table-striped' : null)"
                 @change="handleTableChange"
             >
-                <a-table-column key="title" title="标题" data-index="title" :ellipsis="true">
+                <a-table-column
+                    key="title"
+                    title="标题"
+                    data-index="title"
+                    :width="160"
+                    :ellipsis="true"
+                >
                     <template #default="{ record }">
                         <router-link :to="{ path: '/article-info', query: { id: record.id } }">{{
                             record.title
                         }}</router-link>
-                    </template>
-                </a-table-column>
-                <a-table-column key="image" title="图片" data-index="image">
-                    <template #default="{ record }">
-                        <img class="article-image" :src="record.image" alt="" />
                     </template>
                 </a-table-column>
                 <a-table-column key="user" title="作者" :ellipsis="true">
@@ -93,7 +94,7 @@
                 <a-table-column title="点赞" data-index="like" align="center" />
                 <a-table-column key="action" title="操作" align="center" :width="100">
                     <template #default="{ record }">
-                        <span>
+                        <div v-if="getState(record.userId)">
                             <span class="base" @click="modify(record.id)"><FormOutlined /></span>
                             <a-divider type="vertical" />
                             <a-popconfirm
@@ -104,7 +105,8 @@
                             >
                                 <span class="base del"><DeleteOutlined /></span>
                             </a-popconfirm>
-                        </span>
+                        </div>
+                        <div v-else>-</div>
                     </template>
                 </a-table-column>
             </a-table>
@@ -133,6 +135,7 @@ import { message, Modal } from 'ant-design-vue'
 import { createVNode, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { getList, delArticle } from '@/api/article'
+import { getState, getUserId } from '@/utils'
 
 import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import moment from 'moment'
@@ -166,7 +169,10 @@ export default defineComponent({
             onChange: (selectedRowKeys, selectedRows) => {
                 state.selectedRows = selectedRows
                 state.isAllDel = selectedRows.length < 1
-            }
+            },
+            getCheckboxProps: record => ({
+                disabled: record.userId != getUserId()
+            })
         }
 
         const getParams = () => {
@@ -244,6 +250,7 @@ export default defineComponent({
         // 编辑文章
         const modify = id => {
             console.log('编辑文章', id)
+            router.push({ path: '/article-publish', query: { id } })
         }
 
         const getArtList = query => {
@@ -274,6 +281,7 @@ export default defineComponent({
         return {
             zhCN,
             ...toRefs(state),
+            getState,
             search,
             rowSelection,
             pagination,
