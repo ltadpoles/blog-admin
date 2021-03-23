@@ -16,7 +16,7 @@
                                 list-type="picture-card"
                                 class="avatar-uploader"
                                 :show-upload-list="false"
-                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                action="http://localhost:4000/v1/upImg"
                                 :before-upload="beforeUpload"
                                 @change="handleChange"
                             >
@@ -171,13 +171,8 @@ import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
 import { addArticle, getArticleInfo, modifyArticle } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
 import { addTag as addTags, getTags } from '@/api/tag'
+import { uploadImg } from '@/api/upload'
 import { getUserId } from '@/utils'
-
-function getBase64(img, callback) {
-    const reader = new FileReader()
-    reader.addEventListener('load', () => callback(reader.result))
-    reader.readAsDataURL(img)
-}
 
 export default defineComponent({
     setup() {
@@ -221,11 +216,16 @@ export default defineComponent({
 
             // if (info.file.status === 'done') {
             // Get this url from response in real world.
-            console.log(11223344)
-            getBase64(info.file.originFileObj, base64Url => {
-                state.article.image = base64Url
-                state.loading = false
+            console.log(info)
+            let formData = new FormData()
+            formData.append('file', info.file.originFileObj)
+            uploadImg(formData).then(res => {
+                console.log(res)
             })
+            // getBase64(info.file.originFileObj, base64Url => {
+            //     state.article.image = base64Url
+            //     state.loading = false
+            // })
             // }
 
             // if (info.file.status === 'warning') {
