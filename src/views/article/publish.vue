@@ -64,7 +64,7 @@
         <a-input placeholder="请输入标题" v-model:value="article.title" size="large" />
         <div class="tag">
             <a-tag
-                v-for="item in article.tags"
+                v-for="item in article.tag"
                 :key="item.id"
                 closable
                 @close="tagClose(item.id)"
@@ -77,12 +77,12 @@
                 placement="bottomLeft"
                 overlayClassName="tag-pop"
                 @visibleChange="popoverChange(visible)"
-                v-if="article.tags.length < tagLength"
+                v-if="article.tag.length < tagLength"
             >
                 <template #content>
                     <div class="tag-content">
                         <div class="tag-dec">
-                            <span>还可以添加{{ tagLength - article.tags.length }}个标签</span>
+                            <span>还可以添加{{ tagLength - article.tag.length }}个标签</span>
                             <span
                                 >找不到标签？
                                 <a @click="addTag">创建</a>
@@ -164,7 +164,7 @@
 import { defineComponent, reactive, toRefs, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
-import { addArticle } from '@/api/article'
+import { addArticle, getArticleInfo, modifyArticle } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
 import { addTag as addTags, getTags } from '@/api/tag'
 
@@ -195,7 +195,7 @@ export default defineComponent({
             article: {
                 title: '',
                 html: '',
-                tags: [], // 已选中的标签列表
+                tag: [], // 已选中的标签列表
                 content: '',
                 image: '',
                 type: 1,
@@ -247,13 +247,13 @@ export default defineComponent({
 
         // 关闭选中标签
         const tagClose = id => {
-            state.article.tags = state.article.tags.filter(item => item.id !== id)
+            state.article.tag = state.article.tag.filter(item => item.id !== id)
         }
 
         // 标签选中
         const choiceTag = item => {
-            if (!state.article.tags.some(res => res.id == item.id)) {
-                state.article.tags.push(item)
+            if (!state.article.tag.some(res => res.id == item.id)) {
+                state.article.tag.push(item)
                 state.search = ''
                 state.resultTagList = []
                 state.isSearch = false
@@ -322,8 +322,8 @@ export default defineComponent({
         }
 
         const confirm = () => {
-            const { title, tags, type, link, content } = state.article
-            if (!title || tags.length < 1 || !type || !content) {
+            const { title, tag, type, link, content } = state.article
+            if (!title || tag.length < 1 || !type || !content) {
                 message.warning('请完善文章信息')
                 return
             }
@@ -332,19 +332,34 @@ export default defineComponent({
                 return
             }
 
-            const tagsIds = tags.map(item => item.id).join(',')
+            const tagsIds = tag.map(item => item.id).join(',')
 
             const image =
                 'https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/38ad29cc69d52044086f52bdcf71236c~300x300.image'
-            addArticle({ ...state.article, tags: tagsIds, image, userId }).then(res => {
-                message.success(res.message)
-                router.push('/article')
-            })
+            if (route.query.id) {
+                modifyArticle({
+                    ...state.article,
+                    tags: tagsIds,
+                    image,
+                    userId,
+                    id: route.query.id
+                }).then(res => {
+                    message.success(res.message)
+                    router.push({ path: '/article-info', query: { id: route.query.id } })
+                })
+            } else {
+                addArticle({ ...state.article, tags: tagsIds, image, userId }).then(res => {
+                    message.success(res.message)
+                    router.push('/article')
+                })
+            }
         }
 
         onMounted(() => {
             if (route.query.id) {
-                console.log(route.query)
+                getArticleInfo(route.query.id).then(res => {
+                    state.article = res.data
+                })
             }
         })
 

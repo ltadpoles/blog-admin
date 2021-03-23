@@ -14,7 +14,7 @@
         <div class="content">
             <v-md-preview model="preview" v-html="info.html" height="500px"></v-md-preview>
             <div class="tag">
-                <a-tag v-for="item in info.tag" :key="item.id" color="#87d068">{{
+                <a-tag v-for="item in info.tag" :key="item.id" color='cyan'>{{
                     item.name
                 }}</a-tag>
             </div>

@@ -12,6 +12,10 @@ export const addArticle = params => {
     return request.post('/v1/article/add', params)
 }
 
+export const modifyArticle = params => {
+    return request.post('/v1/article/modify', params)
+}
+
 export const getArticleInfo = id => {
     return request.get('/v1/article/info', { id })
 }
