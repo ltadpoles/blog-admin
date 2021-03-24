@@ -2,6 +2,7 @@
     <div class="article-info">
         <div class="head">
             <div class="title">{{ info.title }}</div>
+
             <div class="head-item">
                 <div class="left">
                     <a-tag color="#87d068">{{ info.type === 1 ? '原创' : '转载' }}</a-tag>
@@ -10,6 +11,9 @@
                 </div>
                 <div class="modify" @click="toModdify" v-if="getState(info.userId)">编辑</div>
             </div>
+        </div>
+        <div class="img">
+            <img :src="info.image" alt="" />
         </div>
         <div class="content">
             <v-md-preview model="preview" v-html="info.html" height="500px"></v-md-preview>
@@ -95,6 +99,13 @@ export default {
             .modify {
                 cursor: pointer;
             }
+        }
+    }
+    .img {
+        text-align: center;
+        margin-top: 20px;
+        img {
+            width: 80%;
         }
     }
     .content {

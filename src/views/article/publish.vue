@@ -12,7 +12,7 @@
                         <div>
                             <a-upload
                                 v-model:file-list="fileList"
-                                name="avatar"
+                                accept=".png, .jpg, .jpeg"
                                 list-type="picture-card"
                                 class="avatar-uploader"
                                 :show-upload-list="false"
@@ -171,8 +171,8 @@ import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
 import { addArticle, getArticleInfo, modifyArticle } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
 import { addTag as addTags, getTags } from '@/api/tag'
-import { uploadImg } from '@/api/upload'
 import { getUserId } from '@/utils'
+import { imgCondition } from '@/utils/upload'
 
 export default defineComponent({
     setup() {
@@ -208,46 +208,25 @@ export default defineComponent({
             dec: ''
         })
 
-        const handleChange = info => {
+        const handleChange = async info => {
             if (info.file.status === 'uploading') {
                 state.loading = true
                 return
             }
 
-            // if (info.file.status === 'done') {
-            // Get this url from response in real world.
-            console.log(info)
-            let formData = new FormData()
-            formData.append('file', info.file.originFileObj)
-            uploadImg(formData).then(res => {
-                console.log(res)
-            })
-            // getBase64(info.file.originFileObj, base64Url => {
-            //     state.article.image = base64Url
-            //     state.loading = false
-            // })
-            // }
+            if (info.file.status === 'done') {
+                message.success('上传成功')
+                state.article.image = info.file.response.url
+            }
 
-            // if (info.file.status === 'warning') {
-            //     state.loading = false
-            //     message.warning('上传失败')
-            // }
+            if (info.file.status === 'warning') {
+                state.loading = false
+                message.warning('上传失败')
+            }
         }
 
         const beforeUpload = file => {
-            const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
-
-            if (!isJpgOrPng) {
-                message.warning('You can only upload JPG file!')
-            }
-
-            const isLt2M = file.size / 1024 / 1024 < 2
-
-            if (!isLt2M) {
-                message.warning('Image must smaller than 2MB!')
-            }
-
-            return isJpgOrPng && isLt2M
+            return imgCondition(file)
         }
 
         // 关闭选中标签
@@ -332,8 +311,9 @@ export default defineComponent({
         }
 
         const confirm = () => {
-            const { title, tag, type, link, content } = state.article
-            if (!title || tag.length < 1 || !type || !content) {
+            const { title, tag, type, link, content, image } = state.article
+
+            if (!title || tag.length < 1 || !type || !content || !image) {
                 message.warning('请完善文章信息')
                 return
             }
@@ -344,8 +324,6 @@ export default defineComponent({
 
             const tagsIds = tag.map(item => item.id).join(',')
 
-            const image =
-                'https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/38ad29cc69d52044086f52bdcf71236c~300x300.image'
             if (route.query.id) {
                 modifyArticle({
                     ...state.article,
@@ -355,7 +333,7 @@ export default defineComponent({
                     id: route.query.id
                 }).then(res => {
                     message.success(res.message)
-                    router.push({ path: '/article-info', query: { id: route.query.id } })
+                    router.replace({ path: '/article-info', query: { id: route.query.id } })
                 })
             } else {
                 addArticle({ ...state.article, tags: tagsIds, image, userId }).then(res => {

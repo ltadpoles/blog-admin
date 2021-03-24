@@ -5,7 +5,7 @@
  */
 export const getState = userId => {
     let info = JSON.parse(localStorage.getItem('info'))
-    if (info && info.state === '0') {
+    if (info && info.state === 0) {
         // 超级管理员
         return true
     } else {

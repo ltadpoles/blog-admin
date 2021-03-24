@@ -135,7 +135,7 @@ import { message, Modal } from 'ant-design-vue'
 import { createVNode, defineComponent, onMounted, reactive, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
 import { getList, delArticle } from '@/api/article'
-import { getState, getUserId } from '@/utils'
+import { getState } from '@/utils'
 
 import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import moment from 'moment'
@@ -171,7 +171,7 @@ export default defineComponent({
                 state.isAllDel = selectedRows.length < 1
             },
             getCheckboxProps: record => ({
-                disabled: record.userId != getUserId()
+                disabled: !getState(record.userId)
             })
         }
 
