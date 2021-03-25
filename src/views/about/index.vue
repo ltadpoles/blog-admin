@@ -236,19 +236,5 @@ export default defineComponent({
         top: 0;
         right: 10px;
     }
-
-    // .avatar-uploader > .ant-upload {
-    //     width: 128px;
-    //     height: 128px;
-    // }
-    // .ant-upload-select-picture-card i {
-    //     font-size: 32px;
-    //     color: #999;
-    // }
-
-    // .ant-upload-select-picture-card .ant-upload-text {
-    //     margin-top: 8px;
-    //     color: #666;
-    // }
 }
 </style>

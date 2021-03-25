@@ -172,7 +172,6 @@ import { addArticle, getArticleInfo, modifyArticle } from '@/api/article'
 import { useRoute, useRouter } from 'vue-router'
 import { addTag as addTags, getTags } from '@/api/tag'
 import { getUserId } from '@/utils'
-import { imgCondition } from '@/utils/upload'
 
 export default defineComponent({
     setup() {
@@ -226,7 +225,34 @@ export default defineComponent({
         }
 
         const beforeUpload = file => {
-            return imgCondition(file)
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader()
+                reader.readAsDataURL(file) //base64编码
+                reader.onload = function(e) {
+                    const img = new Image()
+                    img.src = e.target.result //获取编码后的值,也可以用this.result获取
+                    img.onload = function() {
+                        console.log('height:' + this.height + '----width:' + this.width)
+                        const scale =
+                            this.height / this.width < 0.7 && this.height / this.width > 0.4
+                        if (!scale) {
+                            message.warning('图片比例不支持')
+                            reject('图片比例不支持')
+                        }
+                        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+                        if (!isJpgOrPng) {
+                            message.warning('所选文件格式不支持')
+                            reject('所选文件格式不支持')
+                        }
+                        const isLt1M = file.size / 1024 / 1024 < 1
+                        if (!isLt1M) {
+                            message.warning(`最大支持1MB文件`)
+                            reject(`最大支持1MB文件`)
+                        }
+                        resolve(scale && isJpgOrPng && isLt1M)
+                    }
+                }
+            })
         }
 
         // 关闭选中标签
