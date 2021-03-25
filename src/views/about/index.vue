@@ -7,6 +7,32 @@
             :wrapper-col="wrapperCol"
             hideRequiredMark
         >
+            <a-form-item label="头像" name="avatar">
+                <a-upload
+                    accept=".png, .jpg, .jpeg"
+                    list-type="picture-card"
+                    :show-upload-list="false"
+                    action="http://localhost:4000/v1/upImg"
+                    :before-upload="beforeUpload"
+                    @change="handleChange"
+                    v-if="!isModify"
+                >
+                    <div>
+                        <img
+                            class="avatar"
+                            v-if="userData.avatar"
+                            :src="userData.avatar"
+                            alt="avatar"
+                        />
+                    </div>
+                </a-upload>
+                <img
+                    class="avatar"
+                    v-if="userData.avatar && isModify"
+                    :src="userData.avatar"
+                    alt="avatar"
+                />
+            </a-form-item>
             <a-form-item label="昵称" name="name">
                 <a-input
                     v-model:value="userData.name"
@@ -60,6 +86,8 @@
 <script>
 import { defineComponent, reactive, ref, toRaw, toRefs } from 'vue'
 import { notification } from 'ant-design-vue'
+import { UploadOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
 
 const options = [
     {
@@ -94,14 +122,64 @@ export default defineComponent({
             wrapperCol: {
                 span: 10
             },
-            isModify: true // 编辑状态
+            isModify: true, // 编辑状态
+            loading: false
         })
         const userData = reactive({
+            avatar: 'http://localhost:4000/upload/1616680917385flag.png',
             name: '游荡de蝌蚪',
             sex: '1',
             address: ['Zhejiang', 'Hangzhou'],
             desc: '一个前端'
         })
+
+        const beforeUpload = file => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader()
+                reader.readAsDataURL(file) //base64编码
+                reader.onload = function(e) {
+                    const img = new Image()
+                    img.src = e.target.result //获取编码后的值,也可以用this.result获取
+                    img.onload = async function() {
+                        const isScale =
+                            this.height / this.width < 1.2 && this.height / this.width > 0.8
+                        if (!isScale) {
+                            message.warning('图片比例不支持')
+                            reject('图片比例不支持')
+                        }
+
+                        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+                        if (!isJpgOrPng) {
+                            message.warning('所选文件格式不支持')
+                            reject('所选文件格式不支持')
+                        }
+                        const isLt1M = file.size / 1024 / 1024 < 1
+                        if (!isLt1M) {
+                            message.warning(`最大支持1MB文件`)
+                            reject(`最大支持1MB文件`)
+                        }
+                        resolve(isScale && isJpgOrPng && isLt1M)
+                    }
+                }
+            })
+        }
+
+        const handleChange = info => {
+            if (info.file.status === 'uploading') {
+                state.loading = true
+                return
+            }
+
+            if (info.file.status === 'done') {
+                message.success('上传成功')
+                userData.avatar = info.file.response.url
+            }
+
+            if (info.file.status === 'warning') {
+                state.loading = false
+                message.warning('上传失败')
+            }
+        }
 
         const onSubmit = () => {
             state.isModify = true
@@ -132,11 +210,16 @@ export default defineComponent({
             ...toRefs(state),
             formRef,
             userData,
+            beforeUpload,
+            handleChange,
             onSubmit,
             modify,
             resetForm,
             options
         }
+    },
+    components: {
+        UploadOutlined
     }
 })
 </script>
@@ -144,10 +227,28 @@ export default defineComponent({
 <style lang="less" scoped>
 .about {
     position: relative;
+    .avatar {
+        width: 80px;
+        height: 80px;
+    }
     .record {
         position: absolute;
         top: 0;
         right: 10px;
     }
+
+    // .avatar-uploader > .ant-upload {
+    //     width: 128px;
+    //     height: 128px;
+    // }
+    // .ant-upload-select-picture-card i {
+    //     font-size: 32px;
+    //     color: #999;
+    // }
+
+    // .ant-upload-select-picture-card .ant-upload-text {
+    //     margin-top: 8px;
+    //     color: #666;
+    // }
 }
 </style>

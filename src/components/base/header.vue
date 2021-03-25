@@ -65,9 +65,9 @@ export default defineComponent({
         const goPath = path => {
             if (path === '/login') {
                 localStorage.clear()
-                router.push('/login')
                 message.success('退出成功')
             }
+            router.push(path)
         }
 
         const getInfo = () => {
