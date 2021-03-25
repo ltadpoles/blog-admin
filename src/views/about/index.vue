@@ -84,10 +84,11 @@
 </template>
 
 <script>
-import { defineComponent, reactive, ref, toRaw, toRefs } from 'vue'
+import { defineComponent, onMounted, reactive, ref, toRaw, toRefs } from 'vue'
 import { notification } from 'ant-design-vue'
 import { UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { getCities } from '@/api'
 
 const options = [
     {
@@ -205,6 +206,10 @@ export default defineComponent({
         const modify = () => {
             state.isModify = false
         }
+
+        onMounted(() => {
+            getCities()
+        })
 
         return {
             ...toRefs(state),
