@@ -8,6 +8,10 @@ export const getUserInfo = () => {
     return request.get('/admin/info')
 }
 
+export const userUpdata = params => {
+    return request.post('/admin/updata', params)
+}
+
 export const getUserMenu = () => {
     return request.get('/admin/menu')
 }
