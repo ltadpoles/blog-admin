@@ -1,6 +1,6 @@
 /**
  * 判断用户有没有修改、删除权限
- * @param {String 用户id}} userId
+ * @param {String} userId
  * @returns
  */
 export const getState = userId => {

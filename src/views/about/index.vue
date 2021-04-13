@@ -90,33 +90,11 @@ import { UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { getCities } from '@/api'
 
-const options = [
-    {
-        value: 'Zhejiang',
-        label: '浙江',
-        children: [
-            {
-                value: 'Hangzhou',
-                label: '杭州'
-            }
-        ]
-    },
-    {
-        value: 'Jiangsu',
-        label: '江苏',
-        children: [
-            {
-                value: 'Nanjing',
-                label: '南京'
-            }
-        ]
-    }
-]
-
 export default defineComponent({
     setup() {
         const formRef = ref()
         const state = reactive({
+            options: [],
             labelCol: {
                 span: 4
             },
@@ -207,8 +185,10 @@ export default defineComponent({
             state.isModify = false
         }
 
-        onMounted(() => {
-            getCities()
+        onMounted(async () => {
+            getCities().then(res => {
+                state.options = res.data
+            })
         })
 
         return {
@@ -219,8 +199,7 @@ export default defineComponent({
             handleChange,
             onSubmit,
             modify,
-            resetForm,
-            options
+            resetForm
         }
     },
     components: {
