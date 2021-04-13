@@ -12,9 +12,6 @@
                 <div class="modify" @click="toModdify" v-if="getState(info.userId)">编辑</div>
             </div>
         </div>
-        <div class="img">
-            <img :src="info.image" alt="" />
-        </div>
         <div class="content">
             <v-md-preview model="preview" v-html="info.html" height="500px"></v-md-preview>
             <div class="tag">
@@ -99,13 +96,6 @@ export default {
             .modify {
                 cursor: pointer;
             }
-        }
-    }
-    .img {
-        text-align: center;
-        margin-top: 20px;
-        img {
-            width: 80%;
         }
     }
     .content {
