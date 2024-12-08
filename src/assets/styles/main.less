@@ -1,0 +1,21 @@
+@import url('element-plus/theme-chalk/dark/css-vars.css');
+@import url('./base.less');
+
+/*
+  进入和离开动画可以使用不同
+  持续时间和速度曲线。
+*/
+.slide-fade-enter-active {
+  transition: all 0.4s ease-out;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+/* 灰色滤镜 */
+.gray {
+  filter: grayscale(100%);
+}
