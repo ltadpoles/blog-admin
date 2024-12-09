@@ -14,7 +14,11 @@
             <el-input v-model="loginForm.password" placeholder="请输入密码" type="password" prefix-icon="Lock" />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" :loading="loading" class="login-btn" @click="login(loginFormRef)">
+            <el-button type="primary"
+                       :loading="loading"
+                       class="login-btn"
+                       @click="login(loginFormRef)"
+                       @keydown.enter="keyDown()">
               登录
             </el-button>
           </el-form-item>
@@ -26,7 +30,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { loginIn } from '@/api/user'
 import sha256 from 'crypto-js/sha256'
 import { useUserStore } from '@/stores/modules/user'
@@ -47,6 +51,12 @@ const rules = ref({
   username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 })
+
+const keyDown = e => {
+  if (e.keyCode === 13 || e.keyCode === 100) {
+    login(loginFormRef.value)
+  }
+}
 
 const login = async (formEl) => {
   if (!formEl) {
@@ -73,6 +83,14 @@ const login = async (formEl) => {
     }
   })
 }
+
+onMounted(() => {
+  window.addEventListener('keydown', keyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', keyDown, false)
+})
 </script>
 
 <style lang="less" scoped>
