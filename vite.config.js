@@ -43,7 +43,7 @@ export default defineConfig((mode) => {
       // 代理
       proxy: {
         '/api': {
-          target: 'https://run.mocky.io',
+          target: 'http://127.0.0.1:3000',
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api/, '')
         }

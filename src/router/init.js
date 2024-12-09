@@ -1,11 +1,11 @@
 import router from './index'
 import { ENV } from '../config'
-import { useAuthStore } from '../stores/modules/auth'
+// import { useAuthStore } from '../stores/modules/auth'
 import { useUserStore } from '../stores/modules/user'
 // import { RESETSTORE } from '../stores/reset'
 // import { filterAsyncRoutes, getRouteNameList } from './utils'
 import { notFoundRouter } from './static'
-import { useSettingStore } from '../stores/modules/setting'
+// import { useSettingStore } from '../stores/modules/setting'
 // import { ElNotification } from 'element-plus'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
@@ -41,22 +41,23 @@ router.beforeEach(async (to, from, next) => {
     return next({ path: ENV.LOGIN_URL, query: { redirect: to.fullPath } })
   }
 
-  const authStore = useAuthStore()
-  // 如果没有用户菜单就再去请求一次用户信息
-  if (!authStore.menu || !authStore.menu.length) {
-    // await asyncRoute()
+  // const authStore = useAuthStore()
+  // // 如果没有用户菜单就再去请求一次用户信息
+  // if (!authStore.menu || !authStore.menu.length) {
+  //   await asyncRoute()
 
-    return next({ ...to, replace: true })
-  }
+  //   return next({ ...to, replace: true })
+  // }
 
-  const settingStore = useSettingStore()
-  // 如果用户菜单存在，但动态路由为空
-  if (!settingStore.asyncRouteList || !settingStore.asyncRouteList.length) {
-    // setAsyncRoute(allAsyncRoutes)
-    router.addRoute(notFoundRouter)
+  // const settingStore = useSettingStore()
+  // // 如果用户菜单存在，但动态路由为空
+  // if (!settingStore.asyncRouteList || !settingStore.asyncRouteList.length) {
+  //   // setAsyncRoute(allAsyncRoutes)
 
-    return next({ ...to, replace: true })
-  }
+  //   return next({ ...to, replace: true })
+  // }
+
+  router.addRoute(notFoundRouter)
 
   // 以上条件都不满足，直接跳转
   return next()
