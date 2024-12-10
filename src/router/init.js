@@ -44,17 +44,15 @@ router.beforeEach(async (to, from, next) => {
   // 如果没有用户菜单就再去请求一次用户信息
   if (!userStore.userInfo.username) {
     await asyncRoute()
+  }
+
+  const settingStore = useSettingStore()
+  // 如果用户菜单存在，但动态路由为空
+  if (!settingStore.asyncRouteList || !settingStore.asyncRouteList.length) {
+    setAsyncRoute(allAsyncRoutes)
 
     return next({ ...to, replace: true })
   }
-
-  // const settingStore = useSettingStore()
-  // // 如果用户菜单存在，但动态路由为空
-  // if (!settingStore.asyncRouteList || !settingStore.asyncRouteList.length) {
-  //   // setAsyncRoute(allAsyncRoutes)
-
-  //   return next({ ...to, replace: true })
-  // }
 
   // 以上条件都不满足，直接跳转
   return next()

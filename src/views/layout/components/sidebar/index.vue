@@ -59,7 +59,7 @@ const menu = [
     ]
   },
   {
-    path: '/about', icon: 'Warning', name: '关于', id: '07', children: []
+    path: '/about/index', icon: 'Warning', name: '关于', id: '07', children: []
   }
 ]
 </script>

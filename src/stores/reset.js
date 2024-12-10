@@ -1,5 +1,6 @@
 import { ENV } from '../config'
 import { useAuthStore } from './modules/auth'
+import { useTagsStore } from './modules/tags'
 import { useUserStore } from './modules/user'
 
 /**
@@ -8,9 +9,11 @@ import { useUserStore } from './modules/user'
 export const RESETSTORE = () => {
   const userStore = useUserStore()
   const authStore = useAuthStore()
+  const tagsStore = useTagsStore()
 
   userStore.$reset()
   authStore.$reset()
+  tagsStore.$reset()
 
   ENV.PINIASTORY.clear()
 }
