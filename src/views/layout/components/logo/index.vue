@@ -5,7 +5,9 @@
       <component is="Shop" />
     </el-icon>
 
-    <h3 class="admin-title" v-show="!settingStore.isCollapsed">管理系统</h3>
+    <transition name="fade">
+      <h3 class="admin-title" v-show="!settingStore.isCollapsed">管理系统</h3>
+    </transition>
   </div>
 </template>
 <script setup>

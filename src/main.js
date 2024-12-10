@@ -6,6 +6,7 @@ import router from './router'
 
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
+import '@asika32764/vue-animate/dist/vue-animate.css'
 import './router/init'
 import './assets/styles/main.less'
 import 'element-plus/theme-chalk/el-message.css'

@@ -2,10 +2,10 @@ import router from './index'
 import { ENV } from '../config'
 // import { useAuthStore } from '../stores/modules/auth'
 import { useUserStore } from '../stores/modules/user'
-// import { RESETSTORE } from '../stores/reset'
+import { RESETSTORE } from '../stores/reset'
 // import { filterAsyncRoutes, getRouteNameList } from './utils'
 import { notFoundRouter } from './static'
-// import { useSettingStore } from '../stores/modules/setting'
+import { useSettingStore } from '../stores/modules/setting'
 // import { ElNotification } from 'element-plus'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
@@ -41,13 +41,12 @@ router.beforeEach(async (to, from, next) => {
     return next({ path: ENV.LOGIN_URL, query: { redirect: to.fullPath } })
   }
 
-  // const authStore = useAuthStore()
-  // // 如果没有用户菜单就再去请求一次用户信息
-  // if (!authStore.menu || !authStore.menu.length) {
-  //   await asyncRoute()
+  // 如果没有用户菜单就再去请求一次用户信息
+  if (!userStore.userInfo.username) {
+    await asyncRoute()
 
-  //   return next({ ...to, replace: true })
-  // }
+    return next({ ...to, replace: true })
+  }
 
   // const settingStore = useSettingStore()
   // // 如果用户菜单存在，但动态路由为空
@@ -56,8 +55,6 @@ router.beforeEach(async (to, from, next) => {
 
   //   return next({ ...to, replace: true })
   // }
-
-  router.addRoute(notFoundRouter)
 
   // 以上条件都不满足，直接跳转
   return next()
@@ -81,63 +78,63 @@ router.onError(error => {
 /**
  * @description 异步路由
  */
-// const asyncRoute = async () => {
-//   const userStore = useUserStore()
-//   const authStore = useAuthStore()
+const asyncRoute = async () => {
+  const userStore = useUserStore()
+  // const authStore = useAuthStore()
 
-//   try {
-//     // 获取用户信息
-//     await userStore.getInfoAction()
+  try {
+    // 获取用户信息
+    await userStore.getInfoAction()
 
-//     // 如果用户没有菜单
-//     if (!authStore.menu.length) {
-//       ElNotification({
-//         title: '无权限访问',
-//         message: '当前账号无任何菜单权限，请联系系统管理员！',
-//         type: 'warning',
-//         duration: 3000
-//       })
-//       RESETSTORE()
-//       router.replace(ENV.LOGIN_URL)
-//       return Promise.reject('用户无菜单权限')
-//     }
+    // 如果用户没有菜单
+    // if (!authStore.menu.length) {
+    //   ElNotification({
+    //     title: '无权限访问',
+    //     message: '当前账号无任何菜单权限，请联系系统管理员！',
+    //     type: 'warning',
+    //     duration: 3000
+    //   })
+    //   RESETSTORE()
+    //   router.replace(ENV.LOGIN_URL)
+    //   return Promise.reject('用户无菜单权限')
+    // }
 
-//     // 添加动态路由
-//     setAsyncRoute(allAsyncRoutes)
-//   } catch (error) {
-//     // 如果获取动态路由步骤出错
-//     RESETSTORE()
-//     router.replace(ENV.LOGIN_URL)
-//     return Promise.reject(error)
-//   }
-// }
+    // // 添加动态路由
+    setAsyncRoute(allAsyncRoutes)
+  } catch (error) {
+    // 如果获取动态路由步骤出错
+    RESETSTORE()
+    router.replace(ENV.LOGIN_URL)
+    return Promise.reject(error)
+  }
+}
 
 /**
  * @description 添加动态路由
  * @param {Array} allAsyncRoutes 路由
  */
-// const setAsyncRoute = allAsyncRoutes => {
-//   const settingStore = useSettingStore()
-//   const authStore = useAuthStore()
+const setAsyncRoute = allAsyncRoutes => {
+  const settingStore = useSettingStore()
+  // const authStore = useAuthStore()
 
-//   let asyncRouteList = []
+  let asyncRouteList = []
 
-//   if (ENV.ISASYNCROUTER) {
-//     // 过滤路由
-//     const authRouterList = getRouteNameList(authStore.menu, 'routeName')
-//     const routerList = filterAsyncRoutes(allAsyncRoutes, authRouterList)
-//     asyncRouteList = routerList
-//   } else {
-//     asyncRouteList = allAsyncRoutes
-//   }
+  // if (ENV.ISASYNCROUTER) {
+  //   // 过滤路由
+  //   const authRouterList = getRouteNameList(authStore.menu, 'routeName')
+  //   const routerList = filterAsyncRoutes(allAsyncRoutes, authRouterList)
+  //   asyncRouteList = routerList
+  // } else {
+  asyncRouteList = allAsyncRoutes
+  // }
 
-//   settingStore.setRouteList(asyncRouteList)
+  settingStore.setRouteList(asyncRouteList)
 
-//   // 添加动态路由
-//   asyncRouteList.forEach(route => {
-//     router.addRoute(route)
-//   })
+  // 添加动态路由
+  asyncRouteList.forEach(route => {
+    router.addRoute(route)
+  })
 
-//   // 添加默认跳转路由
-//   router.addRoute(notFoundRouter)
-// }
+  // 添加默认跳转路由
+  router.addRoute(notFoundRouter)
+}

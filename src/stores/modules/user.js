@@ -2,7 +2,7 @@
  * @Description: 用户store
  */
 import { defineStore } from 'pinia'
-// import { getUserInfo } from '@/api/user'
+import { getUserInfo } from '@/api/user'
 // import { useAuthStore } from './auth'
 import { ENV } from '@/config'
 
@@ -19,13 +19,12 @@ export const useUserStore = defineStore('userStore', {
       this.userInfo = data
     },
     async getInfoAction() {
-      // const { data } = await getUserInfo()
-      // const { avatar, buttons, roles, menu, name } = data
+      const { data } = await getUserInfo()
       // const authStore = useAuthStore()
       // 设置用户信息
-      // this.setUserInfo({ avatar, name })
+      this.setUserInfo(data.data)
       // 设置用户权限信息
-      // authStore.setAuth({ buttons, roles, menu })
+      // authStore.setAuth({})
     }
   },
   // 持久化存储

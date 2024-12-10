@@ -4,12 +4,7 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+</script>
 
-<style lang="less" scoped>
-div {
-                      .box {
-    font-size: 14px;
-  }
-}
-</style>
+<style lang="less" scoped></style>
