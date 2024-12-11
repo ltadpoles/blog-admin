@@ -8,7 +8,7 @@
         <el-scrollbar class="content-views" wrap-class="wrap-class">
           <router-view v-slot="{ Component }">
             <transition name="slide-fade">
-              <keep-alive :include="nameList">
+              <keep-alive :include="tagsStore.tagList.map(item => item.name)">
                 <component :is="Component" />
               </keep-alive>
             </transition>
@@ -24,22 +24,9 @@
 import vSidebar from './components/sidebar/index.vue'
 import vHeader from './components/header/index.vue'
 import vTags from './components/tags/index.vue'
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { useTagsStore } from '@/stores/modules/tags'
 
-const route = useRoute()
 const tagsStore = useTagsStore()
-
-let nameList = ref([])
-
-watch(() => route.path, () => {
-  // 对路由变化做出响应...
-  nameList.value = tagsStore.tags.map(item => item.name)
-  if (!nameList.value.includes(route.name)) {
-    tagsStore.setTags({ title: route.meta.title, name: route.name, path: route.path })
-  }
-})
 
 </script>
 

@@ -16,8 +16,6 @@ export default defineConfig((mode) => {
     base: ENV.VITE_PUBLIC_BASE,
     plugins: [
       vue(),
-      // 组件命名插件
-      vueSetupExtend(),
       AutoImport({
         resolvers: [ElementPlusResolver()]
       }),

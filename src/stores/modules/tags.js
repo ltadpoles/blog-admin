@@ -7,7 +7,7 @@ import { ENV } from '@/config'
 export const useTagsStore = defineStore('tagsStore', {
   state: () => ({
     // 用户打开页面
-    tags: [
+    tagList: [
       {
         title: '首页',
         name: 'Dashboard',
@@ -17,12 +17,12 @@ export const useTagsStore = defineStore('tagsStore', {
   }),
 
   actions: {
-    setTags(tag) {
-      this.tags.push(tag)
+    addTag(tag) {
+      this.tagList.push(tag)
     },
     delTag(tag) {
-      let i = this.tags.findIndex(item => item.name === tag.name)
-      this.tags.splice(i, 1)
+      let i = this.tagList.findIndex(item => item.name === tag.name)
+      this.tagList.splice(i, 1)
     }
   },
   // 持久化存储

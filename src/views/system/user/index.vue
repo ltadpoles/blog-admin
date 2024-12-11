@@ -4,8 +4,10 @@
   </div>
 </template>
 
-<script setup name="SystemUser">
-
+<script setup>
+defineOptions({
+  name: 'SystemUser'
+})
 </script>
 
 <style lang="less" scoped></style>
