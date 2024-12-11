@@ -4,8 +4,10 @@
   </div>
 </template>
 
-<script setup name="AboutIndex">
-
+<script setup>
+defineOptions({
+  name: 'AboutIndex'
+})
 </script>
 
 <style lang="scss" scoped></style>

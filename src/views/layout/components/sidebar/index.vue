@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import MenuTree from '../menu/index.vue'
+import menuTree from '../menu/index.vue'
 import { useSettingStore } from '@/stores/modules/setting'
 import { useRoute } from 'vue-router'
 // import { useAuthStore } from '@/stores/modules/auth'
@@ -59,7 +59,7 @@ const menu = [
     ]
   },
   {
-    path: '/about/index', icon: 'Warning', name: '关于', id: '07', children: []
+    path: '/about', icon: 'Warning', name: '关于', id: '07', children: []
   }
 ]
 </script>

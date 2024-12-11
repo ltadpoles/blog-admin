@@ -21,7 +21,10 @@
   </template>
 </template>
 
-<script setup name="menuTree">
+<script setup>
+defineOptions({
+  name: 'menuTree'
+})
 defineProps({
   menu: {
     type: Array,
