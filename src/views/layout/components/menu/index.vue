@@ -1,6 +1,6 @@
 <template>
-  <template v-for="item in menu" :key="item.path">
-    <el-sub-menu :index="item.path" v-if="item.children && item.children.length > 0">
+  <template v-for="item in menu" :key="item.code">
+    <el-sub-menu :index="item.code" v-if="item.children && item.children.length > 0">
       <template #title>
         <el-icon :size="18" v-if="item.icon">
           <component :is="item.icon" />
@@ -11,7 +11,7 @@
     </el-sub-menu>
 
     <template v-else>
-      <el-menu-item :index="item.path">
+      <el-menu-item :index="item.url">
         <el-icon :size="18" v-if="item.icon">
           <component :is="item.icon" />
         </el-icon>

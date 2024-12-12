@@ -14,3 +14,8 @@ export const loginIn = (data) => {
 export const getUserInfo = () => {
   return http.get(CONFIG.HTTP_BASEURL + '/getInfo')
 }
+
+// 获取当前登录用户菜单
+export const getUserMenu = () => {
+  return http.get(CONFIG.HTTP_BASEURL + '/menu')
+}

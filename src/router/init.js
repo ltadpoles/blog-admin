@@ -1,12 +1,11 @@
 import router from './index'
 import { ENV } from '../config'
-// import { useAuthStore } from '../stores/modules/auth'
+import { useAuthStore } from '../stores/modules/auth'
 import { useUserStore } from '../stores/modules/user'
 import { RESETSTORE } from '../stores/reset'
-// import { filterAsyncRoutes, getRouteNameList } from './utils'
 import { notFoundRouter } from './static'
 import { useSettingStore } from '../stores/modules/setting'
-// import { ElNotification } from 'element-plus'
+import { ElNotification } from 'element-plus'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
@@ -41,7 +40,7 @@ router.beforeEach(async (to, from, next) => {
     return next({ path: ENV.LOGIN_URL, query: { redirect: to.fullPath } })
   }
 
-  // 如果没有用户菜单就再去请求一次用户信息
+  // 如果没有用户信息就再去请求一次用户信息
   if (!userStore.userInfo.username) {
     await asyncRoute()
   }
@@ -78,24 +77,24 @@ router.onError(error => {
  */
 const asyncRoute = async () => {
   const userStore = useUserStore()
-  // const authStore = useAuthStore()
+  const authStore = useAuthStore()
 
   try {
     // 获取用户信息
     await userStore.getInfoAction()
 
     // 如果用户没有菜单
-    // if (!authStore.menu.length) {
-    //   ElNotification({
-    //     title: '无权限访问',
-    //     message: '当前账号无任何菜单权限，请联系系统管理员！',
-    //     type: 'warning',
-    //     duration: 3000
-    //   })
-    //   RESETSTORE()
-    //   router.replace(ENV.LOGIN_URL)
-    //   return Promise.reject('用户无菜单权限')
-    // }
+    if (!authStore.menu.length) {
+      ElNotification({
+        title: '无权限访问',
+        message: '当前账号无任何菜单权限，请联系系统管理员！',
+        type: 'warning',
+        duration: 3000
+      })
+      RESETSTORE()
+      router.replace(ENV.LOGIN_URL)
+      return Promise.reject('用户无菜单权限')
+    }
 
     // // 添加动态路由
     setAsyncRoute(allAsyncRoutes)

@@ -6,7 +6,7 @@
 
 <script setup>
 defineOptions({
-  name: 'SystemUser'
+  name: 'AdminUser'
 })
 </script>
 
