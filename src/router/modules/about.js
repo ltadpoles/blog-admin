@@ -11,7 +11,7 @@ const routes = [
     children: [
       {
         path: 'index',
-        meta: { title: '关于' },
+        meta: { title: '关于', icon: 'Warning' },
         name: 'AboutIndex',
         component: () => import('@/views/about/index.vue')
       }

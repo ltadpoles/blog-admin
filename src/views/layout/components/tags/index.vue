@@ -8,7 +8,14 @@
             :type="route.path === tag.path ? 'primary' : 'info'"
             @click="tagClick(tag, index)"
             @close="tagClose(tag, index)">
-      {{ tag.title }}
+      <div class="tag">
+        <el-icon :size="14" v-if="tag.icon && ENV.ISTAGICON">
+          <component :is="tag.icon" />
+        </el-icon>
+        <span class="tag-title">
+          {{ tag.title }}
+        </span>
+      </div>
     </el-tag>
   </div>
 
@@ -18,6 +25,7 @@
 import { useTagsStore } from '@/stores/modules/tags'
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ENV } from '@/config'
 
 const router = useRouter()
 const route = useRoute()
@@ -30,7 +38,8 @@ watch(route, (newVal) => {
     tagsStore.addTag({
       name: newVal.name,
       path: newVal.path,
-      title: newVal.meta.title
+      title: newVal.meta.title,
+      icon: newVal.meta.icon
     })
   }
 }, { deep: true, immediate: true })
@@ -61,6 +70,15 @@ const tagClose = (tag, index) => {
   .tags-item {
     margin-right: 10px;
     cursor: pointer;
+
+    .tag {
+      display: flex;
+      align-items: center;
+
+      .tag-title {
+        margin-left: 5px;
+      }
+    }
   }
 }
 </style>

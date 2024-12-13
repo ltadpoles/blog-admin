@@ -4,7 +4,6 @@
 export const staticRoute = [
   {
     path: '/',
-    meta: { title: '首页' },
     name: 'Index',
     redirect: '/dashboard',
     component: () => import('@/views/layout/index.vue'),
@@ -12,6 +11,7 @@ export const staticRoute = [
       {
         path: 'dashboard',
         name: 'Dashboard',
+        meta: { title: '首页', icon: 'HomeFilled' },
         component: () => import('@/views/dashboard/index.vue')
       }
     ]

@@ -10,6 +10,8 @@ export const ENV = {
   ISASYNCROUTER: true,
   // 是否开启 token 刷新，默认不开启
   ISREFRESHTOKEN: false,
+  // 是否显示tag图标
+  ISTAGICON: true,
   // pinia持久化地址，可选 sessionStorage 与 localStorage
   PINIASTORY: sessionStorage
 }

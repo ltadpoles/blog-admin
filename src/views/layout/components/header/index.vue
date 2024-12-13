@@ -7,7 +7,9 @@
       </el-icon>
 
       <el-breadcrumb :separator-icon="ArrowRight">
-        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <template v-for="item in route?.matched" :key="item">
+          <el-breadcrumb-item v-if="item.meta?.title">{{ item.meta?.title }}</el-breadcrumb-item>
+        </template>
       </el-breadcrumb>
     </div>
     <div class="header-right">
@@ -52,13 +54,16 @@
 <script setup>
 import { ArrowRight } from '@element-plus/icons-vue'
 import { useSettingStore } from '@/stores/modules/setting'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { RESETSTORE } from '@/stores/reset'
 import { useUserStore } from '@/stores/modules/user'
 
 const settingStore = useSettingStore()
 const userStore = useUserStore()
+
+const route = useRoute()
+
 const flodClick = () => {
   settingStore.increment()
 }
@@ -81,43 +86,43 @@ const logout = () => {
 
 <style lang="less" scoped>
 .header {
-    height: 60px;
-    border-bottom: 1px solid #f1f1f1;
+  height: 60px;
+  border-bottom: 1px solid #f1f1f1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background-color: #fff;
+
+  .header-left {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    background-color: #fff;
+  }
 
-    .header-left {
-        display: flex;
-        align-items: center;
+  .header-right {
+    display: flex;
+    align-items: center;
+    width: 110px;
+    min-width: 110px;
+
+    .header-right-theme {
+      margin-right: 10px;
     }
 
-    .header-right {
-        display: flex;
-        align-items: center;
-        width: 110px;
-        min-width: 110px;
+    .header-right-user {
+      display: flex;
+      align-items: center;
 
-        .header-right-theme {
-            margin-right: 10px;
-        }
-
-        .header-right-user {
-            display: flex;
-            align-items: center;
-
-            >img {
-                width: 28px;
-                margin-right: 5px;
-            }
-        }
+      >img {
+        width: 28px;
+        margin-right: 5px;
+      }
     }
+  }
 }
 
 .cursor-icon {
-    cursor: pointer;
-    margin-right: 20px;
+  cursor: pointer;
+  margin-right: 20px;
 }
 </style>

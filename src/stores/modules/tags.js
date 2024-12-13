@@ -11,7 +11,8 @@ export const useTagsStore = defineStore('tagsStore', {
       {
         title: '首页',
         name: 'Dashboard',
-        path: '/dashboard'
+        path: '/dashboard',
+        icon: 'HomeFilled'
       }
     ],
   }),
