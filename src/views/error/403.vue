@@ -1,5 +1,7 @@
 <template>
-  <div>403</div>
+  <div class="error-page">
+    <img src="@/assets/images/ills_403.png" alt="" />
+  </div>
 </template>
 <script setup></script>
 <style lang="less" scoped></style>

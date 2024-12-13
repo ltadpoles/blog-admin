@@ -21,9 +21,22 @@
   filter: grayscale(100%);
 }
 
+// 内容默认样式
 .content-info {
   background-color: var(--el-bg-color);
   padding: 20px;
   border-radius: 5px;
   height: calc(100vh - 130px);
+}
+
+// 错误页面默认样式
+.error-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  > img {
+    width: 30%;
+  }
 }
