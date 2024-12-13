@@ -26,12 +26,12 @@
               </el-icon>
               <span>个人中心</span>
             </el-dropdown-item>
-            <!-- <el-dropdown-item @click="setting">
+            <el-dropdown-item @click="setting">
               <el-icon>
                 <Setting />
               </el-icon>
               <span>设置</span>
-            </el-dropdown-item> -->
+            </el-dropdown-item>
             <el-dropdown-item>
               <el-icon>
                 <Key />
@@ -48,6 +48,21 @@
         </template>
       </el-dropdown>
     </div>
+    <el-drawer v-model="themeConfig.drawer" :with-header="false" :destroy-on-close="true">
+      <el-divider>全局主题</el-divider>
+      <div class="drawer-item">
+        <span class="demonstration">暗黑模式：</span>
+        <el-switch v-model="themeConfig.theme" @change="themeChange" />
+      </div>
+      <div class="drawer-item">
+        <span class="demonstration">主题色设置：</span>
+        <el-color-picker v-model="themeConfig.primaryColor" @change="colorChange" />
+      </div>
+      <div class="drawer-item">
+        <span class="demonstration">灰色模式：</span>
+        <el-switch v-model="themeConfig.gray" @change="grayChange" />
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -57,6 +72,7 @@ import { useSettingStore } from '@/stores/modules/setting'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { RESETSTORE } from '@/stores/reset'
+import { reactive } from 'vue'
 import { useUserStore } from '@/stores/modules/user'
 
 const settingStore = useSettingStore()
@@ -64,6 +80,12 @@ const userStore = useUserStore()
 
 const route = useRoute()
 
+const themeConfig = reactive({
+  drawer: false,
+  theme: false, // 暗黑模式
+  primaryColor: '', // 主题色
+  gray: false // 灰色模式
+})
 const flodClick = () => {
   settingStore.increment()
 }
@@ -71,6 +93,33 @@ const flodClick = () => {
 const router = useRouter()
 const handleMenuClick = command => {
   router.push(command)
+}
+
+const setting = () => {
+  themeConfig.primaryColor = settingStore.primaryColor
+  themeConfig.drawer = true
+}
+
+const themeChange = val => {
+  if (val) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+}
+const colorChange = color => {
+  if (color) {
+    settingStore.setPrimaryColor(color)
+  } else {
+    settingStore.setPrimaryColor('#409eff')
+  }
+}
+const grayChange = val => {
+  if (val) {
+    document.documentElement.classList.add('gray')
+  } else {
+    document.documentElement.classList.remove('gray')
+  }
 }
 
 const logout = () => {
@@ -87,12 +136,12 @@ const logout = () => {
 <style lang="less" scoped>
 .header {
   height: 60px;
-  border-bottom: 1px solid #f1f1f1;
+  border-bottom: 1px solid var(--el-bg-color-page);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
-  background-color: #fff;
+  background-color: var(--el-bg-color);
 
   .header-left {
     display: flex;
@@ -124,5 +173,11 @@ const logout = () => {
 .cursor-icon {
   cursor: pointer;
   margin-right: 20px;
+}
+
+.drawer-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 </style>

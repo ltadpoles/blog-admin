@@ -31,6 +31,7 @@ const route = useRoute()
 .sidebar {
     box-shadow: var(--el-box-shadow);
     height: 100vh;
+    background-color: var(--el-bg-color);
 
     .el-menu {
         border: none;

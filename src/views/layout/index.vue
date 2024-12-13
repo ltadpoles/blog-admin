@@ -33,6 +33,7 @@ const tagsStore = useTagsStore()
 <style lang="less" scoped>
 .layout {
   display: flex;
+  background-color: var(--el-bg-color-page);
 
   .layout-right {
     flex: 1;
