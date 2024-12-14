@@ -5,3 +5,9 @@
         overflow-x: hidden;
     }
 }
+
+::view-transition-new(root),
+::view-transition-old(root) {
+/* 关闭默认动画，否则影响自定义动画的执行 */
+   animation: none;
+}

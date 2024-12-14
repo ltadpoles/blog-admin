@@ -1,6 +1,6 @@
 <template>
   <div class="content-info">
-    
+
   </div>
 </template>
 
