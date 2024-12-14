@@ -2,7 +2,7 @@
  * @Description: 用户store
  */
 import { defineStore } from 'pinia'
-import { getUserInfo, getUserMenu } from '@/api/user'
+import { getUserInfo, getUserMenu } from '@/api/admin'
 import { useAuthStore } from './auth'
 import { ENV } from '@/config'
 

@@ -31,7 +31,7 @@
 
 <script setup>
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
-import { loginIn } from '@/api/user'
+import { loginIn } from '@/api/admin'
 import sha256 from 'crypto-js/sha256'
 import { useUserStore } from '@/stores/modules/user'
 import { useRouter, useRoute } from 'vue-router'
@@ -72,8 +72,6 @@ const login = async (formEl) => {
       }).then(async res => {
         const userStore = useUserStore()
         userStore.setToken(res.data.data)
-        // const { data } = await getUserInfo()
-        // console.log(data)
         router.replace(route.query.redirect || '/')
       }).finally(() => {
         loading.value = false

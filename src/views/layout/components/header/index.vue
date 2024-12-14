@@ -165,6 +165,7 @@ const logout = () => {
 
 <style lang="less" scoped>
 .header {
+  flex: 1;
   height: 60px;
   border-bottom: 1px solid var(--el-bg-color-page);
   display: flex;

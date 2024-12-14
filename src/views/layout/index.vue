@@ -37,6 +37,7 @@ const tagsStore = useTagsStore()
 
   .layout-right {
     flex: 1;
+    overflow: hidden;
 
     .layout-content {
       padding: 10px;
