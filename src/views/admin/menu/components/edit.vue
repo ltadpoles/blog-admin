@@ -36,7 +36,7 @@ import { reactive, ref } from 'vue'
 import vDrawer from '@/components/drawer/index.vue'
 import { ElMessage } from 'element-plus'
 import { resetData } from '@/utils'
-import { add, info } from '@/api/menu'
+import { add, info, update } from '@/api/menu'
 
 const props = defineProps({
   title: String,
@@ -83,9 +83,10 @@ const submit = async (formEl) => {
         close(data.data)
       }
       if (props.type === 2) {
-        // await productLineupdate({ ...form, id: props.id }).finally(() => {
-        //     loading.value = false
-        // })
+        let { data } = await update({ ...form, id: props.id }).finally(() => {
+          loading.value = false
+        })
+        close(data.data)
       }
 
       ElMessage.success('操作成功')

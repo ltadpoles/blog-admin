@@ -33,7 +33,7 @@
         <el-table-column label="操作" width="100" align="center">
           <template #default="scope">
             <el-button link type="primary" size="small" @click="edit(scope.row)">编辑</el-button>
-            <el-button link type="danger" size="small">删除</el-button>
+            <el-button link type="danger" size="small" @click="delData(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -49,8 +49,8 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { list } from '@/api/menu'
-import { dayjs } from 'element-plus'
+import { list, del } from '@/api/menu'
+import { dayjs, ElMessage, ElMessageBox } from 'element-plus'
 import menuDrawer from './components/edit.vue'
 
 defineOptions({
@@ -109,10 +109,34 @@ const menuDrawerClose = val => {
     if (menuDrawerInfo.type === 1) {
       menuTreeRef.value.append(val, choiceInfo.value)
     }
+    if (menuDrawerInfo.type === 2) {
+      menuTreeRef.value.updateKeyChildren(val.id, val)
+    }
 
     // getMenu({ children: [], parentId: parentId.value })
 
   }
+}
+
+const delData = row => {
+  ElMessageBox.confirm(
+    '确认删除此菜单及子节点?',
+    '提示',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      let { data } = await del({ id: row.id })
+      menuTreeRef.value.remove(data.data)
+      ElMessage({
+        type: 'success',
+        message: data.msg,
+      })
+    })
+
 }
 
 onMounted(() => {

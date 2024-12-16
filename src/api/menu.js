@@ -19,3 +19,13 @@ export const add = (data) => {
 export const info = (params) => {
   return http.get(CONFIG.HTTP_BASEURL + '/menu/info', { params })
 }
+
+// 删除菜单信息
+export const del = (params) => {
+  return http.get(CONFIG.HTTP_BASEURL + '/menu/del', { params })
+}
+
+// 更新菜单信息
+export const update = (data) => {
+  return http.post(CONFIG.HTTP_BASEURL + '/menu/update', data)
+}
