@@ -6,7 +6,7 @@
             size="large"
             :closable="index !== 0"
             :type="route.path === tag.path ? 'primary' : 'info'"
-            @click="tagClick(tag, index)"
+            @click="tagClick(tag)"
             @close="tagClose(tag, index)">
       <div class="tag">
         <el-icon :size="14" v-if="tag.icon && ENV.ISTAGICON">
@@ -41,19 +41,22 @@ watch(route, (newVal) => {
       title: newVal.meta.title,
       icon: newVal.meta.icon
     })
+    activeIndex.value = tagsStore.tagList.length - 1
+  } else {
+    activeIndex.value = index
   }
 }, { deep: true, immediate: true })
 
-const tagClick = (tag, index) => {
+const tagClick = (tag) => {
   // 重复点击标签，不跳转
   if (route.path === tag.path) {
     return
   }
   router.push(tag.path)
-  activeIndex.value = index
 }
 const tagClose = (tag, index) => {
   tagsStore.delTag(tag)
+
   if (activeIndex.value === index) {
     // 关闭当前页面，返回前一个页面
     router.push(tagsStore.tagList[index - 1].path)
