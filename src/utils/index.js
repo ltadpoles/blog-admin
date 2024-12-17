@@ -48,7 +48,7 @@ export function resetData(data) {
   const entries = Object.entries(data)
   const obj = {}
   entries.forEach((item) => {
-    obj[item[0]] = Array.isArray(item[1]) ? [] : typeof item[1] === 'object' ? {} : ''
+    obj[item[0]] = Array.isArray(item[1]) ? [] : item[1] === null ? '' : typeof item[1] === 'object' ? {} : ''
   })
   Object.assign(data, obj)
 }

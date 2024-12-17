@@ -4,10 +4,12 @@
       <el-scrollbar height="calc(100vh - 130px)">
         <el-tree ref="menuTreeRef"
                  node-key="id"
+                 :render-after-expand="false"
                  :highlight-current="true"
-                 :default-expanded-keys="defaultExpandedKeys"
                  :data="treeData"
                  :props="props"
+                 :load="loadNode"
+                 lazy
                  @node-click="nodeClick" />
       </el-scrollbar>
     </div>
@@ -15,7 +17,7 @@
       <div class="form-btn">
         <el-button type="primary" @click="add()">新增</el-button>
       </div>
-      <el-table ref="tableRef" :data="tableData" border height="calc(100vh - 206px)">
+      <el-table ref="tableRef" :data="tableData" border>
         <el-table-column prop="code" label="编号" />
         <el-table-column prop="name" label="名称" />
         <el-table-column prop="type" label="类型">
@@ -48,7 +50,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { list, del } from '@/api/menu'
 import { dayjs, ElMessage, ElMessageBox } from 'element-plus'
 import menuDrawer from './components/edit.vue'
@@ -57,11 +59,11 @@ defineOptions({
   name: 'AdminMenu',
 })
 
-const choiceInfo = ref({})
+const choiceNode = ref({ key: null, level: 1 })
 const props = {
   label: 'name',
 }
-const defaultExpandedKeys = ref([null])
+
 const menuTreeRef = ref(null)
 const treeData = ref([
   {
@@ -70,16 +72,28 @@ const treeData = ref([
     id: null
   }
 ])
-const nodeClick = (item) => {
-  choiceInfo.value = item
-  if (!item.children || item.children.length < 1) {
-    getMenu(item, item.id ? item.id : null)
+const loadNode = async (node, resolve) => {
+  if (node.level === 0) {
+    return resolve([{
+      name: '菜单管理',
+      children: [],
+      id: null
+    }])
   }
+  choiceNode.value = node
+  let data = await getMenu(node.key)
+
+  return resolve(data)
 }
-const getMenu = async (node, parentId = null) => {
+const nodeClick = (data, node) => {
+  choiceNode.value = node
+  getMenu(data.id)
+}
+
+const getMenu = async (parentId) => {
   const { data } = await list({ parentId })
-  node.children = data.data
   tableData.value = data.data
+  return data.data
 }
 
 const tableData = ref([])
@@ -88,7 +102,7 @@ const add = () => {
   menuDrawerInfo.isShow = true
   menuDrawerInfo.type = 1
   menuDrawerInfo.title = '菜单新增'
-  menuDrawerInfo.id = choiceInfo.value.id
+  menuDrawerInfo.id = choiceNode.value.key
 }
 const edit = row => {
   menuDrawerInfo.isShow = true
@@ -105,17 +119,14 @@ const menuDrawerInfo = reactive({
 const menuDrawerClose = val => {
   menuDrawerInfo.isShow = false
   if (val) {
-    // 新增
-    if (menuDrawerInfo.type === 1) {
-      menuTreeRef.value.append(val, choiceInfo.value)
-    }
-    if (menuDrawerInfo.type === 2) {
-      menuTreeRef.value.updateKeyChildren(val.id, val)
-    }
-
-    // getMenu({ children: [], parentId: parentId.value })
-
+    updateNode()
   }
+}
+
+const updateNode = () => {
+  let node = menuTreeRef.value.getNode(choiceNode.value.key) // 通过节点id找到对应树节点对象
+  node.loaded = false
+  node.expand() // 主动调用展开节点方法，重新查询该节点下的所有子节点
 }
 
 const delData = row => {
@@ -130,7 +141,7 @@ const delData = row => {
   )
     .then(async () => {
       let { data } = await del({ id: row.id })
-      menuTreeRef.value.remove(data.data)
+      updateNode()
       ElMessage({
         type: 'success',
         message: data.msg,
@@ -138,36 +149,31 @@ const delData = row => {
     })
 
 }
-
-onMounted(() => {
-  getMenu(treeData.value[0])
-  choiceInfo.value = treeData.value[0]
-})
 </script>
 
 <style lang="less" scoped>
 .content-tree {
-    background-color: var(--el-bg-color);
-    border-radius: 5px;
-    height: calc(100vh - 130px);
-    display: flex;
+  background-color: var(--el-bg-color);
+  border-radius: 5px;
+  height: calc(100vh - 130px);
+  display: flex;
 }
 
 .content-info-left {
-    border-right: 1px solid var(--el-border-color);
-    height: calc(100vh - 130px);
-    width: 240px;
-    min-width: 240px;
-    padding: 20px 0;
+  border-right: 1px solid var(--el-border-color);
+  height: calc(100vh - 130px);
+  width: 240px;
+  min-width: 240px;
+  padding: 20px 0;
 }
 
 .content-info-right {
-    flex: 1;
-    padding: 10px;
-    overflow: hidden;
+  flex: 1;
+  padding: 10px;
+  overflow: hidden;
 
-    .form-btn {
-        margin-bottom: 10px;
-    }
+  .form-btn {
+    margin-bottom: 10px;
+  }
 }
 </style>
