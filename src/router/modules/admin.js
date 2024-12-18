@@ -21,6 +21,12 @@ const routes = [
         name: 'AdminMenu',
         meta: { title: '菜单管理', icon: 'Menu' },
         component: () => import('@/views/admin/menu/index.vue')
+      },
+      {
+        path: 'role',
+        name: 'AdminRole',
+        meta: { title: '角色管理', icon: 'UserFilled' },
+        component: () => import('@/views/admin/role/index.vue')
       }
     ]
   }

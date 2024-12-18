@@ -2,15 +2,8 @@
   <div class="content-tree">
     <div class="content-info-left">
       <el-scrollbar height="calc(100vh - 130px)">
-        <el-tree ref="menuTreeRef"
-                 node-key="id"
-                 :render-after-expand="false"
-                 :highlight-current="true"
-                 :data="treeData"
-                 :props="props"
-                 :load="loadNode"
-                 lazy
-                 @node-click="nodeClick" />
+        <el-tree ref="menuTreeRef" node-key="id" :render-after-expand="false" :highlight-current="true" :data="treeData"
+          :props="props" :load="loadNode" lazy @node-click="nodeClick" />
       </el-scrollbar>
     </div>
     <div class="content-info-right">
@@ -20,6 +13,7 @@
       <el-table ref="tableRef" :data="tableData" border>
         <el-table-column prop="code" label="编号" />
         <el-table-column prop="name" label="名称" />
+        <el-table-column prop="icon" label="名称" />
         <el-table-column prop="type" label="类型">
           <template #default="scope">
             {{ scope.row.type === '1' ? '菜单' : scope.row.type === '2' ? '按钮' : '-' }}
@@ -41,11 +35,8 @@
       </el-table>
     </div>
 
-    <menu-drawer :isShow="menuDrawerInfo.isShow"
-                 :title="menuDrawerInfo.title"
-                 :type="menuDrawerInfo.type"
-                 :id="menuDrawerInfo.id"
-                 @close="menuDrawerClose" />
+    <menu-drawer :isShow="menuDrawerInfo.isShow" :title="menuDrawerInfo.title" :type="menuDrawerInfo.type"
+      :id="menuDrawerInfo.id" @close="menuDrawerClose" />
   </div>
 </template>
 
@@ -86,8 +77,11 @@ const loadNode = async (node, resolve) => {
   return resolve(data)
 }
 const nodeClick = (data, node) => {
-  choiceNode.value = node
-  getMenu(data.id)
+  // 防止多次调用接口
+  if (node.loaded) {
+    choiceNode.value = node
+    getMenu(data.id)
+  }
 }
 
 const getMenu = async (parentId) => {

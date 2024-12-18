@@ -45,7 +45,7 @@ const tagsStore = useTagsStore()
   }
 
   .content-views {
-    height: calc(100vh - 130px);
+    height: calc(100vh - 122px);
   }
 }
 </style>
