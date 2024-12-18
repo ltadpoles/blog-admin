@@ -1,6 +1,6 @@
 <template>
   <div>
-    角色管理
+    类别管理
   </div>
 </template>
 
@@ -8,4 +8,6 @@
 
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+
+</style>

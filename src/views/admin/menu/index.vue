@@ -2,8 +2,15 @@
   <div class="content-tree">
     <div class="content-info-left">
       <el-scrollbar height="calc(100vh - 130px)">
-        <el-tree ref="menuTreeRef" node-key="id" :render-after-expand="false" :highlight-current="true" :data="treeData"
-          :props="props" :load="loadNode" lazy @node-click="nodeClick" />
+        <el-tree ref="menuTreeRef"
+                 node-key="id"
+                 :render-after-expand="false"
+                 :highlight-current="true"
+                 :data="treeData"
+                 :props="props"
+                 :load="loadNode"
+                 lazy
+                 @node-click="nodeClick" />
       </el-scrollbar>
     </div>
     <div class="content-info-right">
@@ -35,8 +42,11 @@
       </el-table>
     </div>
 
-    <menu-drawer :isShow="menuDrawerInfo.isShow" :title="menuDrawerInfo.title" :type="menuDrawerInfo.type"
-      :id="menuDrawerInfo.id" @close="menuDrawerClose" />
+    <menu-drawer :isShow="menuDrawerInfo.isShow"
+                 :title="menuDrawerInfo.title"
+                 :type="menuDrawerInfo.type"
+                 :id="menuDrawerInfo.id"
+                 @close="menuDrawerClose" />
   </div>
 </template>
 

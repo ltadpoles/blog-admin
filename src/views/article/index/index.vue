@@ -1,6 +1,6 @@
 <template>
   <div>
-    角色管理
+    文章管理
   </div>
 </template>
 
