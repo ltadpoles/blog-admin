@@ -20,8 +20,8 @@
       </el-form-item>
       <div class="form-btn">
         <div>
-          <el-button type="primary" @click="confirm()">删除</el-button>
-          <el-button type="danger" @click="confirm()">删除</el-button>
+          <el-button type="primary" @click="add">新增</el-button>
+          <el-button type="danger" @click="delData">删除</el-button>
         </div>
         <div>
           <el-button @click="reset(listFormRef)" icon="Search">重置</el-button>
@@ -30,12 +30,12 @@
       </div>
     </el-form>
 
-    <el-table ref="tableRef" :data="tableData" border>
+    <el-table ref="tableRef" :data="tableData" border @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="name" label="标签名称" />
       <el-table-column prop="status" label="标签状态">
         <template #default="scope">
-          {{ scope.row.status === 1 ? '有效' : '无效' }}
+          {{ scope.row.status === '1' ? '有效' : '无效' }}
         </template>
       </el-table-column>
       <el-table-column prop="create_time" label="创建时间">
@@ -43,10 +43,10 @@
           {{ dayjs(scope.row.create_time).format('YYYY-MM-DD') }}
         </template>
       </el-table-column>
-      <el-table-column prop="dec" label="备注" />
+      <el-table-column prop="remark" label="备注" />
       <el-table-column label="操作" width="100" align="center">
-        <template #default>
-          <el-button link type="primary" size="small">编辑</el-button>
+        <template #default="scope">
+          <el-button link type="primary" size="small" @click="edit(scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -58,13 +58,20 @@
                      @size-change="sizeChange"
                      @current-change="currentChange" />
     </div>
+
+    <tag-drawer :isShow="tagDrawerInfo.isShow"
+                :title="tagDrawerInfo.title"
+                :type="tagDrawerInfo.type"
+                :id="tagDrawerInfo.id"
+                @close="tagDrawerClose" />
   </div>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-//   import { list } from '@/api/user'
-import { dayjs } from 'element-plus'
+import { list, del } from '@/api/tag'
+import { dayjs, ElMessage, ElMessageBox } from 'element-plus'
+import tagDrawer from './components/edit.vue'
 
 defineOptions({
   name: 'ArticleTag'
@@ -93,6 +100,57 @@ const reset = (formEl) => {
   search()
 }
 
+const tagDrawerInfo = reactive({
+  isShow: false,
+  title: '新增',
+  type: 1,
+  id: null
+})
+const tagDrawerClose = val => {
+  tagDrawerInfo.isShow = false
+  if (val) {
+    getList(query)
+  }
+}
+const add = () => {
+  tagDrawerInfo.isShow = true
+  tagDrawerInfo.type = 1
+  tagDrawerInfo.id = ''
+  tagDrawerInfo.title = '标签新增'
+}
+const edit = row => {
+  tagDrawerInfo.isShow = true
+  tagDrawerInfo.type = 2
+  tagDrawerInfo.id = row.id
+  tagDrawerInfo.title = '标签修改'
+}
+
+const multipleSelection = ref([])
+const handleSelectionChange = (val) => {
+  multipleSelection.value = val
+}
+const delData = async () => {
+  if (multipleSelection.value.length < 1) {
+    return ElMessage.error('请选择需要删除的标签')
+  }
+  ElMessageBox.confirm(
+    '确认删除选中标签?',
+    '提示',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      let id = multipleSelection.value.map(item => item.id).join()
+      await del({ id: id })
+      getList(query)
+      ElMessage.success('操作成功')
+    })
+}
+
+
 const tableRef = ref(null)
 const tableData = ref([])
 const query = reactive({
@@ -105,9 +163,9 @@ const pageQuery = reactive({
   total: 0
 })
 const getList = async () => {
-  // let { data } = await list(query)
-  // tableData.value = data.data.list
-  // pageQuery.total = data.data.total
+  let { data } = await list(query)
+  tableData.value = data.data.list
+  pageQuery.total = data.data.total
 }
 const sizeChange = (pageSize) => {
   query.pageSize = pageSize
