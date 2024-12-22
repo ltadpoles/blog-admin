@@ -29,3 +29,8 @@ export const info = (params) => {
 export const del = (params) => {
   return http.get(CONFIG.HTTP_BASEURL + '/tag/del', { params })
 }
+
+// 获取标签信息下拉
+export const listAllTag = () => {
+  return http.get(CONFIG.HTTP_BASEURL + '/tag/allTag')
+}

@@ -29,3 +29,8 @@ export const info = (params) => {
 export const del = (params) => {
   return http.get(CONFIG.HTTP_BASEURL + '/category/del', { params })
 }
+
+// 获取分类信息下拉
+export const listAllCategory = () => {
+  return http.get(CONFIG.HTTP_BASEURL + '/category/allCategory')
+}
