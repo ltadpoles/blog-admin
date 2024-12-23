@@ -30,7 +30,7 @@
       </el-form-item>
       <div class="form-btn">
         <div>
-          <el-button type="primary">新增</el-button>
+          <el-button type="primary" @click="addArticle">新增</el-button>
           <el-button type="danger" @click="delData">删除</el-button>
         </div>
         <div>
@@ -51,7 +51,8 @@
       </el-table-column>
       <el-table-column prop="type" label="标签" align="center">
         <template #default="scope">
-          <el-tag style="margin-right: 3px;" type="success" v-for="item in scope.row.tag" :key="item.id">{{ item.name }}</el-tag>
+          <el-tag style="margin-right: 3px;" type="success" v-for="item in scope.row.tag" :key="item.id">{{ item.name
+          }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="type" label="文章类型">
@@ -91,6 +92,11 @@
                      @current-change="currentChange" />
     </div>
 
+    <edit-dialog :isShow="editInfo.isShow"
+                 :title="editInfo.title"
+                 :id="editInfo.id"
+                 :type="editInfo.type"
+                 @close="editClose" />
   </div>
 </template>
 
@@ -100,6 +106,7 @@ import { list } from '@/api/article'
 import { listAllCategory } from '@/api/category'
 import { listAllTag } from '@/api/tag'
 import { dayjs, ElMessage, ElMessageBox } from 'element-plus'
+import editDialog from './components/edit.vue'
 
 defineOptions({
   name: 'ArticleIndex'
@@ -158,6 +165,25 @@ const delData = async () => {
       getList(query)
       ElMessage.success('操作成功')
     })
+}
+
+const editInfo = reactive({
+  isShow: false,
+  title: '新增文章',
+  id: '',
+  type: 1
+})
+const addArticle = () => {
+  editInfo.isShow = true
+  editInfo.title = '新增文章'
+  editInfo.type = 1
+  editInfo.id = ''
+}
+const editClose = val => {
+  editInfo.isShow = false
+  if (val) {
+    getList(query)
+  }
 }
 
 

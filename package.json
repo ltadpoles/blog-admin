@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@asika32764/vue-animate": "^3.0.2",
+    "@kangc/v-md-editor": "^2.3.18",
     "axios": "^1.7.9",
     "crypto-js": "^4.2.0",
     "element-plus": "^2.9.0",
