@@ -1,0 +1,45 @@
+html:root {
+  --el-font-size-large: 1.28rem;
+  --el-font-size-medium: 1.14rem;
+  --el-font-size-base: 1rem;
+  --el-font-size-small: 0.92rem;
+  --el-font-size-extra-small: 0.857rem;
+  --el-menu-item-height: 46px;
+  --el-menu-base-level-padding: 15px;
+  --el-bg-color-page: #f0f2f5;
+  --el-border-color: #f1f1f1;
+
+  .el-breadcrumb {
+    font-size: 1rem;
+  }
+
+  .el-tag {
+    height: 2rem;
+    --el-tag-font-size: 0.857rem;
+    --el-icon-size: 1rem;
+  }
+
+  .el-dropdown-link:focus-visible {
+    outline: none;
+  }
+
+  .el-dropdown-menu {
+    padding: 0;
+    li {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin: 0;
+      cursor: pointer;
+    }
+  }
+
+  .el-divider--horizontal {
+    margin: 1rem 0;
+  }
+}
+
+html.dark {
+  --el-bg-color-page: #020409;
+  --el-border-color: #212121;
+}
