@@ -7,9 +7,12 @@ import { darken, lighten } from '@/utils/theme'
 export const useSettingStore = defineStore('settingStore', {
   state: () => ({
     asyncRouteList: [],
-    isCollapsed: false, // 菜单收缩控制
+    isCollapsed: false,
     fontSize: 14,
-    lang: 'zhCN'
+    lang: 'zhCN',
+    isDark: false,
+    primaryColor: '#409eff',
+    isGrey: false
   }),
   actions: {
     increment() {
@@ -38,6 +41,12 @@ export const useSettingStore = defineStore('settingStore', {
     },
     setLocale(lang) {
       this.lang = lang
+    },
+    setDark(isDark) {
+      this.isDark = isDark
+    },
+    setGrey(isGrey) {
+      this.isGrey = isGrey
     }
   }
 })

@@ -20,7 +20,7 @@
       </el-tab-pane>
     </el-tabs>
     <el-divider />
-    <div class="clear-bell" @click="clearBell">清除消息</div>
+    <div class="clear-bell" @click="clearBell">{{ $t('messages.clear') }}</div>
   </el-popover>
 </template>
 

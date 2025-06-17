@@ -1,12 +1,11 @@
 .layout {
+  height: 100vh;
   display: flex;
 
   &-sidebar {
     width: 200px;
     min-width: 200px;
     height: 100vh;
-    min-height: 100vh;
-    max-height: 100vh;
     border-right: 1px solid var(--el-border-color);
     transition: all 0.3s;
     overflow: hidden;
@@ -18,6 +17,8 @@
   }
 
   &-container {
+    display: flex;
+    flex-direction: column;
     flex: 1;
 
     &-header {
@@ -36,10 +37,21 @@
     }
 
     &-content {
+      overflow-x: hidden;
+      overflow-y: auto;
       background-color: var(--el-bg-color-page);
-      padding: 10px;
-      min-height: calc(100vh - 92px);
       box-sizing: border-box;
+
+      &-grow {
+        padding: 10px;
+        min-height: calc(100% - 40px);
+      }
     }
+  }
+
+  .scroll-top {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
   }
 }

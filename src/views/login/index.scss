@@ -42,4 +42,8 @@
       }
     }
   }
+
+  :deep(.el-input__inner) {
+    background-clip: text;
+  }
 }

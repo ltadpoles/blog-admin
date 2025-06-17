@@ -6,7 +6,7 @@
     <div class="cell">
       <div class="cell-title">{{ $t('messages.darkMode') }}</div>
       <el-switch
-        v-model="themeInfo.theme"
+        v-model="settingStore.isDark"
         @click="darkClick($event)"
         inline-prompt
         :active-icon="Moon"
@@ -15,17 +15,17 @@
     </div>
     <div class="cell">
       <div class="cell-title">{{ $t('messages.themeColor') }}</div>
-      <el-color-picker v-model="themeInfo.color" :predefine="predefineColors" @change="colorChange" />
+      <el-color-picker v-model="settingStore.primaryColor" :predefine="predefineColors" @change="colorChange" />
     </div>
     <div class="cell">
       <div class="cell-title">{{ $t('messages.greyMode') }}</div>
-      <el-switch v-model="themeInfo.grey" @change="greyChange" />
+      <el-switch v-model="settingStore.isGrey" @change="greyChange" />
     </div>
   </custom-drawer>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { useSettingStore } from '@/stores/modules/setting'
 import customDrawer from '@/components/drawer/index.vue'
 import { Sunny, Moon } from '@element-plus/icons-vue'
@@ -35,15 +35,6 @@ const settingStore = useSettingStore()
 const drawerVisible = ref(false)
 
 const predefineColors = ref(['#c71585', '#ff4500', '#ff8c00', '#90ee90', '#00ced1', '#409eff', '#1e90ff'])
-
-const themeInfo = reactive({
-  theme: false,
-  color: '#409eff',
-  weakness: false,
-  grey: false,
-  tag: false,
-  tagIcon: false
-})
 
 const darkClick = e => {
   const transition = document.startViewTransition(() => {
@@ -76,8 +67,10 @@ const colorChange = color => {
 
 const greyChange = val => {
   if (val) {
+    settingStore.setGrey(true)
     document.documentElement.classList.add('grey')
   } else {
+    settingStore.setGrey(false)
     document.documentElement.classList.remove('grey')
   }
 }

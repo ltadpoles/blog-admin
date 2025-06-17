@@ -17,7 +17,8 @@ const en = {
     tadSysManagement: 'System Manage',
     tadUserManage: 'User Manage',
     tadRoleManage: 'Role Manage',
-    tadAbout: 'About'
+    tadAbout: 'About',
+    clear: 'Clear'
   }
 }
 export default en

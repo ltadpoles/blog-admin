@@ -1,5 +1,5 @@
 <template>
-  <div class="tags" ref="tagsRef">
+  <div class="tags">
     <div class="arrow-left" v-show="isArrowShow">
       <SvgIcon name="arrow-left" @click="moveLeft" />
     </div>
@@ -30,7 +30,7 @@
 <script setup>
 import { useTagStore } from '@/stores/modules/tag'
 import { useSettingStore } from '@/stores/modules/setting'
-import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import config from '@/config'
 
@@ -42,8 +42,7 @@ const router = useRouter()
 const activeIndex = ref(0)
 const tagList = computed(() => tagStore.tagList)
 
-const tagsRef = ref(null)
-const tagsScrollRef = ref(null)
+const tagsScrollRef = useTemplateRef('tagsScrollRef')
 const tagsItemRef = ref([])
 const isArrowShow = ref(false)
 

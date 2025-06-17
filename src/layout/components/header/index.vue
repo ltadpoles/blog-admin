@@ -11,8 +11,8 @@
       <CoustomBreadcrumb class="bread-crumb" v-if="config.ISBREADCRUMB" />
     </div>
     <div class="header-right">
-      <div class="header-icon" v-fullscreen>
-        <SvgIcon name="fulll" />
+      <div class="header-icon" @click="toggle">
+        <SvgIcon name="fullscreen" />
       </div>
       <CustomFontSize />
       <CustomLang />
@@ -24,6 +24,7 @@
 </template>
 
 <script setup>
+import { useFullscreen } from '@vueuse/core'
 import { useSettingStore } from '@/stores/modules/setting'
 import CoustomBreadcrumb from './components/breadcrumb/index.vue'
 import CustomFontSize from './components/font/index.vue'
@@ -33,6 +34,7 @@ import CustomBell from './components/bell/index.vue'
 import CustomSetting from './components/setting/index.vue'
 import config from '@/config'
 
+const { toggle } = useFullscreen()
 const settingStore = useSettingStore()
 
 const flodClick = () => {

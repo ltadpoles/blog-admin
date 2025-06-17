@@ -4,10 +4,6 @@
 @use 'base';
 @use 'transtion';
 
-input:-webkit-autofill {
-  box-shadow: 0 0 1px 1000px white inset !important;
-}
-
 ::view-transition-new(root),
 ::view-transition-old(root) {
   /* 关闭默认动画，否则影响自定义动画的执行 */

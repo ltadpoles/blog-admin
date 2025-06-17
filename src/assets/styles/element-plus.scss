@@ -37,6 +37,10 @@ html:root {
   .el-divider--horizontal {
     margin: 1rem 0;
   }
+
+  .el-scrollbar__view {
+    height: 100%;
+  }
 }
 
 html.dark {
