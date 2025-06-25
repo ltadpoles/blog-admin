@@ -41,6 +41,10 @@ html:root {
   .el-scrollbar__view {
     height: 100%;
   }
+
+  .el-scrollbar__bar.is-horizontal {
+    display: none;
+  }
 }
 
 html.dark {

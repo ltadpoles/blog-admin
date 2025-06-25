@@ -46,7 +46,7 @@ import tagsContainer from './components/tags/index.vue'
 import footerContainer from './components/footer/index.vue'
 import { useSettingStore } from '@/stores/modules/setting'
 import { useTagStore } from '@/stores/modules/tag'
-import { watch, useTemplateRef, onMounted, ref } from 'vue'
+import { watch, useTemplateRef, onMounted, ref, nextTick } from 'vue'
 
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
@@ -86,6 +86,12 @@ watch(
         meta: newVal.meta
       })
     }
+
+    nextTick(() => {
+      setTimeout(() => {
+        scrollBarRef.value.update()
+      }, 100)
+    })
   },
   { deep: true, immediate: true }
 )

@@ -1,7 +1,7 @@
 <template>
   <el-dropdown>
     <div class="el-dropdown-link">
-      <img class="avatar-img" alt="avatar" :src="getImageUrl('@/assets/images/avatar.jpg')" />
+      <img class="avatar-img" alt="avatar" :src="getImageUrl('avatar.jpg')" />
       <span>游荡de蝌蚪</span>
     </div>
     <template #dropdown>

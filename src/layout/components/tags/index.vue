@@ -30,7 +30,7 @@
 <script setup>
 import { useTagStore } from '@/stores/modules/tag'
 import { useSettingStore } from '@/stores/modules/setting'
-import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch, useTemplateRef } from 'vue'
+import { computed, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import config from '@/config'
 
@@ -42,23 +42,33 @@ const router = useRouter()
 const activeIndex = ref(0)
 const tagList = computed(() => tagStore.tagList)
 
-const tagsScrollRef = useTemplateRef('tagsScrollRef')
+const tagsScrollRef = ref(null)
 const tagsItemRef = ref([])
 const isArrowShow = ref(false)
+const isAddScroll = ref(false)
 
 const translateX = ref(0)
 const tagsWidth = ref(0)
 const tagScrollWidth = ref(0)
 
-// 初始化标签和尺寸计算
 const initTags = async () => {
   await nextTick()
   if (!tagsScrollRef.value) {
     return
   }
+
   tagsWidth.value = tagsScrollRef.value.offsetWidth
   tagScrollWidth.value = tagsScrollRef.value.scrollWidth
+
   isArrowShow.value = tagScrollWidth.value > tagsWidth.value
+
+  if (tagsWidth.value === tagScrollWidth.value) {
+    isAddScroll.value = true
+  }
+  if (isAddScroll.value && tagsWidth.value !== tagScrollWidth.value) {
+    tagsWidth.value = tagsWidth.value - 80
+    isAddScroll.value = false
+  }
 }
 
 // 自动滚动到当前激活标签
@@ -67,7 +77,6 @@ const moveView = async index => {
   if (!tagsItemRef.value[index] || !tagsScrollRef.value) {
     return
   }
-
   const tagEl = tagsItemRef.value[index]
   const tagLeft = tagEl.offsetLeft
   const tagRight = tagLeft + tagEl.offsetWidth
@@ -76,19 +85,16 @@ const moveView = async index => {
 
   let newTranslate = translateX.value
 
-  // 判断是否需要调整位置
   if (tagLeft < currentScrollLeft) {
     newTranslate = -tagLeft
   } else if (tagRight > currentScrollRight) {
     newTranslate = -(tagRight - tagsWidth.value)
   }
 
-  // 限制滚动范围
-  const maxTranslate = Math.min(0, tagsWidth.value - tagScrollWidth.value)
-  translateX.value = Math.max(Math.min(newTranslate, 0), maxTranslate)
+  translateX.value = newTranslate
+  checkBoundary()
 }
 
-// 左右箭头点击处理
 const moveLeft = () => {
   translateX.value = Math.min(translateX.value + tagsWidth.value, 0)
   checkBoundary()
@@ -100,11 +106,21 @@ const moveRight = () => {
   checkBoundary()
 }
 
-// 边界检测
-const checkBoundary = () => {
+// 边界限制计算
+const getBoundaryLimit = () => {
   const maxTranslate = Math.min(0, tagsWidth.value - tagScrollWidth.value)
-  translateX.value = Math.max(translateX.value, maxTranslate)
-  translateX.value = Math.min(translateX.value, 0)
+  return Math.max(Math.min(translateX.value, 0), maxTranslate)
+}
+// 边界检查
+const checkBoundary = () => {
+  translateX.value = getBoundaryLimit()
+}
+
+// 添加防抖处理的resize事件
+let resizeTimer = null
+const handleResize = () => {
+  clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(() => pageResize(), 150)
 }
 
 const pageResize = () => {
@@ -113,15 +129,16 @@ const pageResize = () => {
   } else {
     settingsStore.isCollapsed = false
   }
+
   initTags()
   checkBoundary()
+
   const index = tagList.value.findIndex(item => item.path === route.path)
   if (index > -1) {
     moveView(index)
   }
 }
 
-// 监听路由变化自动滚动
 watch(
   () => route.path,
   newVal => {
@@ -133,37 +150,50 @@ watch(
   }
 )
 
-// 监听窗口大小变化
 onMounted(() => {
   initTags()
   activeIndex.value = tagList.value.findIndex(item => item.path === route.path)
-  window.addEventListener('resize', pageResize)
+
+  // 添加防抖的resize监听
+  window.addEventListener('resize', handleResize)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', pageResize)
+  window.removeEventListener('resize', handleResize)
+  if (resizeTimer) {
+    clearTimeout(resizeTimer)
+  }
 })
 
-// 标签点击处理
+// 保持原有方法名称
 const tagClick = tag => {
-  router.push(tag.path)
+  if (tag.path !== route.path) {
+    router.push(tag.path)
+  }
 }
 
+// 保持原有方法名称
 const tagClose = (tag, index) => {
   tagStore.delTag(tag)
   if (route.path !== tag.path) {
+    activeIndex.value = tagList.value.findIndex(item => item.path === route.path)
     return
   }
-  router.push(tagList.value[index - 1].path)
+
+  // 安全跳转到前一个标签
+  if (tagList.value.length > 0) {
+    router.push(tagList.value[Math.max(index - 1, 0)].path)
+  }
 }
 
 // 监听标签列表变化
 watch(
   () => tagList.value.length,
-  () => {
-    initTags()
+  async () => {
+    await initTags()
     const index = tagList.value.findIndex(item => item.path === route.path)
     if (index > -1) {
+      await nextTick()
       moveView(index)
     }
   }

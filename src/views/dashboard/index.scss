@@ -1,2 +1,49 @@
 .dashboard {
+  &-box {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    &-item {
+      display: flex;
+      flex: 1;
+      padding: 20px;
+      border-radius: 10px;
+      color: #fff;
+      background-color: var(--el-bg-color);
+      &-content {
+        .dashboard-box-item-value {
+          font-size: 1.2rem;
+          margin-bottom: 5px;
+          font-weight: 600;
+        }
+      }
+    }
+    .weixin {
+      background-color: #70ca63;
+    }
+    .qq {
+      background-color: #3b5998;
+    }
+    .douyin {
+      background-color: #967adc;
+    }
+    .weibo {
+      background-color: #e81c4f;
+    }
+  }
+
+  .echart-list {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    &-item {
+      height: 320px;
+      width: calc(50% - 5px);
+      background-color: var(--el-bg-color);
+      padding: 10px;
+      box-sizing: border-box;
+      border-radius: 10px;
+    }
+  }
 }
