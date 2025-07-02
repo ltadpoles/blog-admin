@@ -13,12 +13,15 @@ const en = {
     themeColor: 'Theme Color',
     weaknessMode: 'Weakness Mode',
     greyMode: 'Grey Mode',
+    clear: 'Clear',
     tadHome: 'Home',
     tadSysManagement: 'System Manage',
     tadUserManage: 'User Manage',
-    tadRoleManage: 'Role Manage',
-    tadAbout: 'About',
-    clear: 'Clear'
+    tadArticle: 'Article Manage',
+    tadTags: 'Tags Manage',
+    tadCategory: 'Category Manage',
+    tadMessages: 'Messages Manage',
+    tadAbout: 'About'
   }
 }
 export default en

@@ -27,22 +27,55 @@ const menu = ref([
     icon: 'system',
     name: '系统管理',
     il18Name: 'tadSysManagement',
-    id: '05',
+    id: '02',
     children: [
       {
         path: '/system/user',
         icon: 'user',
         name: '用户管理',
         il18Name: 'tadUserManage',
-        id: '051',
+        id: '021',
+        children: []
+      }
+    ]
+  },
+  {
+    path: '/article',
+    icon: 'article',
+    name: '文章管理',
+    il18Name: 'tadArticle',
+    id: '03',
+    children: [
+      {
+        path: '/article/index',
+        icon: 'article',
+        name: '文章管理',
+        il18Name: 'tadArticle',
+        id: '031',
         children: []
       },
       {
-        path: '/system/role',
-        icon: 'person',
-        name: '角色管理',
-        il18Name: 'tadRoleManage',
-        id: '052',
+        path: '/article/tags',
+        icon: 'tags',
+        name: '标签管理',
+        il18Name: 'tadTags',
+        id: '032',
+        children: []
+      },
+      {
+        path: '/article/category',
+        icon: 'category',
+        name: '类别管理',
+        il18Name: 'tadCategory',
+        id: '033',
+        children: []
+      },
+      {
+        path: '/article/messages',
+        icon: 'messages',
+        name: '留言管理',
+        il18Name: 'tadMessages',
+        id: '034',
         children: []
       }
     ]

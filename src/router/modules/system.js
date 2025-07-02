@@ -14,13 +14,7 @@ const route = [
         path: 'user',
         meta: { title: '用户管理', i18nName: 'tadUserManage', icon: 'user' },
         name: 'SystemUser',
-        component: () => import('@/views/system/user.vue')
-      },
-      {
-        path: 'role',
-        meta: { title: '角色管理', i18nName: 'tadRoleManage', icon: 'person' },
-        name: 'SystemRole',
-        component: () => import('@/views/system/role.vue')
+        component: () => import('@/views/system/user/index.vue')
       }
     ]
   }
