@@ -2,7 +2,7 @@
   <svg
     aria-hidden="true"
     class="svg-icon"
-    :style="{ marginRight: marginRight, cursor: cursor }"
+    :style="{ marginRight: marginRight, cursor: cursor, minWidth: width, minHeight: height }"
     :width="width"
     :height="height"
   >
