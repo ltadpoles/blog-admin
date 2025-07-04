@@ -38,6 +38,7 @@
   background-color: var(--el-fill-color);
 }
 
+// 错误页面
 .error-page {
   width: 100vw;
   height: 100vh;
@@ -50,5 +51,38 @@
     &-btn {
       margin-top: 30px;
     }
+  }
+}
+
+// 基础布局
+.view-base {
+  padding: 15px;
+  border-radius: 8px;
+  background-color: var(--el-bg-color);
+
+  &-form {
+    .el-input {
+      width: 200px;
+    }
+
+    .el-select {
+      width: 200px;
+    }
+
+    &-btn {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+  }
+
+  &-table {
+    margin-top: 20px;
+  }
+
+  &-pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
   }
 }
