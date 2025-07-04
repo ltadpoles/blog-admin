@@ -27,7 +27,7 @@
 
     <div class="view-base-table">
       <el-table :data="tableData" border>
-        <el-table-column type="selection" width="55" />
+        <el-table-column type="selection" width="45" />
         <el-table-column prop="avatar" label="头像" align="center">
           <template #default="scope">
             <img class="list-avatar" :src="scope.row.avatar" alt="" />

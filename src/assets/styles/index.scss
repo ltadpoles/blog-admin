@@ -1,5 +1,6 @@
 @use 'element-plus/theme-chalk/dark/css-vars.css';
 @use 'element-plus/theme-chalk/src/message.scss';
+@use 'element-plus/theme-chalk/src/message-box.scss';
 @use 'element-plus';
 @use 'base';
 @use 'transtion';
@@ -78,6 +79,7 @@
 
   &-table {
     margin-top: 20px;
+    display: grid;
   }
 
   &-pagination {
