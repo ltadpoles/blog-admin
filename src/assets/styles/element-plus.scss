@@ -45,6 +45,13 @@ html:root {
   .el-scrollbar__bar.is-horizontal {
     display: none;
   }
+
+  .el-dialog.is-fullscreen {
+    padding: 0;
+    .dialog-header {
+      display: none;
+    }
+  }
 }
 
 html.dark {

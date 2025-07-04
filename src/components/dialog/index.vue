@@ -13,6 +13,7 @@
     :destroy-on-close="true"
     @close="close"
     @open="open"
+    header-class="dialog-header"
   >
     <slot></slot>
   </el-dialog>
