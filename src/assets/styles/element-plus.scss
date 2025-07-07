@@ -52,6 +52,15 @@ html:root {
       display: none;
     }
   }
+
+  .el-popover.el-popper {
+    padding: 0;
+
+    .el-popover__title {
+      padding: 1rem;
+      border-bottom: 1px solid var(--el-border-color);
+    }
+  }
 }
 
 html.dark {

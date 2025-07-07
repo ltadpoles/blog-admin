@@ -37,7 +37,7 @@ const props = defineProps({
   },
   closeText: {
     type: String,
-    default: '是否确认关闭改弹窗？'
+    default: '是否确认关闭该弹窗？'
   },
   // Dialog 对话框 Dialog 的标题
   title: {
