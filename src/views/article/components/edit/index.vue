@@ -53,7 +53,7 @@
                 <el-form-item label="文章封面" prop="image">
                   <el-upload
                     class="avatar-uploader"
-                    action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                    action="/api/api/upload"
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
@@ -89,9 +89,10 @@
         <MdEditor
           class="md-editor-custom"
           v-model="info.text"
-          previewTheme="default"
+          previewTheme="github"
           codeTheme="atom"
           :footers="['markdownTotal']"
+          :codeFoldable="false"
           :theme="theme"
           :language="language"
           :toolbars="toolbars"
@@ -117,6 +118,7 @@ import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import { Emoji } from '@vavt/v3-extension'
 import '@vavt/v3-extension/lib/asset/Emoji.css'
+import { upload } from '@/api'
 
 const props = defineProps({
   title: String,
@@ -188,13 +190,11 @@ const toolbars = [
   '-',
   'revoke',
   'next',
-  'save',
   '=',
   'pageFullscreen',
   'fullscreen',
   'preview',
   'previewOnly',
-  'htmlPreview',
   'catalog',
   'github'
 ]
@@ -203,14 +203,24 @@ const onUploadImg = async (files, callback) => {
   ElMessage.info('上传')
   const res = await Promise.all(
     files.map(file => {
-      return new Promise(() => {
+      return new Promise((rev, rej) => {
         const form = new FormData()
         form.append('file', file)
+
+        upload(form)
+          .then(res => {
+            ElMessage.success('上传成功')
+            rev(res)
+          })
+          .catch(err => {
+            ElMessage.error('上传失败')
+            rej(err)
+          })
       })
     })
   )
 
-  callback(res.map(item => item.data.url))
+  callback(res.map(item => item.data.file.downloadUrl))
 }
 
 const onSave = (v, h) => {
