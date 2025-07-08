@@ -2,8 +2,8 @@
   <div>
     <v-dialog :title="title" :isShow="isShow" @close="close" @open="open" width="600px">
       <el-form ref="categoryFormRef" :model="categoryForm" :rules="rules" label-width="120px">
-        <el-form-item label="类别名称" prop="name">
-          <el-input v-model="categoryForm.name" placeholder="请输入类别名称" maxlength="10" show-word-limit />
+        <el-form-item label="分类名称" prop="name">
+          <el-input v-model="categoryForm.name" placeholder="请输入分类名称" maxlength="10" show-word-limit />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-switch
@@ -16,7 +16,7 @@
             v-model="categoryForm.description"
             type="textarea"
             show-word-limit
-            placeholder="请输入类别描述"
+            placeholder="请输入分类描述"
             maxlength="30"
           />
         </el-form-item>
@@ -54,7 +54,7 @@ let categoryForm = reactive({
 })
 
 const rules = {
-  name: [{ required: true, message: '请输入类别名称', trigger: 'blur' }]
+  name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
 }
 
 const emit = defineEmits(['close'])

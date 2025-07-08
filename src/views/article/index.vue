@@ -10,8 +10,8 @@
             <el-option v-for="item in tagList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="类别" prop="category">
-          <el-select v-model="formData.category" placeholder="请选择文章类别" clearable>
+        <el-form-item label="分类" prop="category">
+          <el-select v-model="formData.category" placeholder="请选择文章分类" clearable>
             <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>

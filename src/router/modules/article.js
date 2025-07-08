@@ -24,7 +24,7 @@ const route = [
       },
       {
         path: 'category',
-        meta: { title: '类别管理', i18nName: 'tadCategory', icon: 'category' },
+        meta: { title: '分类管理', i18nName: 'tadCategory', icon: 'category' },
         name: 'articleCategory',
         component: () => import('@/views/article/category/index.vue')
       },

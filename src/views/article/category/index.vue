@@ -2,8 +2,8 @@
   <div class="view-base">
     <div class="view-base-form">
       <el-form ref="formRef" :inline="true" :model="formData">
-        <el-form-item label="类别名称" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入类别名称" clearable />
+        <el-form-item label="分类名称" prop="name">
+          <el-input v-model="formData.name" placeholder="请输入分类名称" clearable />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="formData.status" placeholder="请选择状态" clearable>
@@ -36,7 +36,7 @@
     <div class="view-base-table">
       <el-table :data="tableData" border @selection-change="selectionChange">
         <el-table-column type="selection" width="45" />
-        <el-table-column prop="name" label="类别名称" />
+        <el-table-column prop="name" label="分类名称" />
         <el-table-column prop="description" label="描述" />
         <el-table-column prop="status" label="状态" align="center" width="100">
           <template #default="scope">
@@ -154,7 +154,7 @@ const delData = () => {
     return ElMessage.error('请至少选择一条数据')
   }
 
-  ElMessageBox.confirm('确认删除选中类别？', '提示', {
+  ElMessageBox.confirm('确认删除选中分类？', '提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
@@ -175,18 +175,18 @@ const selectionChange = val => {
 
 const addData = () => {
   editDialogInfo.isShow = true
-  editDialogInfo.title = '新增类别'
+  editDialogInfo.title = '新增分类'
   editDialogInfo.type = 1
 }
 
 const editData = () => {
   editDialogInfo.isShow = true
-  editDialogInfo.title = '编辑类别'
+  editDialogInfo.title = '编辑分类'
   editDialogInfo.type = 2
 }
 
 const editDialogInfo = reactive({
-  title: '新增类别',
+  title: '新增分类',
   isShow: false,
   type: 1,
   info: {}

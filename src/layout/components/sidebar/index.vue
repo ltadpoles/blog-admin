@@ -65,7 +65,7 @@ const menu = ref([
       {
         path: '/article/category',
         icon: 'category',
-        name: '类别管理',
+        name: '分类管理',
         il18Name: 'tadCategory',
         id: '033',
         children: []
