@@ -13,12 +13,6 @@ html:root {
     font-size: 1rem;
   }
 
-  .el-tag {
-    height: 2rem;
-    --el-tag-font-size: 0.857rem;
-    --el-icon-size: 1rem;
-  }
-
   .el-dropdown-link:focus-visible {
     outline: none;
   }
@@ -54,8 +48,6 @@ html:root {
   }
 
   .el-popover.el-popper {
-    padding: 0;
-
     .el-popover__title {
       padding: 1rem;
       border-bottom: 1px solid var(--el-border-color);

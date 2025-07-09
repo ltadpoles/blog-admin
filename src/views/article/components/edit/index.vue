@@ -19,7 +19,7 @@
         <div class="edit-header-right">
           <el-button type="default" @click="close">取消</el-button>
 
-          <el-popover ref="editPopoverRef" placement="bottom" width="400" title="文章发布" trigger="click">
+          <el-popover ref="editPopoverRef" placement="bottom" width="520" title="文章发布" trigger="click">
             <template #reference>
               <el-button type="primary">发布</el-button>
             </template>
@@ -27,22 +27,27 @@
               <el-form :model="info" label-width="80px">
                 <el-form-item label="分类" prop="category">
                   <el-select v-model="info.category" :teleported="false" placeholder="请选择分类" clearable>
-                    <el-option label="Zone one" value="shanghai" />
-                    <el-option label="Zone two" value="beijing" />
+                    <el-option :label="item.label" :value="item.id" v-for="item in categoryList" :key="item.id" />
                   </el-select>
                 </el-form-item>
 
                 <el-form-item label="标签" prop="tags">
-                  <el-select v-model="info.tags" :teleported="false" placeholder="请选择标签" clearable>
-                    <el-option label="Zone one" value="shanghai" />
-                    <el-option label="Zone two" value="beijing" />
+                  <el-select
+                    v-model="info.tags"
+                    :teleported="false"
+                    multiple-limit="3"
+                    multiple
+                    placeholder="请选择标签"
+                    clearable
+                  >
+                    <template #header> 最多选择3个标签 </template>
+                    <el-option :label="item.label" :value="item.id" v-for="item in tagsList" :key="item.id" />
                   </el-select>
                 </el-form-item>
 
                 <el-form-item label="创作类型" prop="type">
                   <el-select v-model="info.type" :teleported="false" placeholder="请选择创作类型" clearable>
-                    <el-option label="Zone one" value="shanghai" />
-                    <el-option label="Zone two" value="beijing" />
+                    <el-option :label="item.label" :value="item.id" v-for="item in typeList" :key="item.id" />
                   </el-select>
                 </el-form-item>
 
@@ -87,8 +92,9 @@
       </div>
       <div class="edit-main">
         <MdEditor
+          ref="mdEditorRef"
           class="md-editor-custom"
-          v-model="info.text"
+          v-model="text"
           previewTheme="github"
           codeTheme="atom"
           :footers="['markdownTotal']"
@@ -133,7 +139,43 @@ const props = defineProps({
   }
 })
 
+const mdEditorRef = useTemplateRef('mdEditorRef')
+
+const text = ref('# Hell World')
 let info = reactive({})
+const tagsList = ref([
+  {
+    label: 'vue',
+    id: '1'
+  },
+  {
+    label: 'react',
+    id: '2'
+  },
+  {
+    label: 'angular',
+    id: '3'
+  },
+  {
+    label: 'node',
+    id: '4'
+  }
+])
+const categoryList = ref([])
+const typeList = ref([
+  {
+    label: '原创',
+    id: '1'
+  },
+  {
+    label: '转载',
+    id: '2'
+  },
+  {
+    label: '翻译',
+    id: '3'
+  }
+])
 const editPopoverRef = useTemplateRef('editPopoverRef')
 const loading = ref(false)
 
@@ -151,7 +193,23 @@ const submit = async () => {
   if (!info.category) {
     return ElMessage.error('请选择文章分类')
   }
+  if (!info.tags) {
+    return ElMessage.error('请选择文章标签')
+  }
+  if (!info.type) {
+    return ElMessage.error('请选择创作类型')
+  }
+  if (info.type === '2' && !info.link) {
+    return ElMessage.error('请输入原文链接')
+  }
+  if (!info.image) {
+    return ElMessage.error('请上传文章封面')
+  }
+  if (!info.decription) {
+    return ElMessage.error('请输入文章摘要')
+  }
   loading.value = true
+  mdEditorRef.value?.triggerSave()
   setTimeout(() => {
     loading.value = false
   }, 3000)
