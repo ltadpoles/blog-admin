@@ -28,15 +28,15 @@
     <div class="view-base-table">
       <el-table :data="tableData" border @selection-change="selectionChange">
         <el-table-column type="selection" width="45" />
+        <el-table-column prop="name" label="留言内容" />
+        <el-table-column prop="description" label="关联文章" />
         <el-table-column prop="description" label="操作人" />
         <el-table-column prop="description" label="联系方式" />
-        <el-table-column prop="description" label="关联文章" />
         <el-table-column prop="createTime" label="留言时间">
           <template #default="scope">
             {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="留言内容" />
         <el-table-column label="操作" width="100" align="center">
           <template #default="scope">
             <el-popconfirm

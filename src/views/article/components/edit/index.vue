@@ -35,7 +35,7 @@
                   <el-select
                     v-model="info.tags"
                     :teleported="false"
-                    multiple-limit="3"
+                    :multiple-limit="3"
                     multiple
                     placeholder="请选择标签"
                     clearable
