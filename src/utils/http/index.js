@@ -14,7 +14,7 @@ http.interceptors.request.use(
   function (config) {
     // 在发送请求之前做些什么
     const userStore = useUserStore()
-    const token = userStore.token.access_token
+    const token = 'Bearer ' + userStore.token.token
 
     // 添加 header 请求头
     if (token) {

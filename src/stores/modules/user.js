@@ -3,6 +3,7 @@
  */
 import { defineStore } from 'pinia'
 import config from '@/config'
+import { getUserInfo } from '@/api/admin'
 
 export const useUserStore = defineStore('userStore', {
   state: () => ({
@@ -22,20 +23,9 @@ export const useUserStore = defineStore('userStore', {
     },
 
     async getInfoAction() {
+      let { data } = await getUserInfo()
       // 设置用户信息
-      this.setUserInfo({
-        username: 'ltadpole',
-        name: '游荡de蝌蚪',
-        age: 18,
-        sex: 1
-      })
-      this.setToken({ token: ' 123456' })
-      this.setMenu([
-        {
-          name: '首页',
-          path: '/'
-        }
-      ])
+      this.setUserInfo(data.data)
     }
   },
   // 持久化存储

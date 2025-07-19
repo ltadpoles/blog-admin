@@ -7,19 +7,13 @@
       <div class="login-container-right">
         <div class="login-content">
           <div class="login-content-title">后台管理系统</div>
-          <el-form class="login-form" ref="ruleFormRef" :model="ruleForm" :rules="rules">
+          <el-form class="login-form" ref="formRef" :model="form" :rules="rules">
             <el-form-item label="" prop="username">
-              <el-input
-                v-model="ruleForm.username"
-                :prefix-icon="User"
-                size="large"
-                placeholder="请输入用户名"
-                clearable
-              />
+              <el-input v-model="form.username" :prefix-icon="User" size="large" placeholder="请输入用户名" clearable />
             </el-form-item>
             <el-form-item label="" prop="password">
               <el-input
-                v-model="ruleForm.password"
+                v-model="form.password"
                 :prefix-icon="Lock"
                 size="large"
                 type="password"
@@ -29,7 +23,13 @@
               />
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="submitForm(ruleFormRef)" auto-insert-space class="login-form-button">
+              <el-button
+                :loading="loading"
+                type="primary"
+                @click="submitForm(formRef)"
+                auto-insert-space
+                class="login-form-button"
+              >
                 登录
               </el-button>
             </el-form-item>
@@ -43,14 +43,19 @@
 <script setup>
 import { useUserStore } from '@/stores/modules/user'
 import { useRouter } from 'vue-router'
-import { useTemplateRef, reactive } from 'vue'
+import { useTemplateRef, reactive, ref } from 'vue'
 import { User, Lock } from '@element-plus/icons-vue'
+import { login } from '@/api/admin'
+import sha256 from 'crypto-js/sha256'
+import { useRoute } from 'vue-router'
 
 const userStore = useUserStore()
 const router = useRouter()
+const route = useRoute()
 
-const ruleFormRef = useTemplateRef('ruleFormRef')
-const ruleForm = reactive({
+const loading = ref(false)
+const formRef = useTemplateRef('formRef')
+const form = reactive({
   username: '',
   password: ''
 })
@@ -63,8 +68,16 @@ const rules = reactive({
 const submitForm = formRef => {
   formRef.validate(async valid => {
     if (valid) {
+      loading.value = true
+      let { data } = await login({
+        username: form.username,
+        password: sha256(form.password).toString()
+      }).finally(() => {
+        loading.value = false
+      })
+      userStore.setToken(data.data)
       await userStore.getInfoAction()
-      router.push('/')
+      router.replace(route.query.redirect || '/')
     } else {
       return false
     }
