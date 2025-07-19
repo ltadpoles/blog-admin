@@ -1,8 +1,8 @@
 <template>
   <el-dropdown>
     <div class="el-dropdown-link">
-      <img class="avatar-img" alt="avatar" :src="getImageUrl('avatar.jpg')" />
-      <span>游荡de蝌蚪</span>
+      <img class="avatar-img" alt="avatar" :src="userStore.userInfo?.avatar" />
+      <span>{{ userStore.userInfo?.name || userStore.userInfo?.username }}</span>
     </div>
     <template #dropdown>
       <el-dropdown-menu>
@@ -24,10 +24,11 @@
 </template>
 
 <script setup>
-import { getImageUrl } from '@/utils'
 import { useRouter } from 'vue-router'
 import { RESETSTORE } from '@/stores/reset'
+import { useUserStore } from '@/stores/modules/user'
 
+const userStore = useUserStore()
 const router = useRouter()
 
 const getAbout = () => {

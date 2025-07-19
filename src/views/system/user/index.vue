@@ -11,8 +11,8 @@
         <el-form-item label="状态" prop="status">
           <el-select v-model="formData.status" placeholder="请选择状态" clearable>
             <el-option label="全部" value="" />
-            <el-option label="启用" value="1" />
-            <el-option label="禁用" value="2" />
+            <el-option label="有效" value="1" />
+            <el-option label="无效" value="0" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -27,8 +27,7 @@
 
     <div class="view-base-table">
       <el-table :data="tableData" border>
-        <el-table-column type="selection" width="45" />
-        <el-table-column prop="avatar" label="头像" align="center">
+        <el-table-column prop="avatar" label="头像" align="center" width="80">
           <template #default="scope">
             <img class="list-avatar" :src="scope.row.avatar" alt="" />
           </template>
@@ -42,7 +41,11 @@
             {{ scope.row.sex === 1 ? '男' : '女' }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" />
+        <el-table-column prop="status" label="状态">
+          <template #default="scope">
+            {{ scope.row.status === 1 ? '有效' : '无效' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="createTime" label="注册时间">
           <template #default="scope">
             {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
@@ -65,9 +68,9 @@
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus'
 import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import { dayjs } from 'element-plus'
+import { page } from '@/api/user'
 
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
@@ -91,8 +94,10 @@ const pageQuery = reactive({
   currentPage: 1
 })
 
-const getList = () => {
-  ElMessage.error('获取数据失败')
+const getList = async () => {
+  let { data } = await page(query)
+  tableData.value = data.data.list
+  pageQuery.total = data.data.total
 }
 const currentChange = page => {
   query.pageNum = page
