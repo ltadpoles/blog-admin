@@ -41,7 +41,7 @@
         <el-table-column prop="remark" label="描述" />
         <el-table-column prop="status" label="状态" align="center" width="100">
           <template #default="scope">
-            <el-tag type="success" v-if="scope.row.status">启用</el-tag>
+            <el-tag type="success" v-if="scope.row.status === '1'">启用</el-tag>
             <el-tag type="danger" v-else>禁用</el-tag>
           </template>
         </el-table-column>
@@ -127,9 +127,6 @@ const pageQuery = reactive({
 
 const getList = async () => {
   let { data } = await page(query)
-  data.data.list.forEach(item => {
-    item.status = item.status === 1
-  })
   tableData.value = data.data.list
   pageQuery.total = data.data.total
 }

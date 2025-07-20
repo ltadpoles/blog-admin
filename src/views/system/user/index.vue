@@ -41,9 +41,10 @@
             {{ scope.row.sex === 1 ? '男' : '女' }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态">
+        <el-table-column prop="status" label="状态" align="center" width="100">
           <template #default="scope">
-            {{ scope.row.status === 1 ? '有效' : '无效' }}
+            <el-tag type="success" v-if="scope.row.status === '1'">有效</el-tag>
+            <el-tag type="danger" v-else>无效</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="注册时间">

@@ -1,3 +1,4 @@
+import { useTagStore } from './modules/tag'
 import { useUserStore } from './modules/user'
 
 /**
@@ -5,6 +6,8 @@ import { useUserStore } from './modules/user'
  */
 export const RESETSTORE = () => {
   const userStore = useUserStore()
+  const tagStore = useTagStore()
 
   userStore.$reset()
+  tagStore.$reset()
 }

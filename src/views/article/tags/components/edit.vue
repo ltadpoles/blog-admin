@@ -66,7 +66,7 @@ const open = () => {
     tagsForm.status = true
   } else {
     tagsForm = Object.assign(tagsForm, props.info)
-    tagsForm.status = props.info.status ? true : false
+    tagsForm.status = props.info.status === '1' ? true : false
   }
 }
 
@@ -87,7 +87,7 @@ const submit = async formEl => {
       loading.value = true
 
       if (props.type === 1) {
-        add({ ...tagsForm, status: tagsForm.status ? 1 : 0 })
+        add({ ...tagsForm, status: tagsForm.status ? '1' : '0' })
           .then(res => {
             loading.value = false
             ElMessage.success(res.data.msg)
@@ -99,7 +99,7 @@ const submit = async formEl => {
       }
 
       if (props.type === 2) {
-        update({ ...tagsForm, status: tagsForm.status ? 1 : 0 })
+        update({ ...tagsForm, status: tagsForm.status ? '1' : '0' })
           .then(res => {
             loading.value = false
             ElMessage.success(res.data.msg)
