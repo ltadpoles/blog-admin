@@ -9,12 +9,13 @@
           <el-select v-model="formData.status" placeholder="请选择状态" clearable>
             <el-option label="全部" value="" />
             <el-option label="启用" value="1" />
-            <el-option label="禁用" value="2" />
+            <el-option label="禁用" value="0" />
           </el-select>
         </el-form-item>
         <el-form-item label="创建时间" prop="date">
           <el-date-picker
             v-model="formData.date"
+            value-format="x"
             type="daterange"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
@@ -37,13 +38,11 @@
       <el-table :data="tableData" border @selection-change="selectionChange">
         <el-table-column type="selection" width="45" />
         <el-table-column prop="name" label="分类名称" />
-        <el-table-column prop="description" label="描述" />
+        <el-table-column prop="remark" label="描述" />
         <el-table-column prop="status" label="状态" align="center" width="100">
           <template #default="scope">
-            <el-switch
-              v-model="scope.row.status"
-              style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-            />
+            <el-tag type="success" v-if="scope.row.status === '1'">启用</el-tag>
+            <el-tag type="danger" v-else>禁用</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间">
@@ -101,6 +100,7 @@ import { ElMessage } from 'element-plus'
 import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import { dayjs } from 'element-plus'
 import { ElMessageBox } from 'element-plus'
+import { page, del } from '@/api/category'
 import editDialog from './components/edit.vue'
 
 const formRef = useTemplateRef('formRef')
@@ -110,11 +110,7 @@ const formData = reactive({
   date: ''
 })
 
-const tableData = ref([
-  {
-    name: 'vue'
-  }
-])
+const tableData = ref([])
 const query = reactive({
   pageNum: 1,
   pageSize: 10,
@@ -125,8 +121,10 @@ const pageQuery = reactive({
   currentPage: 1
 })
 
-const getList = () => {
-  ElMessage.error('获取数据失败')
+const getList = async () => {
+  let { data } = await page(query)
+  tableData.value = data.data.list
+  pageQuery.total = data.data.total
 }
 const currentChange = page => {
   query.pageNum = page
@@ -136,6 +134,13 @@ const currentChange = page => {
 const search = () => {
   pageQuery.currentPage = 1
   query.pageNum = 1
+  if (formData.date) {
+    formData.createTimeStart = formData.date[0]
+    formData.createTimeEnd = formData.date[1]
+  } else {
+    formData.createTimeStart = null
+    formData.createTimeEnd = null
+  }
   query.param = Object.assign(query.param, formData)
   getList(query)
 }
@@ -159,13 +164,17 @@ const delData = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
+    let ids = multipleSelection.value.map(item => item.id).join()
+    await del({ id: ids })
     ElMessage.success('删除成功')
     getList(query)
   })
 }
 
-const delConfirm = () => {
+const delConfirm = async row => {
+  await del({ id: row.id })
   ElMessage.success('删除成功')
+  getList(query)
 }
 
 const multipleSelection = ref([])
@@ -177,12 +186,14 @@ const addData = () => {
   editDialogInfo.isShow = true
   editDialogInfo.title = '新增分类'
   editDialogInfo.type = 1
+  editDialogInfo.info = {}
 }
 
-const editData = () => {
+const editData = row => {
   editDialogInfo.isShow = true
   editDialogInfo.title = '编辑分类'
   editDialogInfo.type = 2
+  editDialogInfo.info = row
 }
 
 const editDialogInfo = reactive({
@@ -191,7 +202,10 @@ const editDialogInfo = reactive({
   type: 1,
   info: {}
 })
-const editDialogClose = () => {
+const editDialogClose = val => {
+  if (val) {
+    getList(query)
+  }
   editDialogInfo.isShow = false
 }
 

@@ -110,11 +110,7 @@ const formData = reactive({
   date: ''
 })
 
-const tableData = ref([
-  {
-    name: 'vue'
-  }
-])
+const tableData = ref([])
 const query = reactive({
   pageNum: 1,
   pageSize: 10,
@@ -142,8 +138,8 @@ const search = () => {
     formData.createTimeStart = formData.date[0]
     formData.createTimeEnd = formData.date[1]
   } else {
-    formData.createTimeStart = ''
-    formData.createTimeEnd = ''
+    formData.createTimeStart = null
+    formData.createTimeEnd = null
   }
   query.param = Object.assign(query.param, formData)
   getList(query)

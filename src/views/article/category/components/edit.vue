@@ -6,14 +6,11 @@
           <el-input v-model="categoryForm.name" placeholder="请输入分类名称" maxlength="10" show-word-limit />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-switch
-            v-model="categoryForm.status"
-            style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-          />
+          <el-switch v-model="categoryForm.status" />
         </el-form-item>
-        <el-form-item label="描述" prop="description">
+        <el-form-item label="描述" prop="remark">
           <el-input
-            v-model="categoryForm.description"
+            v-model="categoryForm.remark"
             type="textarea"
             show-word-limit
             placeholder="请输入分类描述"
@@ -33,6 +30,8 @@ import vDialog from '@/components/dialog/index.vue'
 import { reactive, ref, useTemplateRef } from 'vue'
 import { ElMessage } from 'element-plus'
 import { resetData } from '@/utils'
+import { add } from '@/api/category'
+import { update } from '@/api/category'
 
 const props = defineProps({
   title: String,
@@ -50,7 +49,7 @@ let loading = ref(false)
 let categoryForm = reactive({
   name: '',
   status: true,
-  description: ''
+  remark: ''
 })
 
 const rules = {
@@ -63,12 +62,12 @@ const close = val => {
 }
 
 const open = () => {
-  if (props.type) {
+  if (props.type === 1) {
     resetData(categoryForm)
     categoryForm.status = true
   } else {
     categoryForm = Object.assign(categoryForm, props.info)
-    categoryForm.status = props.info.status ? true : false
+    categoryForm.status = props.info.status === '1' ? true : false
   }
 }
 
@@ -87,14 +86,29 @@ const submit = async formEl => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       loading.value = true
-      // if (props.type === 1) {
-      // }
+      if (props.type === 1) {
+        add({ ...categoryForm, status: categoryForm.status ? '1' : '0' })
+          .then(res => {
+            loading.value = false
+            ElMessage.success(res.data.msg)
+            close(true)
+          })
+          .finally(() => {
+            loading.value = false
+          })
+      }
 
-      // if (props.type === 2) {
-      // }
-
-      loading.value = false
-      ElMessage.success('操作成功')
+      if (props.type === 2) {
+        update({ ...categoryForm, status: categoryForm.status ? '1' : '0' })
+          .then(res => {
+            loading.value = false
+            ElMessage.success(res.data.msg)
+            close(true)
+          })
+          .finally(() => {
+            loading.value = false
+          })
+      }
       close(true)
     } else {
       Promise.reject(fields)
