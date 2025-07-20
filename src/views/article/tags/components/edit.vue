@@ -6,11 +6,11 @@
           <el-input v-model="tagsForm.name" placeholder="请输入标签名称" maxlength="10" show-word-limit />
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-switch v-model="tagsForm.status" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
+          <el-switch v-model="tagsForm.status" />
         </el-form-item>
-        <el-form-item label="描述" prop="description">
+        <el-form-item label="描述" prop="remark">
           <el-input
-            v-model="tagsForm.description"
+            v-model="tagsForm.remark"
             type="textarea"
             show-word-limit
             placeholder="请输入标签描述"
@@ -30,6 +30,7 @@ import vDialog from '@/components/dialog/index.vue'
 import { reactive, ref, useTemplateRef } from 'vue'
 import { ElMessage } from 'element-plus'
 import { resetData } from '@/utils'
+import { add, update } from '@/api/tag'
 
 const props = defineProps({
   title: String,
@@ -47,7 +48,7 @@ let loading = ref(false)
 let tagsForm = reactive({
   name: '',
   status: true,
-  description: ''
+  remark: ''
 })
 
 const rules = {
@@ -60,8 +61,8 @@ const close = val => {
 }
 
 const open = () => {
-  if (props.type) {
-    resetData(tagsForm)
+  resetData(tagsForm)
+  if (props.type === 1) {
     tagsForm.status = true
   } else {
     tagsForm = Object.assign(tagsForm, props.info)
@@ -84,15 +85,30 @@ const submit = async formEl => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       loading.value = true
-      // if (props.type === 1) {
-      // }
 
-      // if (props.type === 2) {
-      // }
+      if (props.type === 1) {
+        add({ ...tagsForm, status: tagsForm.status ? 1 : 0 })
+          .then(res => {
+            loading.value = false
+            ElMessage.success(res.data.msg)
+            close(true)
+          })
+          .finally(() => {
+            loading.value = false
+          })
+      }
 
-      loading.value = false
-      ElMessage.success('操作成功')
-      close(true)
+      if (props.type === 2) {
+        update({ ...tagsForm, status: tagsForm.status ? 1 : 0 })
+          .then(res => {
+            loading.value = false
+            ElMessage.success(res.data.msg)
+            close(true)
+          })
+          .finally(() => {
+            loading.value = false
+          })
+      }
     } else {
       Promise.reject(fields)
     }
