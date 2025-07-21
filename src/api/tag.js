@@ -16,8 +16,8 @@ export const update = data => {
 }
 
 // 不分页有效标签
-export const list = () => {
-  return http.get('/tag/list')
+export const taglist = params => {
+  return http.get('/tag/list', { params })
 }
 
 // 详情

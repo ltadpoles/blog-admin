@@ -16,8 +16,8 @@ export const update = data => {
 }
 
 // 不分页有效分类
-export const list = () => {
-  return http.get('/category/list')
+export const categorylist = params => {
+  return http.get('/category/list', { params })
 }
 
 // 详情

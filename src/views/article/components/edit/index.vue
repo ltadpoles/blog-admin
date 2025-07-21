@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/no-parsing-error -->
 <template>
   <v-dialog
     :isShow="isShow"
@@ -21,13 +20,13 @@
 
           <el-popover ref="editPopoverRef" placement="bottom" width="520" title="文章发布" trigger="click">
             <template #reference>
-              <el-button type="primary">发布</el-button>
+              <el-button type="primary">保存</el-button>
             </template>
             <div class="edit-publish">
               <el-form :model="info" label-width="80px">
                 <el-form-item label="分类" prop="category">
                   <el-select v-model="info.category" :teleported="false" placeholder="请选择分类" clearable>
-                    <el-option :label="item.label" :value="item.id" v-for="item in categoryList" :key="item.id" />
+                    <el-option :label="item.name" :value="item.id" v-for="item in categorysList" :key="item.id" />
                   </el-select>
                 </el-form-item>
 
@@ -41,7 +40,7 @@
                     clearable
                   >
                     <template #header> 最多选择3个标签 </template>
-                    <el-option :label="item.label" :value="item.id" v-for="item in tagsList" :key="item.id" />
+                    <el-option :label="item.name" :value="item.id" v-for="item in tagsList" :key="item.id" />
                   </el-select>
                 </el-form-item>
 
@@ -70,13 +69,13 @@
                   </el-upload>
                 </el-form-item>
 
-                <el-form-item label="文章摘要" prop="decription">
+                <el-form-item label="文章摘要" prop="description">
                   <el-input
-                    v-model="info.decription"
+                    v-model="info.description"
                     :rows="4"
                     resize="none"
                     type="textarea"
-                    maxlength="100"
+                    maxlength="50"
                     show-word-limit
                     placeholder="请输入文章摘要"
                   />
@@ -94,7 +93,7 @@
         <MdEditor
           ref="mdEditorRef"
           class="md-editor-custom"
-          v-model="text"
+          v-model="info.content"
           previewTheme="github"
           codeTheme="atom"
           :footers="['markdownTotal']"
@@ -125,6 +124,9 @@ import 'md-editor-v3/lib/style.css'
 import { Emoji } from '@vavt/v3-extension'
 import '@vavt/v3-extension/lib/asset/Emoji.css'
 import { upload } from '@/api'
+import { taglist } from '@/api/tag'
+import { categorylist } from '@/api/category'
+import { add } from '@/api/article'
 
 const props = defineProps({
   title: String,
@@ -135,49 +137,38 @@ const props = defineProps({
   },
   type: {
     type: Number,
-    default: 0
+    default: 1
   }
 })
 
 const mdEditorRef = useTemplateRef('mdEditorRef')
 
-const text = ref('# Hell World')
-let info = reactive({})
-const tagsList = ref([
-  {
-    label: 'vue',
-    id: '1'
-  },
-  {
-    label: 'react',
-    id: '2'
-  },
-  {
-    label: 'angular',
-    id: '3'
-  },
-  {
-    label: 'node',
-    id: '4'
-  }
-])
-const categoryList = ref([])
+let info = reactive({
+  content: '# Hell World'
+})
 const typeList = ref([
   {
     label: '原创',
-    id: '1'
+    id: 1
   },
   {
     label: '转载',
-    id: '2'
-  },
-  {
-    label: '翻译',
-    id: '3'
+    id: 2
   }
 ])
 const editPopoverRef = useTemplateRef('editPopoverRef')
 const loading = ref(false)
+
+const tagsList = ref([])
+const categorysList = ref([])
+const getTagList = async () => {
+  let { data } = await taglist({ status: '1' })
+  tagsList.value = data.data
+}
+const getCateGoryList = async () => {
+  let { data } = await categorylist({ status: '1' })
+  categorysList.value = data.data
+}
 
 const handleAvatarSuccess = () => {
   return true
@@ -189,11 +180,18 @@ const beforeAvatarUpload = () => {
 const cancel = () => {
   editPopoverRef.value?.hide()
 }
+
 const submit = async () => {
+  if (!info.title) {
+    return ElMessage.error('请输入文章标题')
+  }
+  if (!info.content) {
+    return ElMessage.error('请输入文章内容')
+  }
   if (!info.category) {
     return ElMessage.error('请选择文章分类')
   }
-  if (!info.tags) {
+  if (!info.tags || !info.tags.length) {
     return ElMessage.error('请选择文章标签')
   }
   if (!info.type) {
@@ -202,17 +200,23 @@ const submit = async () => {
   if (info.type === '2' && !info.link) {
     return ElMessage.error('请输入原文链接')
   }
-  if (!info.image) {
-    return ElMessage.error('请上传文章封面')
-  }
-  if (!info.decription) {
+  // if (!info.image) {
+  //   return ElMessage.error('请上传文章封面')
+  // }
+  if (!info.description) {
     return ElMessage.error('请输入文章摘要')
   }
   loading.value = true
   mdEditorRef.value?.triggerSave()
-  setTimeout(() => {
-    loading.value = false
-  }, 3000)
+
+  add(info)
+    .then(res => {
+      ElMessage.success(res.data.msg)
+      close(true)
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 const settingStore = useSettingStore()
@@ -294,6 +298,8 @@ const close = value => {
 
 const open = () => {
   resetData(info)
+  getCateGoryList()
+  getTagList()
   if (props.id) {
     getInfo(props.id)
   }

@@ -2,17 +2,17 @@
   <div class="view-base">
     <div class="view-base-form">
       <el-form ref="formRef" :inline="true" :model="formData">
-        <el-form-item label="标题" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入标题" clearable />
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="formData.title" placeholder="请输入标题" clearable />
         </el-form-item>
         <el-form-item label="标签" prop="tags">
           <el-select v-model="formData.tags" placeholder="请选择文章标签" clearable multiple>
-            <el-option v-for="item in tagList" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in tagsList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="分类" prop="category">
           <el-select v-model="formData.category" placeholder="请选择文章分类" clearable>
-            <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id" />
+            <el-option v-for="item in categorysList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="创作类型" prop="type">
@@ -26,6 +26,7 @@
           <el-date-picker
             v-model="formData.date"
             type="daterange"
+            value-format="x"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
           />
@@ -48,16 +49,16 @@
     <div class="view-base-table">
       <el-table :data="tableData" border @selection-change="selectionChange">
         <el-table-column type="selection" width="45" />
-        <el-table-column prop="title" label="标题" />
+        <el-table-column prop="title" label="标题" min-width="180" />
         <el-table-column prop="createUserName" label="作者" align="center" />
-        <el-table-column prop="tags" label="标签" min-width="120px" class-name="tag-class">
+        <el-table-column prop="tags" label="标签" align="center" width="200px" class-name="tag-class">
           <template #default="scope">
             <el-tag class="tag-item" type="success" v-for="item in scope.row.tag" :key="item.id">{{
               item.name
             }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="category" label="分类" align="center">
+        <el-table-column prop="category" label="分类" align="center" width="100">
           <template #default="scope">
             <el-tag v-for="item in scope.row.category" :key="item.id">{{ item.name }}</el-tag>
           </template>
@@ -153,24 +154,31 @@ import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import { dayjs } from 'element-plus'
 import { ElMessageBox } from 'element-plus'
 import editDialog from './components/edit/index.vue'
+import { page } from '@/api/article'
+import { taglist } from '@/api/tag'
+import { categorylist } from '@/api/category'
 
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
-  name: '',
-  tags: '',
+  title: '',
+  tags: [],
   category: '',
   type: '',
-  date: ''
+  date: null
 })
 
-const tagList = ref([])
-const categoryList = ref([])
+const tagsList = ref([])
+const categorysList = ref([])
+const getTagList = async () => {
+  let { data } = await taglist()
+  tagsList.value = data.data
+}
+const getCateGoryList = async () => {
+  let { data } = await categorylist()
+  categorysList.value = data.data
+}
 
-const tableData = ref([
-  {
-    name: 'vue'
-  }
-])
+const tableData = ref([])
 const query = reactive({
   pageNum: 1,
   pageSize: 10,
@@ -181,8 +189,10 @@ const pageQuery = reactive({
   currentPage: 1
 })
 
-const getList = () => {
-  ElMessage.error('获取数据失败')
+const getList = async () => {
+  let { data } = await page(query)
+  tableData.value = data.data.list
+  pageQuery.total = data.data.total
 }
 const currentChange = page => {
   query.pageNum = page
@@ -192,6 +202,13 @@ const currentChange = page => {
 const search = () => {
   pageQuery.currentPage = 1
   query.pageNum = 1
+  if (formData.date) {
+    formData.createTimeStart = formData.date[0]
+    formData.createTimeEnd = formData.date[1]
+  } else {
+    formData.createTimeStart = null
+    formData.createTimeEnd = null
+  }
   query.param = Object.assign(query.param, formData)
   getList(query)
 }
@@ -250,11 +267,16 @@ const editDialogInfo = reactive({
   type: 1,
   info: {}
 })
-const editDialogClose = () => {
+const editDialogClose = val => {
+  if (val) {
+    getList(query)
+  }
   editDialogInfo.isShow = false
 }
 
 onMounted(() => {
+  getTagList()
+  getCateGoryList()
   getList(query)
 })
 </script>
