@@ -57,7 +57,8 @@
                 <el-form-item label="文章封面" prop="image">
                   <el-upload
                     class="avatar-uploader"
-                    action="/api/api/upload"
+                    :headers="headers"
+                    :action="action"
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
@@ -127,6 +128,7 @@ import { upload } from '@/api'
 import { taglist } from '@/api/tag'
 import { categorylist } from '@/api/category'
 import { add } from '@/api/article'
+import { useUserStore } from '@/stores/modules/user'
 
 const props = defineProps({
   title: String,
@@ -140,6 +142,12 @@ const props = defineProps({
     default: 1
   }
 })
+
+const userStore = useUserStore()
+const action = import.meta.env.VITE_HTTP_BASEURL + '/file/upload'
+const headers = {
+  Authorization: `Bearer ${userStore.token.token}`
+}
 
 const mdEditorRef = useTemplateRef('mdEditorRef')
 
