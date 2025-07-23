@@ -63,7 +63,7 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                   >
-                    <img v-if="info.image" :src="info.image" class="avatar" />
+                    <img v-if="info.image" :src="ImgUrl + info.image" class="avatar" />
                     <el-icon v-else class="avatar-uploader-icon">
                       <Plus />
                     </el-icon>
@@ -144,6 +144,7 @@ const props = defineProps({
 })
 
 const userStore = useUserStore()
+const ImgUrl = import.meta.env.VITE_HTTP_BASEURL + '/file/download?fileId='
 const action = import.meta.env.VITE_HTTP_BASEURL + '/file/upload'
 const headers = {
   Authorization: `Bearer ${userStore.token.token}`
@@ -178,8 +179,8 @@ const getCateGoryList = async () => {
   categorysList.value = data.data
 }
 
-const handleAvatarSuccess = () => {
-  return true
+const handleAvatarSuccess = file => {
+  info.image = file.data.fileId
 }
 const beforeAvatarUpload = () => {
   return true
@@ -208,9 +209,9 @@ const submit = async () => {
   if (info.type === '2' && !info.link) {
     return ElMessage.error('请输入原文链接')
   }
-  // if (!info.image) {
-  //   return ElMessage.error('请上传文章封面')
-  // }
+  if (!info.image) {
+    return ElMessage.error('请上传文章封面')
+  }
   if (!info.description) {
     return ElMessage.error('请输入文章摘要')
   }
@@ -290,7 +291,12 @@ const onUploadImg = async (files, callback) => {
     })
   )
 
-  callback(res.map(item => item.data.file.downloadUrl))
+  callback(
+    res.map(item => ({
+      url: ImgUrl + item.data.data.fileId,
+      alt: 'IMG.ALT'
+    }))
+  )
 }
 
 const onSave = (v, h) => {
