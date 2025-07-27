@@ -36,9 +36,9 @@
         <el-table-column prop="name" label="昵称" />
         <el-table-column prop="phone" label="手机号" />
         <el-table-column prop="email" label="邮箱" />
-        <el-table-column prop="sex" label="性别">
+        <el-table-column prop="gender" label="性别">
           <template #default="scope">
-            {{ scope.row.sex === 1 ? '男' : '女' }}
+            {{ scope.row.gender === '1' ? '男' : '女' }}
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" align="center" width="100">

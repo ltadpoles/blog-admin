@@ -3,7 +3,7 @@
     <v-dialog :title="title" :isShow="isShow" @close="close" @open="open" width="600px">
       <el-form ref="tagsFormRef" :model="tagsForm" :rules="rules" label-width="120px">
         <el-form-item label="标签名称" prop="name">
-          <el-input v-model="tagsForm.name" placeholder="请输入标签名称" maxlength="10" show-word-limit />
+          <el-input v-model="tagsForm.name" placeholder="请输入标签名称" maxlength="15" show-word-limit />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-switch v-model="tagsForm.status" />

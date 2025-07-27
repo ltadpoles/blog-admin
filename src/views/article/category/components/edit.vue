@@ -109,7 +109,6 @@ const submit = async formEl => {
             loading.value = false
           })
       }
-      close(true)
     } else {
       Promise.reject(fields)
     }

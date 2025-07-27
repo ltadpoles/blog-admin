@@ -24,3 +24,8 @@ export const info = params => {
 export const del = params => {
   return http.get('/article/del', { params })
 }
+
+// 置顶
+export const top = params => {
+  return http.get('/article/top', { params })
+}

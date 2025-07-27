@@ -13,7 +13,7 @@
     <div class="edit">
       <div class="edit-header">
         <div class="edit-header-left">
-          <input class="edit-header-input" v-model="info.title" maxlength="20" placeholder="请输入文章标题" />
+          <input class="edit-header-input" v-model="infoData.title" maxlength="20" placeholder="请输入文章标题" />
         </div>
         <div class="edit-header-right">
           <el-button type="default" @click="close">取消</el-button>
@@ -23,16 +23,16 @@
               <el-button type="primary">保存</el-button>
             </template>
             <div class="edit-publish">
-              <el-form :model="info" label-width="80px">
+              <el-form :model="infoData" label-width="80px">
                 <el-form-item label="分类" prop="category">
-                  <el-select v-model="info.category" :teleported="false" placeholder="请选择分类" clearable>
+                  <el-select v-model="infoData.category" :teleported="false" placeholder="请选择分类" clearable>
                     <el-option :label="item.name" :value="item.id" v-for="item in categorysList" :key="item.id" />
                   </el-select>
                 </el-form-item>
 
                 <el-form-item label="标签" prop="tags">
                   <el-select
-                    v-model="info.tags"
+                    v-model="infoData.tags"
                     :teleported="false"
                     :multiple-limit="3"
                     multiple
@@ -45,16 +45,16 @@
                 </el-form-item>
 
                 <el-form-item label="创作类型" prop="type">
-                  <el-select v-model="info.type" :teleported="false" placeholder="请选择创作类型" clearable>
+                  <el-select v-model="infoData.type" :teleported="false" placeholder="请选择创作类型" clearable>
                     <el-option :label="item.label" :value="item.id" v-for="item in typeList" :key="item.id" />
                   </el-select>
                 </el-form-item>
 
                 <el-form-item label="原文链接" prop="link">
-                  <el-input v-model="info.link" maxlength="200" placeholder="请输入原文链接" />
+                  <el-input v-model="infoData.link" maxlength="200" placeholder="请输入原文链接" />
                 </el-form-item>
 
-                <el-form-item label="文章封面" prop="image">
+                <el-form-item label="文章封面" prop="coverImgId">
                   <el-upload
                     class="avatar-uploader"
                     :headers="headers"
@@ -63,7 +63,7 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                   >
-                    <img v-if="info.image" :src="ImgUrl + info.image" class="avatar" />
+                    <img v-if="infoData.coverImgId" :src="ImgUrl + infoData.coverImgId" class="avatar" />
                     <el-icon v-else class="avatar-uploader-icon">
                       <Plus />
                     </el-icon>
@@ -72,7 +72,7 @@
 
                 <el-form-item label="文章摘要" prop="description">
                   <el-input
-                    v-model="info.description"
+                    v-model="infoData.description"
                     :rows="4"
                     resize="none"
                     type="textarea"
@@ -94,7 +94,7 @@
         <MdEditor
           ref="mdEditorRef"
           class="md-editor-custom"
-          v-model="info.content"
+          v-model="infoData.content"
           previewTheme="github"
           codeTheme="atom"
           :footers="['markdownTotal']"
@@ -103,7 +103,6 @@
           :language="language"
           :toolbars="toolbars"
           @onUploadImg="onUploadImg"
-          @onSave="onSave"
         >
           <template #defToolbars>
             <Emoji />
@@ -127,7 +126,7 @@ import '@vavt/v3-extension/lib/asset/Emoji.css'
 import { upload } from '@/api'
 import { taglist } from '@/api/tag'
 import { categorylist } from '@/api/category'
-import { add } from '@/api/article'
+import { add, info, update } from '@/api/article'
 import { useUserStore } from '@/stores/modules/user'
 
 const props = defineProps({
@@ -150,19 +149,17 @@ const headers = {
   Authorization: `Bearer ${userStore.token.token}`
 }
 
-const mdEditorRef = useTemplateRef('mdEditorRef')
-
-let info = reactive({
-  content: '# Hell World'
+let infoData = reactive({
+  content: '### 标题'
 })
 const typeList = ref([
   {
     label: '原创',
-    id: 1
+    id: '1'
   },
   {
     label: '转载',
-    id: 2
+    id: '2'
   }
 ])
 const editPopoverRef = useTemplateRef('editPopoverRef')
@@ -180,7 +177,7 @@ const getCateGoryList = async () => {
 }
 
 const handleAvatarSuccess = file => {
-  info.image = file.data.fileId
+  infoData.coverImgId = file.data.fileId
 }
 const beforeAvatarUpload = () => {
   return true
@@ -191,41 +188,53 @@ const cancel = () => {
 }
 
 const submit = async () => {
-  if (!info.title) {
+  if (!infoData.title) {
     return ElMessage.error('请输入文章标题')
   }
-  if (!info.content) {
+  if (!infoData.content) {
     return ElMessage.error('请输入文章内容')
   }
-  if (!info.category) {
+  if (!infoData.category) {
     return ElMessage.error('请选择文章分类')
   }
-  if (!info.tags || !info.tags.length) {
+  if (!infoData.tags || !infoData.tags.length) {
     return ElMessage.error('请选择文章标签')
   }
-  if (!info.type) {
+  if (!infoData.type) {
     return ElMessage.error('请选择创作类型')
   }
-  if (info.type === '2' && !info.link) {
+  if (infoData.type === '2' && !infoData.link) {
     return ElMessage.error('请输入原文链接')
   }
-  if (!info.image) {
+  if (!infoData.coverImgId) {
     return ElMessage.error('请上传文章封面')
   }
-  if (!info.description) {
+  if (!infoData.description) {
     return ElMessage.error('请输入文章摘要')
   }
   loading.value = true
-  mdEditorRef.value?.triggerSave()
 
-  add(info)
-    .then(res => {
-      ElMessage.success(res.data.msg)
-      close(true)
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  if (props.type === 1) {
+    add(infoData)
+      .then(res => {
+        ElMessage.success(res.data.msg)
+        close(true)
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }
+
+  if (props.type === 2) {
+    update(infoData)
+      .then(res => {
+        ElMessage.success(res.data.msg)
+        close(true)
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }
 }
 
 const settingStore = useSettingStore()
@@ -271,7 +280,6 @@ const toolbars = [
 ]
 
 const onUploadImg = async (files, callback) => {
-  ElMessage.info('上传')
   const res = await Promise.all(
     files.map(file => {
       return new Promise((rev, rej) => {
@@ -280,11 +288,9 @@ const onUploadImg = async (files, callback) => {
 
         upload(form)
           .then(res => {
-            ElMessage.success('上传成功')
             rev(res)
           })
           .catch(err => {
-            ElMessage.error('上传失败')
             rej(err)
           })
       })
@@ -299,19 +305,13 @@ const onUploadImg = async (files, callback) => {
   )
 }
 
-const onSave = (v, h) => {
-  h.then(() => {
-    ElMessage.info('save')
-  })
-}
-
 const emit = defineEmits(['close'])
 const close = value => {
+  resetData(infoData)
   emit('close', value)
 }
 
 const open = () => {
-  resetData(info)
   getCateGoryList()
   getTagList()
   if (props.id) {
@@ -319,8 +319,11 @@ const open = () => {
   }
 }
 
-const getInfo = async () => {
-  ElMessage.success('获取数据成功')
+const getInfo = async id => {
+  let { data } = await info({ id })
+  infoData = Object.assign(infoData, data.data)
+  infoData.tags = infoData.tag.map(item => item.id)
+  infoData.category = infoData.category[0]?.id
 }
 </script>
 

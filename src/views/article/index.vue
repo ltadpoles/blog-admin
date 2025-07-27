@@ -36,8 +36,6 @@
         <div class="view-base-form-btn-left">
           <el-button icon="CirclePlus" type="primary" @click="addData">新增</el-button>
           <el-button icon="Delete" type="danger" @click="delData">删除</el-button>
-          <el-button type="primary" @click="addData">发布</el-button>
-          <el-button type="danger" @click="addData">下架</el-button>
         </div>
         <div class="view-base-form-btn-right">
           <el-button icon="Refresh" @click="reset(formRef)">重置</el-button>
@@ -50,8 +48,8 @@
       <el-table :data="tableData" border @selection-change="selectionChange">
         <el-table-column type="selection" width="45" />
         <el-table-column prop="title" label="标题" min-width="180" />
-        <el-table-column prop="createUserName" label="作者" align="center" />
-        <el-table-column prop="tags" label="标签" align="center" width="200px" class-name="tag-class">
+        <el-table-column prop="operatorName" label="作者" align="center" />
+        <el-table-column prop="tags" label="标签" min-width="120" align="center" class-name="tag-class">
           <template #default="scope">
             <el-tag class="tag-item" type="success" v-for="item in scope.row.tag" :key="item.id">{{
               item.name
@@ -63,14 +61,14 @@
             <el-tag v-for="item in scope.row.category" :key="item.id">{{ item.name }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="创作类型" align="center">
+        <el-table-column prop="category" label="置顶" align="center" width="100">
           <template #default="scope">
-            {{ scope.row.type === 1 ? '原创' : '转载' }}
+            <el-switch v-model="scope.row.isTop" @change="topChange(scope.row)" style="--el-switch-on-color: #13ce66" />
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="发布状态">
+        <el-table-column prop="type" label="创作类型" align="center">
           <template #default="scope">
-            {{ scope.row.status === '1' ? '已发布' : '未发布' }}
+            {{ scope.row.type === '1' ? '原创' : '转载' }}
           </template>
         </el-table-column>
         <el-table-column prop="link" label="原文链接" />
@@ -84,33 +82,9 @@
             {{ scope.row.updateTime ? dayjs(scope.row.updateTime).format('YYYY-MM-DD HH:mm') : '' }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120" class-name="table-btn">
+        <el-table-column label="操作" width="80" align="center">
           <template #default="scope">
             <el-button link type="primary" icon="Edit" @click="editData(scope.row)" />
-            <el-popconfirm
-              v-if="scope.row.top === 1"
-              confirm-button-text="确认"
-              cancel-button-text="取消"
-              icon="Bottom"
-              title="确认取消置顶?"
-              @confirm="topConfirm(scope.row)"
-            >
-              <template #reference>
-                <el-button link type="primary" icon="Bottom" />
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              else
-              confirm-button-text="确认"
-              cancel-button-text="取消"
-              icon="Top"
-              title="确认置顶?"
-              @confirm="topConfirm(scope.row)"
-            >
-              <template #reference>
-                <el-button link type="primary" icon="Top" />
-              </template>
-            </el-popconfirm>
             <el-popconfirm
               confirm-button-text="确认"
               cancel-button-text="取消"
@@ -142,7 +116,7 @@
       :isShow="editDialogInfo.isShow"
       :title="editDialogInfo.title"
       :type="editDialogInfo.type"
-      :info="editDialogInfo.info"
+      :id="editDialogInfo.id"
       @close="editDialogClose"
     />
   </div>
@@ -154,7 +128,7 @@ import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import { dayjs } from 'element-plus'
 import { ElMessageBox } from 'element-plus'
 import editDialog from './components/edit/index.vue'
-import { page } from '@/api/article'
+import { del, page, top } from '@/api/article'
 import { taglist } from '@/api/tag'
 import { categorylist } from '@/api/category'
 
@@ -191,6 +165,9 @@ const pageQuery = reactive({
 
 const getList = async () => {
   let { data } = await page(query)
+  data.data.list.forEach(item => {
+    item.isTop = item.top === '1'
+  })
   tableData.value = data.data.list
   pageQuery.total = data.data.total
 }
@@ -232,16 +209,28 @@ const delData = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
+    let ids = multipleSelection.value.map(item => item.id).join()
+    await del({ id: ids })
     ElMessage.success('删除成功')
     getList(query)
   })
 }
 
-const delConfirm = () => {
+const delConfirm = async row => {
+  await del({ id: row.id })
   ElMessage.success('删除成功')
+  getList(query)
 }
-const topConfirm = () => {
-  ElMessage.success('置顶成功')
+
+const topChange = async row => {
+  let isTop = row.isTop ? '1' : '0'
+  top({ id: row.id, top: isTop })
+    .then(res => {
+      ElMessage.success(res.data.msg)
+    })
+    .finally(() => {
+      getList(query)
+    })
 }
 
 const multipleSelection = ref([])
@@ -252,12 +241,14 @@ const selectionChange = val => {
 const addData = () => {
   editDialogInfo.isShow = true
   editDialogInfo.title = '新增文章'
+  editDialogInfo.id = 0
   editDialogInfo.type = 1
 }
 
-const editData = () => {
+const editData = row => {
   editDialogInfo.isShow = true
   editDialogInfo.title = '编辑文章'
+  editDialogInfo.id = row.id
   editDialogInfo.type = 2
 }
 
