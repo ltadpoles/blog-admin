@@ -47,9 +47,14 @@
     <div class="view-base-table">
       <el-table :data="tableData" border @selection-change="selectionChange">
         <el-table-column type="selection" width="45" />
-        <el-table-column prop="title" label="标题" min-width="180" />
+        <el-table-column prop="tags" label="封面" width="200" align="center">
+          <template #default="scope">
+            <img :src="ImgUrl + scope.row.coverImgId" alt="" class="cover-img" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="title" label="标题" />
         <el-table-column prop="operatorName" label="作者" align="center" />
-        <el-table-column prop="tags" label="标签" min-width="120" align="center" class-name="tag-class">
+        <el-table-column prop="tags" label="标签" min-width="120" align="center">
           <template #default="scope">
             <el-tag class="tag-item" type="success" v-for="item in scope.row.tag" :key="item.id">{{
               item.name
@@ -140,6 +145,8 @@ const formData = reactive({
   type: '',
   date: null
 })
+
+const ImgUrl = import.meta.env.VITE_HTTP_BASEURL + '/file/download?fileId='
 
 const tagsList = ref([])
 const categorysList = ref([])
