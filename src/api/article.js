@@ -29,3 +29,8 @@ export const del = params => {
 export const top = params => {
   return http.get('/article/top', { params })
 }
+
+// 统计
+export const stats = () => {
+  return http.get('/article/stats')
+}
