@@ -136,6 +136,7 @@ import editDialog from './components/edit/index.vue'
 import { del, page, top } from '@/api/article'
 import { taglist } from '@/api/tag'
 import { categorylist } from '@/api/category'
+import config from '@/config'
 
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
@@ -146,7 +147,7 @@ const formData = reactive({
   date: null
 })
 
-const ImgUrl = import.meta.env.VITE_HTTP_BASEURL + '/file/download?fileId='
+const ImgUrl = config.HTTPBASEURL + '/file/download?fileId='
 
 const tagsList = ref([])
 const categorysList = ref([])
