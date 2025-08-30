@@ -13,7 +13,7 @@
     <div class="edit">
       <div class="edit-header">
         <div class="edit-header-left">
-          <input class="edit-header-input" v-model="infoData.title" maxlength="20" placeholder="请输入文章标题" />
+          <input class="edit-header-input" v-model="infoData.title" maxlength="50" placeholder="请输入文章标题" />
         </div>
         <div class="edit-header-right">
           <el-button type="default" @click="close">取消</el-button>
