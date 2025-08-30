@@ -128,6 +128,7 @@ import { taglist } from '@/api/tag'
 import { categorylist } from '@/api/category'
 import { add, info, update } from '@/api/article'
 import { useUserStore } from '@/stores/modules/user'
+import config from '@/config'
 
 const props = defineProps({
   title: String,
@@ -143,8 +144,8 @@ const props = defineProps({
 })
 
 const userStore = useUserStore()
-const ImgUrl = import.meta.env.VITE_HTTP_BASEURL + '/file/download?fileId='
-const action = import.meta.env.VITE_HTTP_BASEURL + '/file/upload'
+const ImgUrl = config.HTTPBASEURL + '/file/download?fileId='
+const action = config.HTTPBASEURL + '/file/upload'
 const headers = {
   Authorization: `Bearer ${userStore.token.token}`
 }

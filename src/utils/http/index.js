@@ -8,7 +8,7 @@ import { RESETSTORE } from '@/stores/reset'
 
 const http = axios.create({
   timeout: 3000,
-  baseURL: import.meta.env.VITE_HTTP_BASEURL
+  baseURL: config.HTTPBASEURL
 })
 
 // 添加请求拦截器
