@@ -31,6 +31,6 @@ export const top = params => {
 }
 
 // 统计
-export const stats = () => {
-  return http.get('/article/stats')
+export const countArticlesByType = () => {
+  return http.get('/article/countArticlesByType')
 }

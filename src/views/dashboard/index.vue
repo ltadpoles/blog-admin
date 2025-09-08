@@ -4,7 +4,7 @@
       <div class="dashboard-box-item">
         <div class="dashboard-box-item-content">
           <div class="dashboard-box-item-title">文章</div>
-          <div class="dashboard-box-item-value">{{ statsInfo.articles?.total }}</div>
+          <div class="dashboard-box-item-value">{{ info.articles }}</div>
         </div>
         <div class="dashboard-box-item-svg">
           <SvgIcon name="article" width="30" height="30" marginRight="10px" />
@@ -13,7 +13,7 @@
       <div class="dashboard-box-item">
         <div class="dashboard-box-item-content">
           <div class="dashboard-box-item-title">标签</div>
-          <div class="dashboard-box-item-value">{{ statsInfo.tags?.total }}</div>
+          <div class="dashboard-box-item-value">{{ info.tags?.length }}</div>
         </div>
         <div class="dashboard-box-item-svg">
           <SvgIcon name="tags" width="30" height="30" marginRight="10px" />
@@ -22,7 +22,7 @@
       <div class="dashboard-box-item">
         <div class="dashboard-box-item-content">
           <div class="dashboard-box-item-title">分类</div>
-          <div class="dashboard-box-item-value">{{ statsInfo.categories?.total }}</div>
+          <div class="dashboard-box-item-value">{{ info.categories?.length }}</div>
         </div>
         <div class="dashboard-box-item-svg">
           <SvgIcon name="category" width="30" height="30" marginRight="10px" />
@@ -31,7 +31,7 @@
       <div class="dashboard-box-item">
         <div class="dashboard-box-item-content">
           <div class="dashboard-box-item-title">访问量</div>
-          <div class="dashboard-box-item-value">0</div>
+          <div class="dashboard-box-item-value">{{ website.stats?.totalVisits }}</div>
         </div>
         <div class="dashboard-box-item-svg">
           <SvgIcon name="visit" width="30" height="30" marginRight="10px" />
@@ -64,16 +64,30 @@ import lineEchart from './line/index.vue'
 import pieEchart from './pie/index.vue'
 import scatterEchart from './scatter/index.vue'
 import pictorialBarEchart from './pictorial-bar/index.vue'
-import { stats } from '@/api/article'
+import { countArticlesByType } from '@/api/article'
+import { websiteInfo } from '@/api'
 
-const statsInfo = ref({})
-
+const info = ref({})
+const website = ref({})
+/**
+ * 获取文章信息
+ */
 const getStats = async () => {
-  let { data } = await stats()
-  statsInfo.value = data.data
+  const { data } = await countArticlesByType()
+  info.value = data.data
 }
+
+/**
+ * 获取文章信息
+ */
+const getWebsiteInfo = async () => {
+  const { data } = await websiteInfo()
+  website.value = data.data
+}
+
 onMounted(() => {
   getStats()
+  getWebsiteInfo()
 })
 </script>
 
