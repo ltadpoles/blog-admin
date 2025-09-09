@@ -7,7 +7,7 @@ export const page = data => {
 
 // 删除留言（支持批量，后端按 ids 逗号分隔或数组均可）
 export const del = params => {
-  return http.get('/board/del', { params })
+  return http.get('/board/delete', { params })
 }
 
 // 单条详情（如后续需要查看）
@@ -15,7 +15,7 @@ export const info = params => {
   return http.get('/board/info', { params })
 }
 
-// 修改留言状态（置顶/私密/启用禁用等，按后端接口扩展）
+// 修改留言状态（置顶/私密/是否可回复）
 export const update = data => {
   return http.post('/board/update', data)
 }

@@ -9,6 +9,7 @@
           <el-date-picker
             v-model="formData.date"
             type="daterange"
+            value-format="x"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
           />
@@ -109,6 +110,24 @@
         <el-table-column prop="likeCount" label="点赞" width="90" align="center">
           <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
         </el-table-column>
+        <el-table-column prop="top" label="是否置顶" width="100" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.top === '1'" type="primary">是</el-tag>
+            <el-tag v-else type="info">否</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="isReply" label="是否可回复" width="100" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.isReply === '1'" type="primary">是</el-tag>
+            <el-tag v-else type="info">否</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="isPrivate" label="是否私密" width="100" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.isPrivate === '1'" type="primary">是</el-tag>
+            <el-tag v-else type="info">否</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="createTime" label="留言时间" width="180">
           <template #default="scope">
             {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
@@ -116,6 +135,7 @@
         </el-table-column>
         <el-table-column label="操作" width="100" align="center">
           <template #default="scope">
+            <el-button link type="primary" icon="Edit" @click="editMessage(scope.row)" />
             <el-popconfirm
               confirm-button-text="确认"
               cancel-button-text="取消"
@@ -142,15 +162,22 @@
         @current-change="currentChange"
       />
     </div>
+
+    <board-edit-dialog
+      :isShow="boardEditInfo.isShow"
+      :title="boardEditInfo.title"
+      :info="boardEditInfo.info"
+      @close="boardEditClose"
+    />
   </div>
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import { dayjs } from 'element-plus'
-import { ElMessageBox } from 'element-plus'
 import * as messageApi from '@/api/message'
+import boardEditDialog from '../components/board-edit/index.vue'
 
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
@@ -197,8 +224,8 @@ const search = () => {
   query.pageNum = 1
   const params = { ...formData }
   if (Array.isArray(formData.date) && formData.date.length === 2) {
-    params.startTime = formData.date[0]
-    params.endTime = formData.date[1]
+    params.createTimeStart = formData.date[0]
+    params.createTimeEnd = formData.date[1]
   }
   delete params.date
   query.param = params
@@ -246,11 +273,6 @@ const delChild = async (childRow, parentRow) => {
   onExpandChange(parentRow, true)
 }
 
-const multipleSelection = ref([])
-const selectionChange = val => {
-  multipleSelection.value = val
-}
-
 // 子表多选收集
 const childSelectionChange = (parentId, sels) => {
   childSelections[parentId] = sels
@@ -275,6 +297,11 @@ const delChildren = async row => {
   onExpandChange(row, true)
 }
 
+const multipleSelection = ref([])
+const selectionChange = val => {
+  multipleSelection.value = val
+}
+
 // 懒加载子留言：在行展开时触发
 const onExpandChange = async (row, expanded) => {
   if (!expanded) {
@@ -291,6 +318,24 @@ const onExpandChange = async (row, expanded) => {
   } finally {
     loadingChildren[row.id] = false
   }
+}
+
+let boardEditInfo = reactive({
+  isShow: false,
+  title: '编辑留言',
+  info: {}
+})
+
+const editMessage = row => {
+  // 深拷贝当前行数据，避免直接修改表格数据
+  boardEditInfo.info = JSON.parse(JSON.stringify(row))
+  boardEditInfo.isShow = true
+}
+const boardEditClose = val => {
+  if (val) {
+    getList(query)
+  }
+  boardEditInfo.isShow = false
 }
 
 onMounted(() => {
