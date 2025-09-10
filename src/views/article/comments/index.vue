@@ -2,10 +2,10 @@
   <div class="view-base">
     <div class="view-base-form">
       <el-form ref="formRef" :inline="true" :model="formData">
-        <el-form-item label="留言内容" prop="content">
-          <el-input v-model="formData.content" placeholder="请输入留言关键字" clearable />
+        <el-form-item label="评论内容" prop="content">
+          <el-input v-model="formData.content" placeholder="请输入评论关键字" clearable />
         </el-form-item>
-        <el-form-item label="留言时间" prop="date">
+        <el-form-item label="评论时间" prop="date">
           <el-date-picker
             v-model="formData.date"
             type="daterange"
@@ -47,7 +47,7 @@
                 icon="Delete"
                 @click="delChildren(props.row)"
               >
-                删除所选子留言
+                删除所选子评论
               </el-button>
             </div>
             <el-table
@@ -58,13 +58,13 @@
               row-key="id"
             >
               <el-table-column type="selection" width="45" />
-              <el-table-column prop="content" label="留言内容" />
+              <el-table-column prop="content" label="评论内容" />
               <el-table-column label="头像" width="70" align="center">
                 <template #default="scope">
                   <el-avatar :size="24" :src="scope.row.user?.avatar" />
                 </template>
               </el-table-column>
-              <el-table-column label="回复人" width="120">
+              <el-table-column label="评论人" width="120">
                 <template #default="scope">{{ scope.row.user?.name || '-' }}</template>
               </el-table-column>
               <el-table-column prop="replyToUserName" label="回复对象" width="120" />
@@ -73,7 +73,7 @@
               <el-table-column prop="likeCount" label="点赞" width="90" align="center">
                 <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
               </el-table-column>
-              <el-table-column prop="createTime" label="留言时间" width="180">
+              <el-table-column prop="createTime" label="评论时间" width="180">
                 <template #default="scope">
                   {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
                 </template>
@@ -97,47 +97,43 @@
           </template>
         </el-table-column>
         <el-table-column type="selection" width="45" />
-        <el-table-column prop="content" label="留言内容" />
+        <el-table-column prop="content" label="评论内容" />
         <el-table-column label="头像" width="70" align="center">
           <template #default="scope">
             <el-avatar :size="24" :src="scope.row.user?.avatar" />
           </template>
         </el-table-column>
-        <el-table-column label="回复人" width="120">
+        <el-table-column label="评论人" width="120">
           <template #default="scope">{{ scope.row.user?.name || '-' }}</template>
+        </el-table-column>
+        <el-table-column prop="article.title" label="所属文章" width="220">
+          <template #default="scope">{{ scope.row.article?.title || '-' }}</template>
         </el-table-column>
         <el-table-column prop="replyToUserName" label="回复对象" width="120" />
         <el-table-column prop="ipAddress" label="IP" width="160" />
         <el-table-column prop="region" label="地区" width="160" />
-        <el-table-column prop="likeCount" label="点赞" width="90" align="center">
-          <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
-        </el-table-column>
         <el-table-column prop="top" label="是否置顶" width="100" align="center">
           <template #default="scope">
             <el-tag v-if="scope.row.top === '1'" type="primary">是</el-tag>
             <el-tag v-else type="info">否</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="isReply" label="是否可回复" width="100" align="center">
-          <template #default="scope">
-            <el-tag v-if="scope.row.isReply === '1'" type="primary">是</el-tag>
-            <el-tag v-else type="info">否</el-tag>
-          </template>
+        <el-table-column prop="likeCount" label="点赞" width="90" align="center">
+          <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
         </el-table-column>
-        <el-table-column prop="isPrivate" label="是否私密" width="100" align="center">
-          <template #default="scope">
-            <el-tag v-if="scope.row.isPrivate === '1'" type="primary">是</el-tag>
-            <el-tag v-else type="info">否</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="留言时间" width="180">
+        <el-table-column prop="createTime" label="评论时间" width="180">
           <template #default="scope">
             {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100" align="center">
+        <el-table-column label="操作" width="160" align="center">
           <template #default="scope">
-            <el-button link type="primary" icon="Edit" @click="editMessage(scope.row)" />
+            <el-tooltip v-if="scope.row.top === '1'" content="取消置顶" placement="top">
+              <el-button link type="warning" size="small" icon="Bottom" @click="toggleTop(scope.row, '0')" />
+            </el-tooltip>
+            <el-tooltip v-else content="置顶" placement="top">
+              <el-button link type="primary" size="small" icon="Top" @click="toggleTop(scope.row, '1')" />
+            </el-tooltip>
             <el-popconfirm
               confirm-button-text="确认"
               cancel-button-text="取消"
@@ -164,22 +160,15 @@
         @current-change="currentChange"
       />
     </div>
-
-    <board-edit-dialog
-      :isShow="boardEditInfo.isShow"
-      :title="boardEditInfo.title"
-      :info="boardEditInfo.info"
-      @close="boardEditClose"
-    />
   </div>
 </template>
 
 <script setup>
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import { dayjs } from 'element-plus'
-import * as messageApi from '@/api/message'
-import boardEditDialog from '../components/board-edit/index.vue'
+import { ElMessageBox } from 'element-plus'
+import * as commentApi from '@/api/comment'
 
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
@@ -206,8 +195,7 @@ const loading = ref(false)
 const getList = async () => {
   try {
     loading.value = true
-    const { data } = await messageApi.page(query)
-    // 兼容后端返回格式：{ data: { records,total } } 或 { data: { list,total } }
+    const { data } = await commentApi.page(query)
     const payload = data?.data || data
     tableData.value = payload?.records || payload?.list || []
     pageQuery.total = payload?.total || 0
@@ -249,55 +237,22 @@ const delData = () => {
     return ElMessage.error('请至少选择一条数据')
   }
 
-  ElMessageBox.confirm('确认删除选中留言？', '提示', {
+  ElMessageBox.confirm('确认删除选中评论？', '提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
     const ids = multipleSelection.value.map(i => i.id).join(',')
-    await messageApi.del({ ids })
+    await commentApi.del({ ids })
     ElMessage.success('删除成功')
     getList(query)
   })
 }
 
 const delConfirm = async row => {
-  await messageApi.del({ ids: row.id })
+  await commentApi.del({ ids: row.id })
   ElMessage.success('删除成功')
   getList(query)
-}
-
-// 子留言单条删除
-const delChild = async (childRow, parentRow) => {
-  await messageApi.del({ ids: childRow.id })
-  ElMessage.success('删除成功')
-  // 仅刷新该父行的子列表
-  childrenMap[parentRow.id] = undefined
-  onExpandChange(parentRow, true)
-}
-
-// 子表多选收集
-const childSelectionChange = (parentId, sels) => {
-  childSelections[parentId] = sels
-}
-
-// 批量删除子留言
-const delChildren = async row => {
-  const sels = childSelections[row.id] || []
-  if (sels.length === 0) {
-    return ElMessage.error('请至少选择一条子留言')
-  }
-  await ElMessageBox.confirm('确认删除选中子留言？', '提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-  const ids = sels.map(i => i.id).join(',')
-  await messageApi.del({ ids })
-  ElMessage.success('删除成功')
-  // 重新拉取该父留言的子列表
-  childrenMap[row.id] = undefined
-  onExpandChange(row, true)
 }
 
 const multipleSelection = ref([])
@@ -305,7 +260,35 @@ const selectionChange = val => {
   multipleSelection.value = val
 }
 
-// 懒加载子留言：在行展开时触发
+const childSelectionChange = (parentId, sels) => {
+  childSelections[parentId] = sels
+}
+
+const delChildren = async row => {
+  const sels = childSelections[row.id] || []
+  if (sels.length === 0) {
+    return ElMessage.error('请至少选择一条子评论')
+  }
+  await ElMessageBox.confirm('确认删除选中子评论？', '提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+  const ids = sels.map(i => i.id).join(',')
+  await commentApi.del({ ids })
+  ElMessage.success('删除成功')
+  childrenMap[row.id] = undefined
+  onExpandChange(row, true)
+}
+
+const delChild = async (childRow, parentRow) => {
+  await commentApi.del({ ids: childRow.id })
+  ElMessage.success('删除成功')
+  childrenMap[parentRow.id] = undefined
+  onExpandChange(parentRow, true)
+}
+
+// 懒加载子评论
 const onExpandChange = async (row, expandedOrRows) => {
   const isExpanded = Array.isArray(expandedOrRows)
     ? expandedOrRows.some(r => (r?.id ?? r) === row.id)
@@ -314,13 +297,19 @@ const onExpandChange = async (row, expandedOrRows) => {
     expandedRowKeys.value = []
     return
   }
+  // 只展开一个
   expandedRowKeys.value = [row.id]
   if (childrenMap[row.id]) {
     return
   }
   loadingChildren[row.id] = true
   try {
-    const { data } = await messageApi.children({ parentId: row.id })
+    const articleId = row.articleId || row.article?.id
+    const params = { parentId: row.id }
+    if (articleId) {
+      params.articleId = articleId
+    }
+    const { data } = await commentApi.children(params)
     const list = data?.data?.list || data?.data || data || []
     childrenMap[row.id] = list
   } finally {
@@ -328,27 +317,18 @@ const onExpandChange = async (row, expandedOrRows) => {
   }
 }
 
+// 高亮已展开的父行
 const rowClassName = ({ row }) => {
   return expandedRowKeys.value.includes(row.id) ? 'expanded-row' : ''
 }
 
-let boardEditInfo = reactive({
-  isShow: false,
-  title: '编辑留言',
-  info: {}
-})
-
-const editMessage = row => {
-  // 深拷贝当前行数据，避免直接修改表格数据
-  boardEditInfo.info = JSON.parse(JSON.stringify(row))
-  boardEditInfo.isShow = true
+// 顶/状态切换
+const toggleTop = async (row, topVal) => {
+  await commentApi.update({ id: row.id, top: topVal })
+  ElMessage.success('更新成功')
+  getList(query)
 }
-const boardEditClose = val => {
-  if (val) {
-    getList(query)
-  }
-  boardEditInfo.isShow = false
-}
+// 已取消状态字段与相关操作
 
 onMounted(() => {
   getList(query)

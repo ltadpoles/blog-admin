@@ -77,6 +77,14 @@ const menu = ref([
         il18Name: 'tadMessages',
         id: '034',
         children: []
+      },
+      {
+        path: '/article/comments',
+        icon: 'messages',
+        name: '评论管理',
+        il18Name: 'tadComments',
+        id: '035',
+        children: []
       }
     ]
   },
