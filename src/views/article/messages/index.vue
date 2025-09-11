@@ -136,7 +136,7 @@
             {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="100" align="center">
+        <el-table-column label="操作" width="120" align="center">
           <template #default="scope">
             <el-button link type="primary" icon="Edit" @click="editMessage(scope.row)" />
             <el-button link type="primary" icon="ChatLineSquare" @click="replyMessage(scope.row)" />

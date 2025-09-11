@@ -80,6 +80,7 @@
               </el-table-column>
               <el-table-column label="操作" width="100" align="center">
                 <template #default="scope">
+                  <el-button link type="primary" icon="ChatLineSquare" @click="replyComment(scope.row)" />
                   <el-popconfirm
                     confirm-button-text="确认"
                     cancel-button-text="取消"
@@ -128,6 +129,7 @@
         </el-table-column>
         <el-table-column label="操作" width="160" align="center">
           <template #default="scope">
+            <el-button link type="primary" icon="ChatLineSquare" @click="replyComment(scope.row)" />
             <el-tooltip v-if="scope.row.top === '1'" content="取消置顶" placement="top">
               <el-button link type="warning" size="small" icon="Bottom" @click="toggleTop(scope.row, '0')" />
             </el-tooltip>
@@ -160,6 +162,12 @@
         @current-change="currentChange"
       />
     </div>
+    <comment-reply-dialog
+      :isShow="commentReplyInfo.isShow"
+      :title="commentReplyInfo.title"
+      :info="commentReplyInfo.info"
+      @close="commentReplyClose"
+    />
   </div>
 </template>
 
@@ -169,6 +177,7 @@ import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import { dayjs } from 'element-plus'
 import { ElMessageBox } from 'element-plus'
 import * as commentApi from '@/api/comment'
+import commentReplyDialog from '../components/comment-reply/index.vue'
 
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
@@ -329,6 +338,34 @@ const toggleTop = async (row, topVal) => {
   getList(query)
 }
 // 已取消状态字段与相关操作
+
+let commentReplyInfo = reactive({
+  isShow: false,
+  title: '回复评论',
+  info: {}
+})
+
+const replyComment = row => {
+  // 深拷贝当前行数据，避免直接修改表格数据
+  commentReplyInfo.info = JSON.parse(JSON.stringify(row))
+  commentReplyInfo.isShow = true
+}
+
+const commentReplyClose = val => {
+  if (val) {
+    // 回复成功后，只刷新该条主评论的子级
+    // 找到对应的主评论ID
+    const parentId = commentReplyInfo.info.parentId || commentReplyInfo.info.id
+    // 清除该主评论的子级缓存
+    childrenMap[parentId] = undefined
+    // 重新加载该主评论的子级
+    const parentRow = tableData.value.find(row => row.id === parentId)
+    if (parentRow) {
+      onExpandChange(parentRow, true)
+    }
+  }
+  commentReplyInfo.isShow = false
+}
 
 onMounted(() => {
   getList(query)

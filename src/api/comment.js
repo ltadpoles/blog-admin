@@ -24,3 +24,8 @@ export const update = data => {
 export const info = params => {
   return http.get('/comment/info', { params })
 }
+
+// 创建评论（回复评论）
+export const create = data => {
+  return http.post('/comment/add', data)
+}

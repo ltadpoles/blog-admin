@@ -1,0 +1,50 @@
+.reply-info {
+  padding: 10px 15px;
+  background-color: var(--el-color-primary-light-9);
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.reply-user {
+  margin-bottom: 5px;
+}
+
+.reply-label {
+  font-weight: bold;
+  color: var(--el-text-color-primary);
+}
+
+.reply-name {
+  color: var(--el-color-primary);
+}
+
+.reply-content {
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.reply-article {
+  margin-bottom: 10px;
+}
+
+.reply-article-title {
+  color: var(--el-color-primary);
+  font-size: 13px;
+}
+
+.reply-content-wrapper {
+  position: relative;
+}
+
+.emoji-picker {
+  position: absolute;
+  bottom: 72px;
+  left: 25px;
+  cursor: pointer;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+}
