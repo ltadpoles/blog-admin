@@ -80,6 +80,7 @@
               </el-table-column>
               <el-table-column label="操作" width="100" align="center">
                 <template #default="scope">
+                  <el-button link type="primary" icon="ChatLineSquare" @click="replyMessage(scope.row)" />
                   <el-popconfirm
                     confirm-button-text="确认"
                     cancel-button-text="取消"
@@ -138,6 +139,7 @@
         <el-table-column label="操作" width="100" align="center">
           <template #default="scope">
             <el-button link type="primary" icon="Edit" @click="editMessage(scope.row)" />
+            <el-button link type="primary" icon="ChatLineSquare" @click="replyMessage(scope.row)" />
             <el-popconfirm
               confirm-button-text="确认"
               cancel-button-text="取消"
@@ -171,6 +173,13 @@
       :info="boardEditInfo.info"
       @close="boardEditClose"
     />
+
+    <board-reply-dialog
+      :isShow="boardReplyInfo.isShow"
+      :title="boardReplyInfo.title"
+      :info="boardReplyInfo.info"
+      @close="boardReplyClose"
+    />
   </div>
 </template>
 
@@ -180,6 +189,7 @@ import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import { dayjs } from 'element-plus'
 import * as messageApi from '@/api/message'
 import boardEditDialog from '../components/board-edit/index.vue'
+import boardReplyDialog from '../components/board-reply/index.vue'
 
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
@@ -348,6 +358,34 @@ const boardEditClose = val => {
     getList(query)
   }
   boardEditInfo.isShow = false
+}
+
+let boardReplyInfo = reactive({
+  isShow: false,
+  title: '回复留言',
+  info: {}
+})
+
+const replyMessage = row => {
+  // 深拷贝当前行数据，避免直接修改表格数据
+  boardReplyInfo.info = JSON.parse(JSON.stringify(row))
+  boardReplyInfo.isShow = true
+}
+
+const boardReplyClose = val => {
+  if (val) {
+    // 回复成功后，只刷新该条主留言的子级
+    // 找到对应的主留言ID
+    const parentId = boardReplyInfo.info.parentId || boardReplyInfo.info.id
+    // 清除该主留言的子级缓存
+    childrenMap[parentId] = undefined
+    // 重新加载该主留言的子级
+    const parentRow = tableData.value.find(row => row.id === parentId)
+    if (parentRow) {
+      onExpandChange(parentRow, true)
+    }
+  }
+  boardReplyInfo.isShow = false
 }
 
 onMounted(() => {

@@ -24,3 +24,8 @@ export const update = data => {
 export const children = params => {
   return http.get('/board/list', { params })
 }
+
+// 创建留言（回复留言）
+export const create = data => {
+  return http.post('/board/add', data)
+}
