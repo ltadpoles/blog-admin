@@ -15,6 +15,12 @@ const route = [
         meta: { title: '用户管理', i18nName: 'tadUserManage', icon: 'user' },
         name: 'SystemUser',
         component: () => import('@/views/system/user/index.vue')
+      },
+      {
+        path: 'ip',
+        meta: { title: 'IP管理', i18nName: 'tadIpManage', icon: 'visit' },
+        name: 'SystemIp',
+        component: () => import('@/views/system/ip/index.vue')
       }
     ]
   }

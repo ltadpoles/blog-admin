@@ -36,6 +36,14 @@ const menu = ref([
         il18Name: 'tadUserManage',
         id: '021',
         children: []
+      },
+      {
+        path: '/system/ip',
+        icon: 'visit',
+        name: 'IP管理',
+        il18Name: 'tadIpManage',
+        id: '022',
+        children: []
       }
     ]
   },

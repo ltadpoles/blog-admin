@@ -1,0 +1,16 @@
+// IP管理页面样式
+.view-base {
+  .view-base-form {
+    .el-form-item {
+      margin-bottom: 16px;
+    }
+  }
+
+  .view-base-table {
+    .el-table {
+      .el-table__cell {
+        padding: 8px 0;
+      }
+    }
+  }
+}

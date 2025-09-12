@@ -17,6 +17,7 @@ const en = {
     tadHome: 'Home',
     tadSysManagement: 'System Manage',
     tadUserManage: 'User Manage',
+    tadIpManage: 'IP Manage',
     tadArticle: 'Article Manage',
     tadTags: 'Tags Manage',
     tadCategory: 'Category Manage',
