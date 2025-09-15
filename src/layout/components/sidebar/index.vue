@@ -97,6 +97,23 @@ const menu = ref([
     ]
   },
   {
+    path: '/website',
+    icon: 'system',
+    name: '网站管理',
+    il18Name: 'tadWebsiteManage',
+    id: '04',
+    children: [
+      {
+        path: '/website/basic',
+        icon: 'system',
+        name: '基础信息',
+        il18Name: 'tadBasicInfo',
+        id: '041',
+        children: []
+      }
+    ]
+  },
+  {
     path: '/about/index',
     icon: 'about',
     name: '关于',
