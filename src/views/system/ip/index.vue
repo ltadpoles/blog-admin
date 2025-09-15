@@ -43,43 +43,35 @@
 
     <div class="view-base-table">
       <el-table :data="tableData" border row-key="id" @selection-change="selectionChange">
-        <el-table-column type="selection" width="45" />
-        <el-table-column prop="ip" label="IP地址" width="140" />
-        <el-table-column prop="country" label="国家" width="100" />
-        <el-table-column prop="province" label="省份" width="100" />
-        <el-table-column prop="city" label="城市" width="100" />
-        <el-table-column prop="isp" label="运营商" width="120" />
-        <el-table-column prop="visitCount" label="访问次数" width="100" align="center">
+        <el-table-column type="selection" />
+        <el-table-column prop="ip" label="IP地址" />
+        <el-table-column prop="country" label="国家" />
+        <el-table-column prop="province" label="省份" />
+        <el-table-column prop="city" label="城市" />
+        <el-table-column prop="isp" label="运营商" show-overflow-tooltip />
+        <el-table-column prop="visitCount" label="访问次数" align="center">
           <template #default="scope">{{ scope.row.visitCount || 0 }}</template>
         </el-table-column>
-        <el-table-column prop="lastVisitTime" label="最后访问" width="180">
+        <el-table-column prop="lastVisitTime" label="最后访问">
           <template #default="scope">
-            {{ scope.row.lastVisitTime ? dayjs(scope.row.lastVisitTime).format('YYYY-MM-DD HH:mm') : '-' }}
+            {{ scope.row.lastVisitTime ? dayjs(scope.row.lastVisitTime).format('YYYY-MM-DD') : '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="isBlocked" label="状态" width="100" align="center">
+        <el-table-column prop="isBlocked" label="状态" align="center">
           <template #default="scope">
             <el-tag v-if="scope.row.isBlocked === '1'" type="danger">已封禁</el-tag>
             <el-tag v-else type="success">正常</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="blockReason" label="封禁原因" width="150" show-overflow-tooltip />
-        <el-table-column prop="blockExpireTime" label="解封时间" width="180">
+        <el-table-column prop="blockReason" label="封禁原因" show-overflow-tooltip />
+        <el-table-column prop="remark" label="备注" show-overflow-tooltip />
+        <el-table-column prop="createTime" label="创建时间">
           <template #default="scope">
-            {{ scope.row.blockExpireTime ? dayjs(scope.row.blockExpireTime).format('YYYY-MM-DD HH:mm') : '-' }}
+            {{ dayjs(scope.row.createTime).format('YYYY-MM-DD') }}
           </template>
         </el-table-column>
-        <el-table-column prop="operator" label="操作人" width="100" />
-        <el-table-column prop="remark" label="备注" width="150" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column label="操作" width="120" align="center">
           <template #default="scope">
-            {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" align="center">
-          <template #default="scope">
-            <el-button link type="primary" icon="View" @click="viewDetail(scope.row)" />
-            <el-button link type="warning" icon="Edit" @click="editIp(scope.row)" />
             <el-popconfirm
               v-if="scope.row.isBlocked !== '1'"
               confirm-button-text="确认"
@@ -130,60 +122,6 @@
         @current-change="currentChange"
       />
     </div>
-
-    <!-- IP详情/编辑对话框 -->
-    <el-dialog v-model="dialogInfo.isShow" :title="dialogInfo.title" width="600px" @close="dialogClose">
-      <el-form ref="dialogFormRef" :model="dialogForm" label-width="100px">
-        <el-form-item label="IP地址">
-          <el-input v-model="dialogForm.ip" disabled />
-        </el-form-item>
-        <el-form-item label="国家">
-          <el-input v-model="dialogForm.country" />
-        </el-form-item>
-        <el-form-item label="省份">
-          <el-input v-model="dialogForm.province" />
-        </el-form-item>
-        <el-form-item label="城市">
-          <el-input v-model="dialogForm.city" />
-        </el-form-item>
-        <el-form-item label="运营商">
-          <el-input v-model="dialogForm.isp" />
-        </el-form-item>
-        <el-form-item label="访问次数">
-          <el-input-number v-model="dialogForm.visitCount" :min="0" />
-        </el-form-item>
-        <el-form-item label="最后访问时间">
-          <el-date-picker v-model="dialogForm.lastVisitTime" type="datetime" value-format="x" placeholder="选择时间" />
-        </el-form-item>
-        <el-form-item label="是否封禁">
-          <el-switch v-model="dialogForm.isBlocked" :active-value="'1'" :inactive-value="'0'" />
-        </el-form-item>
-        <el-form-item v-if="dialogForm.isBlocked === '1'" label="封禁原因">
-          <el-input v-model="dialogForm.blockReason" type="textarea" :rows="3" />
-        </el-form-item>
-        <el-form-item v-if="dialogForm.isBlocked === '1'" label="封禁时间">
-          <el-date-picker v-model="dialogForm.blockTime" type="datetime" value-format="x" placeholder="选择时间" />
-        </el-form-item>
-        <el-form-item v-if="dialogForm.isBlocked === '1'" label="解封时间">
-          <el-date-picker
-            v-model="dialogForm.blockExpireTime"
-            type="datetime"
-            value-format="x"
-            placeholder="选择时间"
-          />
-        </el-form-item>
-        <el-form-item label="操作人">
-          <el-input v-model="dialogForm.operator" />
-        </el-form-item>
-        <el-form-item label="备注">
-          <el-input v-model="dialogForm.remark" type="textarea" :rows="3" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogClose">取消</el-button>
-        <el-button type="primary" @click="saveDialog">保存</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -194,7 +132,6 @@ import { dayjs } from 'element-plus'
 import * as ipApi from '@/api/ip'
 
 const formRef = useTemplateRef('formRef')
-const dialogFormRef = useTemplateRef('dialogFormRef')
 const formData = reactive({
   ip: '',
   region: '',
@@ -330,7 +267,7 @@ const blockIp = async row => {
     inputPattern: /.+/,
     inputErrorMessage: '封禁原因不能为空'
   }).then(async ({ value }) => {
-    await ipApi.blockIP({ id: row.id, reason: value })
+    await ipApi.blockIP({ ip: row.ip, reason: value })
     ElMessage.success('封禁成功')
     getList(query)
   })
@@ -338,55 +275,9 @@ const blockIp = async row => {
 
 // 单个解封
 const unblockIp = async row => {
-  await ipApi.unblockIP({ id: row.id })
+  await ipApi.unblockIP({ ip: row.ip })
   ElMessage.success('解封成功')
   getList(query)
-}
-
-// 查看详情
-const viewDetail = row => {
-  dialogInfo.isShow = true
-  dialogInfo.title = 'IP详情'
-  dialogInfo.mode = 'view'
-  dialogForm.value = { ...row }
-}
-
-// 编辑IP
-const editIp = row => {
-  dialogInfo.isShow = true
-  dialogInfo.title = '编辑IP'
-  dialogInfo.mode = 'edit'
-  dialogForm.value = { ...row }
-}
-
-// 对话框相关
-const dialogInfo = reactive({
-  isShow: false,
-  title: '',
-  mode: 'view' // view/edit
-})
-
-const dialogForm = ref({})
-
-const dialogClose = () => {
-  dialogInfo.isShow = false
-  dialogForm.value = {}
-}
-
-const saveDialog = async () => {
-  if (dialogInfo.mode === 'view') {
-    dialogClose()
-    return
-  }
-
-  try {
-    // 注意：根据后端接口，这里可能需要调整更新接口
-    // 如果后端没有提供更新接口，可以提示用户
-    ElMessage.warning('更新功能暂未实现，请联系后端开发人员')
-    dialogClose()
-  } catch {
-    ElMessage.error('保存失败')
-  }
 }
 
 // 清理过期IP记录
