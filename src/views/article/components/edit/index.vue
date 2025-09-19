@@ -76,7 +76,7 @@
                     :rows="4"
                     resize="none"
                     type="textarea"
-                    maxlength="50"
+                    maxlength="200"
                     show-word-limit
                     placeholder="请输入文章摘要"
                   />
