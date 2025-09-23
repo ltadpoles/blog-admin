@@ -24,8 +24,7 @@ const en = {
     tadTags: 'Tags Manage',
     tadCategory: 'Category Manage',
     tadMessages: 'Messages Manage',
-    tadComments: 'Comments Manage',
-    tadAbout: 'About'
+    tadComments: 'Comments Manage'
   }
 }
 export default en

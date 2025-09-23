@@ -36,9 +36,20 @@
         <el-table-column prop="name" label="昵称" />
         <el-table-column prop="phone" label="手机号" />
         <el-table-column prop="email" label="邮箱" />
-        <el-table-column prop="gender" label="性别">
+        <el-table-column prop="gender" label="性别" align="center" width="80">
           <template #default="scope">
-            {{ scope.row.gender === '1' ? '男' : '女' }}
+            <el-tag v-if="scope.row.gender === '0'" type="info">女</el-tag>
+            <el-tag v-else-if="scope.row.gender === '1'" type="primary">男</el-tag>
+            <el-tag v-else type="warning">未知</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="address" label="地址" show-overflow-tooltip />
+        <el-table-column prop="website" label="网站" show-overflow-tooltip>
+          <template #default="scope">
+            <el-link v-if="scope.row.website" :href="scope.row.website" target="_blank" type="primary">
+              {{ scope.row.website }}
+            </el-link>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" align="center" width="100">
@@ -77,6 +88,7 @@ const formRef = useTemplateRef('formRef')
 const formData = reactive({
   name: '',
   username: '',
+  gender: '',
   status: ''
 })
 

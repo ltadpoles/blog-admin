@@ -41,11 +41,11 @@
         </el-col>
       </el-row>
 
-      <!-- 基础信息表单 -->
+      <!-- Tab页面 -->
       <el-card class="box-card">
         <template #header>
           <div class="card-header">
-            <span>网站基础信息</span>
+            <span>网站管理</span>
             <div>
               <el-button @click="resetForm">重置</el-button>
               <el-button type="primary" :loading="loading" @click="saveForm">保存</el-button>
@@ -53,111 +53,37 @@
           </div>
         </template>
 
-        <el-form ref="formRef" :model="formData" label-width="120px" :rules="rules">
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item label="网站名称" prop="siteName">
-                <el-input v-model="formData.siteName" placeholder="请输入网站名称" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="网站URL" prop="siteUrl">
-                <el-input v-model="formData.siteUrl" placeholder="请输入网站URL" />
-              </el-form-item>
-            </el-col>
-          </el-row>
-
-          <el-form-item label="网站描述" prop="siteDescription">
-            <el-input v-model="formData.siteDescription" type="textarea" :rows="3" placeholder="请输入网站描述" />
-          </el-form-item>
-
-          <el-form-item label="网站关键词" prop="siteKeywords">
-            <el-input
-              v-model="formData.siteKeywords"
-              type="textarea"
-              :rows="2"
-              placeholder="请输入网站关键词，用逗号分隔"
+        <el-tabs v-model="activeTab" class="website-tabs">
+          <!-- 基本信息 -->
+          <el-tab-pane label="基本信息" name="basic">
+            <basic-info-tab
+              :form-data="formData"
+              :rules="rules"
+              ref="basicInfoRef"
+              @update:form-data="handleFormDataUpdate"
             />
-          </el-form-item>
+          </el-tab-pane>
 
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item label="网站Logo" prop="siteLogo">
-                <el-input v-model="formData.siteLogo" placeholder="请输入Logo地址" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="网站图标" prop="siteFavicon">
-                <el-input v-model="formData.siteFavicon" placeholder="请输入网站图标地址" />
-              </el-form-item>
-            </el-col>
-          </el-row>
+          <!-- 作者信息 -->
+          <el-tab-pane label="作者信息" name="author">
+            <author-tab :form-data="formData" :rules="rules" ref="authorRef" @update:form-data="handleFormDataUpdate" />
+          </el-tab-pane>
 
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item label="联系邮箱" prop="siteEmail">
-                <el-input v-model="formData.siteEmail" placeholder="请输入联系邮箱" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="联系电话" prop="sitePhone">
-                <el-input v-model="formData.sitePhone" placeholder="请输入联系电话" />
-              </el-form-item>
-            </el-col>
-          </el-row>
+          <!-- 社交信息 -->
+          <el-tab-pane label="社交信息" name="social">
+            <social-tab :form-data="formData" :rules="rules" ref="socialRef" @update:form-data="handleFormDataUpdate" />
+          </el-tab-pane>
 
-          <el-form-item label="联系地址" prop="siteAddress">
-            <el-input v-model="formData.siteAddress" placeholder="请输入联系地址" />
-          </el-form-item>
-
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item label="版权信息" prop="siteCopyright">
-                <el-input v-model="formData.siteCopyright" placeholder="请输入版权信息" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="ICP备案号" prop="siteIcp">
-                <el-input v-model="formData.siteIcp" placeholder="请输入ICP备案号" />
-              </el-form-item>
-            </el-col>
-          </el-row>
-
-          <el-form-item label="GitHub地址" prop="githubUrl">
-            <el-input v-model="formData.githubUrl" placeholder="请输入GitHub地址" />
-          </el-form-item>
-
-          <el-form-item label="网站公告" prop="siteNotice">
-            <el-input v-model="formData.siteNotice" type="textarea" :rows="3" placeholder="请输入网站公告" />
-          </el-form-item>
-
-          <el-form-item label="关于我们" prop="siteAbout">
-            <el-input v-model="formData.siteAbout" type="textarea" :rows="4" placeholder="请输入关于我们的内容" />
-          </el-form-item>
-
-          <el-form-item label="维护模式" prop="isMaintenance">
-            <el-switch
-              v-model="formData.isMaintenance"
-              :active-value="'1'"
-              :inactive-value="'0'"
-              @change="handleMaintenanceChange"
+          <!-- 网站设置 -->
+          <el-tab-pane label="网站设置" name="website">
+            <website-tab
+              :form-data="formData"
+              :rules="rules"
+              ref="websiteRef"
+              @update:form-data="handleFormDataUpdate"
             />
-            <span class="ml-2 text-gray-500">开启后网站将进入维护模式</span>
-          </el-form-item>
-
-          <el-form-item v-if="formData.isMaintenance === '1'" label="维护提示" prop="maintenanceMessage">
-            <el-input
-              v-model="formData.maintenanceMessage"
-              type="textarea"
-              :rows="2"
-              placeholder="请输入维护模式提示信息"
-            />
-          </el-form-item>
-
-          <el-form-item label="备注" prop="remark">
-            <el-input v-model="formData.remark" type="textarea" :rows="2" placeholder="请输入备注信息" />
-          </el-form-item>
-        </el-form>
+          </el-tab-pane>
+        </el-tabs>
       </el-card>
     </div>
   </div>
@@ -167,27 +93,47 @@
 import { ElMessage } from 'element-plus'
 import { reactive, ref, useTemplateRef, onMounted } from 'vue'
 import * as websiteApi from '@/api/website'
+import BasicInfoTab from './components/BasicInfoTab.vue'
+import AuthorTab from './components/AuthorTab.vue'
+import SocialTab from './components/SocialTab.vue'
+import WebsiteTab from './components/WebsiteTab.vue'
 
 const formRef = useTemplateRef('formRef')
+const activeTab = ref('basic')
+const basicInfoRef = useTemplateRef('basicInfoRef')
+const authorRef = useTemplateRef('authorRef')
+const socialRef = useTemplateRef('socialRef')
+const websiteRef = useTemplateRef('websiteRef')
 
 const formData = reactive({
   id: null,
+  // 基本信息
   siteName: '',
   siteDescription: '',
   siteKeywords: '',
   siteLogo: '',
-  siteFavicon: '',
   siteUrl: '',
-  siteEmail: '',
-  sitePhone: '',
-  siteAddress: '',
-  siteCopyright: '',
-  siteIcp: '',
   siteNotice: '',
-  siteAbout: '',
+  // 作者信息
+  authorName: '',
+  authorAvatar: '',
+  authorBio: '',
+  authorAbout: '',
+  // 社交信息
   githubUrl: '',
+  giteeUrl: '',
+  qqNumber: '',
+  qqGroup: '',
+  wechat: '',
+  email: '',
+  // 网站设置
   isMaintenance: '0',
   maintenanceMessage: '',
+  commentModeration: '0',
+  messageModeration: '0',
+  // 其他
+  siteCopyright: '',
+  siteIcp: '',
   operator: '',
   remark: ''
 })
@@ -210,6 +156,11 @@ const rules = {
 }
 
 const loading = ref(false)
+
+// 处理子组件数据更新
+const handleFormDataUpdate = newData => {
+  Object.assign(formData, newData)
+}
 
 // 获取网站信息
 const getWebsiteInfo = async () => {
@@ -246,12 +197,13 @@ const getStats = async () => {
 
 // 保存表单
 const saveForm = async () => {
-  if (!formRef.value) {
-    return
-  }
-
   try {
-    await formRef.value.validate()
+    // 验证当前激活的tab页面表单
+    const currentTabRef = getCurrentTabRef()
+    if (currentTabRef && currentTabRef.validate) {
+      await currentTabRef.validate()
+    }
+
     loading.value = true
     await websiteApi.updateWebsiteInfo(formData)
     ElMessage.success('保存成功')
@@ -266,27 +218,21 @@ const saveForm = async () => {
   }
 }
 
+// 获取当前激活tab的ref
+const getCurrentTabRef = () => {
+  const tabRefs = {
+    basic: basicInfoRef.value,
+    author: authorRef.value,
+    social: socialRef.value,
+    website: websiteRef.value
+  }
+  return tabRefs[activeTab.value]
+}
+
 // 重置表单
 const resetForm = () => {
   if (formRef.value) {
     formRef.value.resetFields()
-  }
-}
-
-// 维护模式切换
-const handleMaintenanceChange = async value => {
-  try {
-    await websiteApi.toggleMaintenance({
-      isMaintenance: value,
-      maintenanceMessage: formData.maintenanceMessage
-    })
-    ElMessage.success(value === '1' ? '已开启维护模式' : '已关闭维护模式')
-    // 更新统计信息
-    statsData.isMaintenance = value
-  } catch {
-    ElMessage.error('切换维护模式失败')
-    // 回滚状态
-    formData.isMaintenance = value === '1' ? '0' : '1'
   }
 }
 
@@ -347,6 +293,16 @@ onMounted(() => {
   .text-gray-500 {
     color: #6b7280;
     font-size: 14px;
+  }
+
+  .website-tabs {
+    .el-tabs__content {
+      padding: 20px 0;
+    }
+
+    .el-tab-pane {
+      min-height: 400px;
+    }
   }
 }
 </style>

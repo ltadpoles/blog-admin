@@ -112,14 +112,6 @@ const menu = ref([
         children: []
       }
     ]
-  },
-  {
-    path: '/about/index',
-    icon: 'about',
-    name: '关于',
-    il18Name: 'tadAbout',
-    id: '07',
-    children: []
   }
 ])
 </script>

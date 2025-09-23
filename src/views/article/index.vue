@@ -76,6 +76,11 @@
             {{ scope.row.type === '1' ? '原创' : '转载' }}
           </template>
         </el-table-column>
+        <el-table-column prop="visitCount" label="访问量" align="center" width="100">
+          <template #default="scope">
+            {{ scope.row.visitCount || 0 }}
+          </template>
+        </el-table-column>
         <el-table-column prop="link" label="原文链接" />
         <el-table-column prop="createTime" label="创建时间" min-width="96px" align="center">
           <template #default="scope">

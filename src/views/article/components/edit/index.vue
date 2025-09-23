@@ -44,6 +44,13 @@
                   </el-select>
                 </el-form-item>
 
+                <el-form-item label="开启评论" prop="isComment">
+                  <el-radio-group v-model="infoData.isComment">
+                    <el-radio value="1">是</el-radio>
+                    <el-radio value="0">否</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+
                 <el-form-item label="创作类型" prop="type">
                   <el-select v-model="infoData.type" :teleported="false" placeholder="请选择创作类型" clearable>
                     <el-option :label="item.label" :value="item.id" v-for="item in typeList" :key="item.id" />
@@ -151,7 +158,8 @@ const headers = {
 }
 
 let infoData = reactive({
-  content: '### 标题'
+  content: '### 标题',
+  isComment: '1' // 默认开启评论
 })
 const typeList = ref([
   {

@@ -24,8 +24,7 @@ const zhCN = {
     tadTags: '标签管理',
     tadCategory: '分类管理',
     tadMessages: '留言管理',
-    tadComments: '评论管理',
-    tadAbout: '关于'
+    tadComments: '评论管理'
   }
 }
 export default zhCN
