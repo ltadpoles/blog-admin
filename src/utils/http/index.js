@@ -36,12 +36,12 @@ http.interceptors.response.use(
   function (response) {
     // 2xx 范围内的状态码都会触发该函数。
     // 对响应数据做点什么
-    if (response.data.code === '500' || response.data.code === '403') {
+    if (response.data.code !== '0') {
       ElMessage({
-        message: response.data.msg,
+        message: response.data.msg || '操作失败',
         type: 'error'
       })
-      return Promise.reject(response.data.msg)
+      return Promise.reject(response.data.msg || '操作失败')
     }
     return response
   },
@@ -55,7 +55,7 @@ http.interceptors.response.use(
             message: error.response.data.msg || '请求错误',
             type: 'error'
           })
-          break
+          return Promise.reject(error.response.data.msg || '请求错误')
         case 401:
           if (config.ISREFRESHTOKEN) {
             refresh(http, error.response.config)
@@ -73,24 +73,25 @@ http.interceptors.response.use(
             message: '您没有相关权限',
             type: 'error'
           })
-          break
+          return Promise.reject('您没有相关权限')
         case 404:
           ElMessage({
             message: '请求链接不存在',
             type: 'error'
           })
-          break
+          return Promise.reject('请求链接不存在')
         case 500:
           ElMessage({
             message: '服务器错误，请稍后再试',
             type: 'error'
           })
-          break
+          return Promise.reject('服务器错误，请稍后再试')
         default:
           ElMessage({
             message: '系统异常，请稍后再试',
             type: 'error'
           })
+          return Promise.reject('系统异常，请稍后再试')
       }
     } catch (error) {
       return Promise.reject(error)

@@ -31,8 +31,8 @@ export const batchUnblockIP = data => {
 }
 
 // 删除IP记录
-export const deleteIP = id => {
-  return http.get(`/ip/${id}`)
+export const deleteIP = params => {
+  return http.get('/ip/delete', { params })
 }
 
 // 清理过期IP记录

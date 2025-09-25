@@ -204,10 +204,8 @@ const delData = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    const ids = multipleSelection.value.map(i => i.id)
-    for (const id of ids) {
-      await ipApi.deleteIP(id)
-    }
+    const id = multipleSelection.value.map(i => i.id)
+    await ipApi.deleteIP({ id: id.join(',') })
     ElMessage.success('删除成功')
     getList(query)
   })
