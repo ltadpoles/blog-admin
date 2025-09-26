@@ -129,8 +129,8 @@ const formData = reactive({
   // 网站设置
   isMaintenance: '0',
   maintenanceMessage: '',
-  commentModeration: '0',
-  messageModeration: '0',
+  isCommentAuditEnabled: '0',
+  isBoardAuditEnabled: '0',
   // 其他
   siteCopyright: '',
   siteIcp: '',

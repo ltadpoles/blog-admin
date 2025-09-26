@@ -17,7 +17,7 @@ export const getWebsiteList = params => {
 
 // 更新网站基础信息
 export const updateWebsiteInfo = data => {
-  return http.put('/website/info', data)
+  return http.post('/website/save', data)
 }
 
 // 删除网站信息记录

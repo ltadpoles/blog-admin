@@ -18,6 +18,8 @@
       <div class="view-base-form-btn">
         <div class="view-base-form-btn-left">
           <el-button icon="Delete" type="danger" @click="delData">删除</el-button>
+          <el-button icon="Check" type="success" @click="auditData('1')">审核通过</el-button>
+          <el-button icon="Close" type="warning" @click="auditData('0')">审核拒绝</el-button>
         </div>
         <div class="view-base-form-btn-right">
           <el-button icon="Refresh" @click="reset(formRef)">重置</el-button>
@@ -72,6 +74,14 @@
               <el-table-column prop="region" label="地区" width="160" />
               <el-table-column prop="likeCount" label="点赞" width="90" align="center">
                 <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
+              </el-table-column>
+              <el-table-column prop="auditStatus" label="审核状态" width="100" align="center">
+                <template #default="scope">
+                  <el-tag v-if="scope.row.auditStatus === '0'" type="warning">待审核</el-tag>
+                  <el-tag v-else-if="scope.row.auditStatus === '1'" type="success">审核通过</el-tag>
+                  <el-tag v-else-if="scope.row.auditStatus === '2'" type="danger">审核拒绝</el-tag>
+                  <el-tag v-else type="info">未知</el-tag>
+                </template>
               </el-table-column>
               <el-table-column prop="createTime" label="留言时间" width="180">
                 <template #default="scope">
@@ -129,6 +139,14 @@
           <template #default="scope">
             <el-tag v-if="scope.row.isPrivate === '1'" type="primary">是</el-tag>
             <el-tag v-else type="info">否</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="auditStatus" label="审核状态" width="100" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.auditStatus === '0'" type="warning">待审核</el-tag>
+            <el-tag v-else-if="scope.row.auditStatus === '1'" type="success">审核通过</el-tag>
+            <el-tag v-else-if="scope.row.auditStatus === '2'" type="danger">审核拒绝</el-tag>
+            <el-tag v-else type="info">未知</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="留言时间" width="180">
@@ -267,6 +285,26 @@ const delData = () => {
     const ids = multipleSelection.value.map(i => i.id).join(',')
     await messageApi.del({ ids })
     ElMessage.success('删除成功')
+    getList(query)
+  })
+}
+
+const auditData = type => {
+  if (multipleSelection.value.length === 0) {
+    return ElMessage.error('请至少选择一条数据')
+  }
+
+  const actionText = type === '1' ? '审核通过' : '审核拒绝'
+  const confirmText = `确认${actionText}选中留言？`
+
+  ElMessageBox.confirm(confirmText, '提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    const ids = multipleSelection.value.map(i => i.id)
+    await messageApi.audit({ ids, type })
+    ElMessage.success(`${actionText}成功`)
     getList(query)
   })
 }

@@ -29,3 +29,8 @@ export const children = params => {
 export const create = data => {
   return http.post('/board/add', data)
 }
+
+// 审核留言
+export const audit = data => {
+  return http.post('/board/audit', data)
+}
