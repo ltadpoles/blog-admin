@@ -14,6 +14,13 @@
             end-placeholder="结束日期"
           />
         </el-form-item>
+        <el-form-item label="审核状态" prop="auditStatus">
+          <el-select v-model="formData.auditStatus" placeholder="请选择审核状态" clearable>
+            <el-option label="待审核" value="0" />
+            <el-option label="审核通过" value="1" />
+            <el-option label="审核拒绝" value="2" />
+          </el-select>
+        </el-form-item>
       </el-form>
       <div class="view-base-form-btn">
         <div class="view-base-form-btn-left">
@@ -212,7 +219,8 @@ import boardReplyDialog from '../components/board-reply/index.vue'
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
   content: '',
-  date: ''
+  date: '',
+  auditStatus: ''
 })
 
 const tableData = ref([])
@@ -290,22 +298,57 @@ const delData = () => {
 }
 
 const auditData = type => {
-  if (multipleSelection.value.length === 0) {
+  // 收集所有选中的留言ID（包括主留言和子留言）
+  const selectedIds = []
+
+  // 收集主留言选中的ID
+  if (multipleSelection.value.length > 0) {
+    selectedIds.push(...multipleSelection.value.map(i => i.id))
+  }
+
+  // 收集子留言选中的ID
+  Object.keys(childSelections).forEach(parentId => {
+    const childSels = childSelections[parentId] || []
+    if (childSels.length > 0) {
+      selectedIds.push(...childSels.map(i => i.id))
+    }
+  })
+
+  if (selectedIds.length === 0) {
     return ElMessage.error('请至少选择一条数据')
   }
 
   const actionText = type === '1' ? '审核通过' : '审核拒绝'
-  const confirmText = `确认${actionText}选中留言？`
+  const confirmText = `确认${actionText}选中的${selectedIds.length}条留言？`
 
   ElMessageBox.confirm(confirmText, '提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    const ids = multipleSelection.value.map(i => i.id)
-    await messageApi.audit({ ids, type })
+    await messageApi.audit({ ids: selectedIds, type })
     ElMessage.success(`${actionText}成功`)
+
+    // 刷新主列表
     getList(query)
+
+    // 刷新所有已展开的子留言列表
+    Object.keys(childSelections).forEach(async parentId => {
+      const childSels = childSelections[parentId] || []
+      if (childSels.length > 0) {
+        // 如果该父留言下有选中的子留言，直接重新加载子列表
+        loadingChildren[parentId] = true
+        try {
+          const { data } = await messageApi.children({ parentId })
+          const list = data?.data?.list || data?.data || data || []
+          childrenMap[parentId] = list
+        } finally {
+          loadingChildren[parentId] = false
+        }
+      }
+      // 清空选中状态
+      childSelections[parentId] = []
+    })
   })
 }
 

@@ -2,12 +2,12 @@ import http from '@/utils/http'
 
 // 分页查询评论（顶级）
 export const page = data => {
-  return http.post('/comment/all-page', data)
+  return http.post('/comment/admin-page', data)
 }
 
 // 子评论列表
 export const children = params => {
-  return http.get('/comment/list', { params })
+  return http.get('/comment/admin-list', { params })
 }
 
 // 删除评论（支持批量）
@@ -28,4 +28,9 @@ export const info = params => {
 // 创建评论（回复评论）
 export const create = data => {
   return http.post('/comment/add', data)
+}
+
+// 审核评论
+export const audit = data => {
+  return http.post('/comment/audit', data)
 }

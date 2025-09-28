@@ -14,10 +14,19 @@
             end-placeholder="结束日期"
           />
         </el-form-item>
+        <el-form-item label="审核状态" prop="auditStatus">
+          <el-select v-model="formData.auditStatus" placeholder="请选择审核状态" clearable>
+            <el-option label="待审核" value="0" />
+            <el-option label="审核通过" value="1" />
+            <el-option label="审核拒绝" value="2" />
+          </el-select>
+        </el-form-item>
       </el-form>
       <div class="view-base-form-btn">
         <div class="view-base-form-btn-left">
           <el-button icon="Delete" type="danger" @click="delData">删除</el-button>
+          <el-button icon="Check" type="success" @click="auditData('1')">审核通过</el-button>
+          <el-button icon="Close" type="warning" @click="auditData('0')">审核拒绝</el-button>
         </div>
         <div class="view-base-form-btn-right">
           <el-button icon="Refresh" @click="reset(formRef)">重置</el-button>
@@ -73,6 +82,14 @@
               <el-table-column prop="likeCount" label="点赞" width="90" align="center">
                 <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
               </el-table-column>
+              <el-table-column prop="auditStatus" label="审核状态" width="100" align="center">
+                <template #default="scope">
+                  <el-tag v-if="scope.row.auditStatus === '0'" type="warning">待审核</el-tag>
+                  <el-tag v-else-if="scope.row.auditStatus === '1'" type="success">审核通过</el-tag>
+                  <el-tag v-else-if="scope.row.auditStatus === '2'" type="danger">审核拒绝</el-tag>
+                  <el-tag v-else type="info">未知</el-tag>
+                </template>
+              </el-table-column>
               <el-table-column prop="createTime" label="评论时间" width="180">
                 <template #default="scope">
                   {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
@@ -121,6 +138,14 @@
         </el-table-column>
         <el-table-column prop="likeCount" label="点赞" width="90" align="center">
           <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
+        </el-table-column>
+        <el-table-column prop="auditStatus" label="审核状态" width="100" align="center">
+          <template #default="scope">
+            <el-tag v-if="scope.row.auditStatus === '0'" type="warning">待审核</el-tag>
+            <el-tag v-else-if="scope.row.auditStatus === '1'" type="success">审核通过</el-tag>
+            <el-tag v-else-if="scope.row.auditStatus === '2'" type="danger">审核拒绝</el-tag>
+            <el-tag v-else type="info">未知</el-tag>
+          </template>
         </el-table-column>
         <el-table-column prop="createTime" label="评论时间" width="180">
           <template #default="scope">
@@ -182,7 +207,8 @@ import commentReplyDialog from '../components/comment-reply/index.vue'
 const formRef = useTemplateRef('formRef')
 const formData = reactive({
   content: '',
-  date: ''
+  date: '',
+  auditStatus: ''
 })
 
 const tableData = ref([])
@@ -255,6 +281,68 @@ const delData = () => {
     await commentApi.del({ ids })
     ElMessage.success('删除成功')
     getList(query)
+  })
+}
+
+const auditData = type => {
+  // 收集所有选中的评论ID（包括主评论和子评论）
+  const selectedIds = []
+
+  // 收集主评论选中的ID
+  if (multipleSelection.value.length > 0) {
+    selectedIds.push(...multipleSelection.value.map(i => i.id))
+  }
+
+  // 收集子评论选中的ID
+  Object.keys(childSelections).forEach(parentId => {
+    const childSels = childSelections[parentId] || []
+    if (childSels.length > 0) {
+      selectedIds.push(...childSels.map(i => i.id))
+    }
+  })
+
+  if (selectedIds.length === 0) {
+    return ElMessage.error('请至少选择一条数据')
+  }
+
+  const actionText = type === '1' ? '审核通过' : '审核拒绝'
+  const confirmText = `确认${actionText}选中的${selectedIds.length}条评论？`
+
+  ElMessageBox.confirm(confirmText, '提示', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    await commentApi.audit({ ids: selectedIds, type })
+    ElMessage.success(`${actionText}成功`)
+
+    // 刷新主列表
+    getList(query)
+
+    // 刷新所有已展开的子评论列表
+    Object.keys(childSelections).forEach(async parentId => {
+      const childSels = childSelections[parentId] || []
+      if (childSels.length > 0) {
+        // 如果该父评论下有选中的子评论，直接重新加载子列表
+        loadingChildren[parentId] = true
+        try {
+          const articleId =
+            tableData.value.find(row => row.id === parentId)?.articleId ||
+            tableData.value.find(row => row.id === parentId)?.article?.id
+          const params = { parentId }
+          if (articleId) {
+            params.articleId = articleId
+          }
+          const { data } = await commentApi.children(params)
+          const list = data?.data?.list || data?.data || data || []
+          childrenMap[parentId] = list
+        } finally {
+          loadingChildren[parentId] = false
+        }
+      }
+      // 清空选中状态
+      childSelections[parentId] = []
+    })
   })
 }
 
