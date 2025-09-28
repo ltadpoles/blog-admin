@@ -97,7 +97,10 @@ watch(
 
 // 本地表单数据，避免直接修改props
 const localFormData = computed({
-  get: () => props.formData,
+  get: () => ({
+    ...props.formData,
+    authorAbout: props.formData.authorAbout || '' // 确保authorAbout始终是字符串
+  }),
   set: value => emit('update:formData', value)
 })
 
