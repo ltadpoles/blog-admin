@@ -15,7 +15,7 @@
             <Plus />
           </el-icon>
         </el-upload>
-        <div class="upload-tip">点击上传头像，支持JPG、PNG格式，建议尺寸200x200px</div>
+        <div class="upload-tip">点击上传头像，支持JPG、PNG、SVG格式，建议尺寸200x200px，自动保持宽高比</div>
       </div>
     </el-form-item>
 
@@ -66,6 +66,8 @@ import { upload } from '@/api'
 import { useUserStore } from '@/stores/modules/user'
 import { useSettingStore } from '@/stores/modules/setting'
 import config from '@/config'
+import { compressImage, getCompressPresets } from '@/utils/imageCompress'
+import { ElMessage } from 'element-plus'
 
 const props = defineProps({
   formData: {
@@ -124,9 +126,32 @@ const handleAvatarSuccess = file => {
   })
 }
 
-// 头像上传前验证
-const beforeAvatarUpload = () => {
-  return true
+// 头像上传前验证和压缩
+const beforeAvatarUpload = async file => {
+  const isImage = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/svg+xml'
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error('头像图片只能是 JPG/PNG/SVG 格式!')
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error('头像图片大小不能超过 5MB!')
+    return false
+  }
+
+  try {
+    // 获取头像压缩配置
+    const avatarPreset = getCompressPresets().avatar
+
+    // 压缩图片（SVG会自动跳过压缩）
+    const compressedFile = await compressImage(file, avatarPreset)
+
+    return compressedFile
+  } catch {
+    ElMessage.error('图片压缩失败，请重试')
+    return false
+  }
 }
 
 // 主题设置
@@ -174,30 +199,48 @@ const toolbars = [
 
 // 图片上传处理
 const onUploadImg = async (files, callback) => {
-  const res = await Promise.all(
-    files.map(file => {
-      return new Promise((rev, rej) => {
-        const form = new FormData()
-        form.append('file', file)
-        form.append('type', 'other') // 设置上传类型为other
+  try {
+    // 获取编辑器图片压缩配置
+    const editorPreset = getCompressPresets().editor
 
-        upload(form)
-          .then(res => {
-            rev(res)
-          })
-          .catch(err => {
-            rej(err)
-          })
+    // 批量压缩图片
+    const compressedFiles = await Promise.all(
+      files.map(async file => {
+        try {
+          return await compressImage(file, editorPreset)
+        } catch {
+          return file
+        }
       })
-    })
-  )
+    )
 
-  callback(
-    res.map(item => ({
-      url: ImgUrl + item.data.data.fileId,
-      alt: 'IMG.ALT'
-    }))
-  )
+    const res = await Promise.all(
+      compressedFiles.map(file => {
+        return new Promise((rev, rej) => {
+          const form = new FormData()
+          form.append('file', file)
+          form.append('type', 'other') // 设置上传类型为other
+
+          upload(form)
+            .then(res => {
+              rev(res)
+            })
+            .catch(err => {
+              rej(err)
+            })
+        })
+      })
+    )
+
+    callback(
+      res.map(item => ({
+        url: ImgUrl + item.data.data.fileId,
+        alt: 'IMG.ALT'
+      }))
+    )
+  } catch {
+    ElMessage.error('图片上传失败，请重试')
+  }
 }
 
 // 暴露验证方法给父组件

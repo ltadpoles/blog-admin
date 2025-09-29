@@ -62,19 +62,24 @@
                 </el-form-item>
 
                 <el-form-item label="文章封面" prop="coverImgId">
-                  <el-upload
-                    class="avatar-uploader"
-                    :headers="headers"
-                    :action="action"
-                    :show-file-list="false"
-                    :on-success="handleAvatarSuccess"
-                    :before-upload="beforeAvatarUpload"
-                  >
-                    <img v-if="infoData.coverImgId" :src="ImgUrl + infoData.coverImgId" class="avatar" />
-                    <el-icon v-else class="avatar-uploader-icon">
-                      <Plus />
-                    </el-icon>
-                  </el-upload>
+                  <div class="cover-upload-container">
+                    <el-upload
+                      class="avatar-uploader"
+                      :headers="headers"
+                      :action="action"
+                      :show-file-list="false"
+                      :on-success="handleAvatarSuccess"
+                      :before-upload="beforeAvatarUpload"
+                    >
+                      <img v-if="infoData.coverImgId" :src="ImgUrl + infoData.coverImgId" class="avatar" />
+                      <el-icon v-else class="avatar-uploader-icon">
+                        <Plus />
+                      </el-icon>
+                    </el-upload>
+                    <div class="upload-tip">
+                      点击上传封面，支持JPG、PNG、SVG格式，建议尺寸1200x800px，自动保持宽高比
+                    </div>
+                  </div>
                 </el-form-item>
 
                 <el-form-item label="文章摘要" prop="description">
@@ -136,6 +141,7 @@ import { categorylist } from '@/api/category'
 import { add, info, update } from '@/api/article'
 import { useUserStore } from '@/stores/modules/user'
 import config from '@/config'
+import { compressImage, getCompressPresets } from '@/utils/imageCompress'
 
 const props = defineProps({
   title: String,
@@ -188,8 +194,33 @@ const getCateGoryList = async () => {
 const handleAvatarSuccess = file => {
   infoData.coverImgId = file.data.fileId
 }
-const beforeAvatarUpload = () => {
-  return true
+
+// 封面图片上传前验证和压缩
+const beforeAvatarUpload = async file => {
+  const isImage = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/svg+xml'
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error('封面图片只能是 JPG/PNG/SVG 格式!')
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error('封面图片大小不能超过 5MB!')
+    return false
+  }
+
+  try {
+    // 获取封面压缩配置
+    const coverPreset = getCompressPresets().cover
+
+    // 压缩图片（SVG会自动跳过压缩）
+    const compressedFile = await compressImage(file, coverPreset)
+
+    return compressedFile
+  } catch {
+    ElMessage.error('图片压缩失败，请重试')
+    return false
+  }
 }
 
 const cancel = () => {
@@ -289,29 +320,47 @@ const toolbars = [
 ]
 
 const onUploadImg = async (files, callback) => {
-  const res = await Promise.all(
-    files.map(file => {
-      return new Promise((rev, rej) => {
-        const form = new FormData()
-        form.append('file', file)
+  try {
+    // 获取编辑器图片压缩配置
+    const editorPreset = getCompressPresets().editor
 
-        upload(form)
-          .then(res => {
-            rev(res)
-          })
-          .catch(err => {
-            rej(err)
-          })
+    // 批量压缩图片
+    const compressedFiles = await Promise.all(
+      files.map(async file => {
+        try {
+          return await compressImage(file, editorPreset)
+        } catch {
+          return file
+        }
       })
-    })
-  )
+    )
 
-  callback(
-    res.map(item => ({
-      url: ImgUrl + item.data.data.fileId,
-      alt: 'IMG.ALT'
-    }))
-  )
+    const res = await Promise.all(
+      compressedFiles.map(file => {
+        return new Promise((rev, rej) => {
+          const form = new FormData()
+          form.append('file', file)
+
+          upload(form)
+            .then(res => {
+              rev(res)
+            })
+            .catch(err => {
+              rej(err)
+            })
+        })
+      })
+    )
+
+    callback(
+      res.map(item => ({
+        url: ImgUrl + item.data.data.fileId,
+        alt: 'IMG.ALT'
+      }))
+    )
+  } catch {
+    ElMessage.error('图片上传失败，请重试')
+  }
 }
 
 const emit = defineEmits(['close'])

@@ -41,7 +41,7 @@
             <Plus />
           </el-icon>
         </el-upload>
-        <div class="upload-tip">点击上传Logo，支持JPG、PNG格式，建议尺寸200x80px</div>
+        <div class="upload-tip">点击上传Logo，支持JPG、PNG、SVG格式，建议尺寸200x80px，自动保持宽高比</div>
       </div>
     </el-form-item>
 
@@ -56,6 +56,8 @@ import { useTemplateRef, computed, ref, watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/modules/user'
 import config from '@/config'
+import { compressImage, getCompressPresets } from '@/utils/imageCompress'
+import { ElMessage } from 'element-plus'
 
 const props = defineProps({
   formData: {
@@ -109,9 +111,32 @@ const handleLogoSuccess = file => {
   })
 }
 
-// Logo上传前验证
-const beforeLogoUpload = () => {
-  return true
+// Logo上传前验证和压缩
+const beforeLogoUpload = async file => {
+  const isImage = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/svg+xml'
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error('Logo图片只能是 JPG/PNG/SVG 格式!')
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error('Logo图片大小不能超过 5MB!')
+    return false
+  }
+
+  try {
+    // 获取Logo压缩配置
+    const logoPreset = getCompressPresets().logo
+
+    // 压缩图片（SVG会自动跳过压缩）
+    const compressedFile = await compressImage(file, logoPreset)
+
+    return compressedFile
+  } catch {
+    ElMessage.error('图片压缩失败，请重试')
+    return false
+  }
 }
 
 // 暴露验证方法给父组件
