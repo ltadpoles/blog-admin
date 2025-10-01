@@ -27,18 +27,6 @@ const route = [
         meta: { title: '分类管理', i18nName: 'tadCategory', icon: 'category' },
         name: 'articleCategory',
         component: () => import('@/views/article/category/index.vue')
-      },
-      {
-        path: 'messages',
-        meta: { title: '留言管理', i18nName: 'tadMessages', icon: 'messages' },
-        name: 'articleMessages',
-        component: () => import('@/views/article/messages/index.vue')
-      },
-      {
-        path: 'comments',
-        meta: { title: '评论管理', i18nName: 'tadComments', icon: 'messages' },
-        name: 'articleComments',
-        component: () => import('@/views/article/comments/index.vue')
       }
     ]
   }

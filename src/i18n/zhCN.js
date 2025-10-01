@@ -23,6 +23,7 @@ const zhCN = {
     tadArticle: '文章管理',
     tadTags: '标签管理',
     tadCategory: '分类管理',
+    tadMessageManage: '消息管理',
     tadMessages: '留言管理',
     tadComments: '评论管理'
   }

@@ -23,6 +23,7 @@ const en = {
     tadArticle: 'Article Manage',
     tadTags: 'Tags Manage',
     tadCategory: 'Category Manage',
+    tadMessageManage: 'Message Manage',
     tadMessages: 'Messages Manage',
     tadComments: 'Comments Manage'
   }
