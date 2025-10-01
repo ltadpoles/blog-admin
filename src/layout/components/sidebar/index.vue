@@ -82,7 +82,7 @@ const menu = ref([
   },
   {
     path: '/message',
-    icon: 'messages',
+    icon: 'message',
     name: '消息管理',
     il18Name: 'tadMessageManage',
     id: '05',
@@ -97,10 +97,18 @@ const menu = ref([
       },
       {
         path: '/message/comments',
-        icon: 'messages',
+        icon: 'comment',
         name: '评论管理',
         il18Name: 'tadComments',
         id: '052',
+        children: []
+      },
+      {
+        path: '/message/notification',
+        icon: 'notification',
+        name: '通知管理',
+        il18Name: 'tadNotification',
+        id: '053',
         children: []
       }
     ]

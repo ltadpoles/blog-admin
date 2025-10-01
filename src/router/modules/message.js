@@ -18,9 +18,15 @@ const route = [
       },
       {
         path: 'comments',
-        meta: { title: '评论管理', i18nName: 'tadComments', icon: 'messages' },
+        meta: { title: '评论管理', i18nName: 'tadComments', icon: 'comment' },
         name: 'messageComments',
         component: () => import('@/views/article/comments/index.vue')
+      },
+      {
+        path: 'notification',
+        meta: { title: '通知管理', i18nName: 'tadNotification', icon: 'notification' },
+        name: 'messageNotification',
+        component: () => import('@/views/system/notification/index.vue')
       }
     ]
   }

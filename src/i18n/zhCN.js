@@ -18,6 +18,7 @@ const zhCN = {
     tadSysManagement: '系统管理',
     tadUserManage: '用户管理',
     tadIpManage: 'IP管理',
+    tadNotification: '通知管理',
     tadWebsiteManage: '网站管理',
     tadBasicInfo: '基础信息',
     tadArticle: '文章管理',
