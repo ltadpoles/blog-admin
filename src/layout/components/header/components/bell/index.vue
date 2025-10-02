@@ -24,12 +24,18 @@
             <span class="notification-time">{{ formatTime(item.createTime) }}</span>
           </div>
         </div>
-        <div class="notification-content">{{ item.content }}</div>
+        <div class="notification-content">{{ formatNotificationContent(item) }}</div>
       </div>
     </div>
     <el-divider />
     <div class="bell-footer">
-      <span class="clear-bell" @click="markAllAsRead">全部已读</span>
+      <span
+        class="clear-bell"
+        :class="{ 'is-disabled': notificationList.length === 0 }"
+        @click="notificationList.length > 0 ? markAllAsRead() : null"
+      >
+        全部已读
+      </span>
       <span class="view-more" @click="viewMore">查看更多</span>
     </div>
   </el-popover>
@@ -151,7 +157,6 @@ const getTypeTag = type => {
   const typeMap = {
     comment: 'primary',
     board: 'success',
-    reply: 'info',
     like: 'warning',
     system: 'danger'
   }
@@ -163,11 +168,52 @@ const getTypeText = type => {
   const typeMap = {
     comment: '评论',
     board: '留言',
-    reply: '回复',
     like: '点赞',
     system: '系统'
   }
   return typeMap[type] || '通知'
+}
+
+// 格式化通知内容
+const formatNotificationContent = item => {
+  const { type, content, title, fromUser, articleTitle, sourceType } = item
+
+  const userName = fromUser?.name || '某用户'
+
+  // 根据类型和来源类型组合判断
+  if (type === 'like') {
+    if (sourceType === 'article') {
+      // 文章点赞：xx点赞了你的文章《xx》
+      return `${userName}点赞了你的文章《${articleTitle || '未知文章'}》`
+    } else if (sourceType === 'board') {
+      // 留言点赞：xx点赞了你的留言xx
+      return `${userName}点赞了你的留言${content && content !== '-' ? '：' + content : ''}`
+    }
+  }
+
+  if (type === 'comment') {
+    if (sourceType === 'article') {
+      // 文章评论：xx评论了你的文章《xx》：xxx
+      const commentContent = content && content !== '-' ? '：' + content : ''
+      return `${userName}评论了你的文章《${articleTitle || '未知文章'}》${commentContent}`
+    } else if (sourceType === 'board') {
+      // 留言评论：xx给你留言：xxx
+      return `${userName}给你留言评论：${content && content !== '-' ? content : '留言内容'}`
+    }
+  }
+
+  if (type === 'board') {
+    // 留言通知：xx给你留言：xxx
+    return `${userName}给你留言：${content && content !== '-' ? content : '留言内容'}`
+  }
+
+  if (type === 'system') {
+    // 系统通知：显示标题
+    return title || '系统通知'
+  }
+
+  // 默认情况：显示标题
+  return title || '通知'
 }
 
 // 初始化
