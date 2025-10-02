@@ -15,7 +15,7 @@
         v-for="item in notificationList"
         :key="item.id"
         class="bell-content-item is-unread"
-        @click="handleNotificationClick(item)"
+        @click.stop="handleNotificationClick(item)"
       >
         <div class="notification-header">
           <el-tag :type="getTypeTag(item.type)" size="small">{{ getTypeText(item.type) }}</el-tag>
@@ -92,6 +92,11 @@ const getUnreadCount = async () => {
 // 点击通知项
 const handleNotificationClick = async item => {
   try {
+    // 如果是审核类型，先跳转到对应页面
+    if (item.type === 'system') {
+      await handleAuditNotification(item)
+    }
+
     await notificationApi.markAsRead({ ids: [item.id] })
     // 从列表中移除该通知
     const index = notificationList.value.findIndex(n => n.id === item.id)
@@ -123,6 +128,26 @@ const markAllAsRead = async () => {
     unreadCount.value = 0
   } catch {
     // 忽略错误
+  }
+}
+
+// 处理审核通知跳转
+const handleAuditNotification = async item => {
+  const { sourceType } = item
+
+  try {
+    if (sourceType === 'comment') {
+      // 跳转到评论管理页面
+      router.push('/message/comments')
+    } else if (sourceType === 'board') {
+      // 跳转到留言管理页面
+      router.push('/message/messages')
+    } else {
+      // 默认跳转到通知管理页面
+      router.push('/message/notification')
+    }
+  } catch {
+    // 忽略跳转错误
   }
 }
 
@@ -158,7 +183,8 @@ const getTypeTag = type => {
     comment: 'primary',
     board: 'success',
     like: 'warning',
-    system: 'danger'
+    system: 'danger',
+    audit: 'warning'
   }
   return typeMap[type] || 'info'
 }
@@ -169,7 +195,8 @@ const getTypeText = type => {
     comment: '评论',
     board: '留言',
     like: '点赞',
-    system: '系统'
+    system: '系统',
+    audit: '审核'
   }
   return typeMap[type] || '通知'
 }
@@ -205,6 +232,17 @@ const formatNotificationContent = item => {
   if (type === 'board') {
     // 留言通知：xx给你留言：xxx
     return `${userName}给你留言：${content && content !== '-' ? content : '留言内容'}`
+  }
+
+  if (type === 'audit') {
+    // 审核通知：根据来源类型显示不同内容
+    if (sourceType === 'comment') {
+      return '有新的评论需要审核'
+    }
+    if (sourceType === 'board') {
+      return '有新的留言需要审核'
+    }
+    return '有新的内容需要审核'
   }
 
   if (type === 'system') {
