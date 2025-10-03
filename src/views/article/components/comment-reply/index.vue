@@ -129,7 +129,7 @@ const submit = async formEl => {
           content: replyForm.content,
           parentId: replyForm.parentId,
           replyToUserName: replyForm.replyToUserName,
-          articleId: props.info.article?.id,
+          articleId: props.info.articleId || props.info.article?.id,
           name: userStore.userInfo.name,
           userId: userStore.userInfo.userId,
           email: userStore.userInfo.email,

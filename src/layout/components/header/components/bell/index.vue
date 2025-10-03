@@ -226,6 +226,9 @@ const formatNotificationContent = item => {
     } else if (sourceType === 'board') {
       // 留言评论：xx给你留言：xxx
       return `${userName}给你留言评论：${content && content !== '-' ? content : '留言内容'}`
+    } else if (sourceType === 'comment') {
+      // 评论评论：xx给你评论：xxx
+      return `${userName}回复你：${content && content !== '-' ? content : '评论内容'}`
     }
   }
 
@@ -234,7 +237,7 @@ const formatNotificationContent = item => {
     return `${userName}给你留言：${content && content !== '-' ? content : '留言内容'}`
   }
 
-  if (type === 'audit') {
+  if (type === 'system') {
     // 审核通知：根据来源类型显示不同内容
     if (sourceType === 'comment') {
       return '有新的评论需要审核'
@@ -243,11 +246,6 @@ const formatNotificationContent = item => {
       return '有新的留言需要审核'
     }
     return '有新的内容需要审核'
-  }
-
-  if (type === 'system') {
-    // 系统通知：显示标题
-    return title || '系统通知'
   }
 
   // 默认情况：显示标题
