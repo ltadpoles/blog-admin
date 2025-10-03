@@ -2,18 +2,21 @@
   <div>
     <v-dialog :title="title" :isShow="isShow" @close="close" @open="open" width="400px">
       <el-form ref="borderFormRef" :model="boardForm" label-width="120px">
-        <el-form-item label="是否置顶">
+        <el-form-item v-if="boardForm.parentId === 0" label="是否置顶">
           <el-switch v-model="boardForm.top" :active-value="'1'" :inactive-value="'0'" />
         </el-form-item>
-        <el-form-item label="是否私密">
+        <el-form-item v-if="boardForm.parentId === 0" label="是否私密">
           <el-switch v-model="boardForm.isPrivate" :active-value="'1'" :inactive-value="'0'" />
         </el-form-item>
-        <el-form-item label="是否可回复">
+        <el-form-item v-if="boardForm.parentId === 0" label="是否可回复">
           <el-switch v-model="boardForm.isReply" :active-value="'1'" :inactive-value="'0'" />
+        </el-form-item>
+        <el-form-item v-if="boardForm.parentId !== 0">
+          <div style="text-align: center; color: #999; padding: 20px">子留言不支持编辑置顶、私密、回复状态</div>
         </el-form-item>
         <el-form-item>
           <el-button @click="cancel(borderFormRef)">取消</el-button>
-          <el-button type="primary" @click="submit(borderFormRef)" :loading="loading"> 确认 </el-button>
+          <el-button v-if="boardForm.parentId === 0" type="primary" @click="submit(borderFormRef)" :loading="loading">确认</el-button>
         </el-form-item>
       </el-form>
     </v-dialog>

@@ -36,84 +36,7 @@
     </div>
 
     <div class="view-base-table">
-      <el-table
-        :data="tableData"
-        border
-        row-key="id"
-        v-model:expand-row-keys="expandedRowKeys"
-        :row-class-name="rowClassName"
-        @selection-change="selectionChange"
-        @expand-change="onExpandChange"
-      >
-        <el-table-column type="expand">
-          <template #default="props">
-            <div style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center">
-              <div></div>
-              <el-button
-                v-if="(childSelections[props.row.id] || []).length > 0"
-                size="small"
-                type="danger"
-                icon="Delete"
-                @click="delChildren(props.row)"
-              >
-                删除所选子评论
-              </el-button>
-            </div>
-            <el-table
-              :data="childrenMap[props.row.id] || []"
-              size="small"
-              v-loading="!!loadingChildren[props.row.id]"
-              @selection-change="sels => childSelectionChange(props.row.id, sels)"
-              row-key="id"
-            >
-              <el-table-column type="selection" width="45" />
-              <el-table-column prop="content" label="评论内容" />
-              <el-table-column label="头像" width="70" align="center">
-                <template #default="scope">
-                  <el-avatar :size="24" :src="scope.row.user?.avatar" />
-                </template>
-              </el-table-column>
-              <el-table-column label="评论人" width="120">
-                <template #default="scope">{{ scope.row.user?.name || '-' }}</template>
-              </el-table-column>
-              <el-table-column prop="replyToUserName" label="回复对象" width="120" />
-              <el-table-column prop="ipAddress" label="IP" width="160" />
-              <el-table-column prop="region" label="地区" width="160" />
-              <el-table-column prop="likeCount" label="点赞" width="90" align="center">
-                <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
-              </el-table-column>
-              <el-table-column prop="auditStatus" label="审核状态" width="100" align="center">
-                <template #default="scope">
-                  <el-tag v-if="scope.row.auditStatus === '0'" type="warning">待审核</el-tag>
-                  <el-tag v-else-if="scope.row.auditStatus === '1'" type="success">审核通过</el-tag>
-                  <el-tag v-else-if="scope.row.auditStatus === '2'" type="danger">审核拒绝</el-tag>
-                  <el-tag v-else type="info">未知</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="createTime" label="评论时间" width="180">
-                <template #default="scope">
-                  {{ dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm') }}
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="100" align="center">
-                <template #default="scope">
-                  <el-button link type="primary" icon="ChatLineSquare" @click="replyComment(scope.row)" />
-                  <el-popconfirm
-                    confirm-button-text="确认"
-                    cancel-button-text="取消"
-                    icon="InfoFilled"
-                    title="确认删除?"
-                    @confirm="delChild(scope.row, props.row)"
-                  >
-                    <template #reference>
-                      <el-button link type="danger" icon="Delete" />
-                    </template>
-                  </el-popconfirm>
-                </template>
-              </el-table-column>
-            </el-table>
-          </template>
-        </el-table-column>
+      <el-table :data="tableData" border row-key="id" @selection-change="selectionChange">
         <el-table-column type="selection" width="45" />
         <el-table-column prop="content" label="评论内容" />
         <el-table-column label="头像" width="70" align="center">
@@ -127,13 +50,16 @@
         <el-table-column prop="article.title" label="所属文章" width="220">
           <template #default="scope">{{ scope.row.article?.title || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="replyToUserName" label="回复对象" width="120" />
+        <el-table-column prop="replyToUserName" label="回复对象" width="120">
+          <template #default="scope">{{ scope.row.replyToUserName || '-' }}</template>
+        </el-table-column>
         <el-table-column prop="ipAddress" label="IP" width="160" />
         <el-table-column prop="region" label="地区" width="160" />
         <el-table-column prop="top" label="是否置顶" width="100" align="center">
           <template #default="scope">
-            <el-tag v-if="scope.row.top === '1'" type="primary">是</el-tag>
-            <el-tag v-else type="info">否</el-tag>
+            <el-tag v-if="scope.row.parentId === 0 && scope.row.top === '1'" type="primary">是</el-tag>
+            <el-tag v-else-if="scope.row.parentId === 0" type="info">否</el-tag>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="likeCount" label="点赞" width="90" align="center">
@@ -155,10 +81,10 @@
         <el-table-column label="操作" width="160" align="center">
           <template #default="scope">
             <el-button link type="primary" icon="ChatLineSquare" @click="replyComment(scope.row)" />
-            <el-tooltip v-if="scope.row.top === '1'" content="取消置顶" placement="top">
+            <el-tooltip v-if="scope.row.parentId === 0 && scope.row.top === '1'" content="取消置顶" placement="top">
               <el-button link type="warning" size="small" icon="Bottom" @click="toggleTop(scope.row, '0')" />
             </el-tooltip>
-            <el-tooltip v-else content="置顶" placement="top">
+            <el-tooltip v-else-if="scope.row.parentId === 0" content="置顶" placement="top">
               <el-button link type="primary" size="small" icon="Top" @click="toggleTop(scope.row, '1')" />
             </el-tooltip>
             <el-popconfirm
@@ -212,10 +138,6 @@ const formData = reactive({
 })
 
 const tableData = ref([])
-const childrenMap = reactive({})
-const loadingChildren = reactive({})
-const childSelections = reactive({})
-const expandedRowKeys = ref([])
 const query = reactive({
   pageNum: 1,
   pageSize: 10,
@@ -285,26 +207,11 @@ const delData = () => {
 }
 
 const auditData = type => {
-  // 收集所有选中的评论ID（包括主评论和子评论）
-  const selectedIds = []
-
-  // 收集主评论选中的ID
-  if (multipleSelection.value.length > 0) {
-    selectedIds.push(...multipleSelection.value.map(i => i.id))
-  }
-
-  // 收集子评论选中的ID
-  Object.keys(childSelections).forEach(parentId => {
-    const childSels = childSelections[parentId] || []
-    if (childSels.length > 0) {
-      selectedIds.push(...childSels.map(i => i.id))
-    }
-  })
-
-  if (selectedIds.length === 0) {
+  if (multipleSelection.value.length === 0) {
     return ElMessage.error('请至少选择一条数据')
   }
 
+  const selectedIds = multipleSelection.value.map(i => i.id)
   const actionText = type === '1' ? '审核通过' : '审核拒绝'
   const confirmText = `确认${actionText}选中的${selectedIds.length}条评论？`
 
@@ -315,34 +222,7 @@ const auditData = type => {
   }).then(async () => {
     await commentApi.audit({ ids: selectedIds, type })
     ElMessage.success(`${actionText}成功`)
-
-    // 刷新主列表
     getList(query)
-
-    // 刷新所有已展开的子评论列表
-    Object.keys(childSelections).forEach(async parentId => {
-      const childSels = childSelections[parentId] || []
-      if (childSels.length > 0) {
-        // 如果该父评论下有选中的子评论，直接重新加载子列表
-        loadingChildren[parentId] = true
-        try {
-          const articleId =
-            tableData.value.find(row => row.id === parentId)?.articleId ||
-            tableData.value.find(row => row.id === parentId)?.article?.id
-          const params = { parentId }
-          if (articleId) {
-            params.articleId = articleId
-          }
-          const { data } = await commentApi.children(params)
-          const list = data?.data?.list || data?.data || data || []
-          childrenMap[parentId] = list
-        } finally {
-          loadingChildren[parentId] = false
-        }
-      }
-      // 清空选中状态
-      childSelections[parentId] = []
-    })
   })
 }
 
@@ -357,67 +237,10 @@ const selectionChange = val => {
   multipleSelection.value = val
 }
 
-const childSelectionChange = (parentId, sels) => {
-  childSelections[parentId] = sels
-}
 
-const delChildren = async row => {
-  const sels = childSelections[row.id] || []
-  if (sels.length === 0) {
-    return ElMessage.error('请至少选择一条子评论')
-  }
-  await ElMessageBox.confirm('确认删除选中子评论？', '提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-  const ids = sels.map(i => i.id).join(',')
-  await commentApi.del({ ids })
-  ElMessage.success('删除成功')
-  childrenMap[row.id] = undefined
-  onExpandChange(row, true)
-}
 
-const delChild = async (childRow, parentRow) => {
-  await commentApi.del({ ids: childRow.id })
-  ElMessage.success('删除成功')
-  childrenMap[parentRow.id] = undefined
-  onExpandChange(parentRow, true)
-}
 
-// 懒加载子评论
-const onExpandChange = async (row, expandedOrRows) => {
-  const isExpanded = Array.isArray(expandedOrRows)
-    ? expandedOrRows.some(r => (r?.id ?? r) === row.id)
-    : !!expandedOrRows
-  if (!isExpanded) {
-    expandedRowKeys.value = []
-    return
-  }
-  // 只展开一个
-  expandedRowKeys.value = [row.id]
-  if (childrenMap[row.id]) {
-    return
-  }
-  loadingChildren[row.id] = true
-  try {
-    const articleId = row.articleId || row.article?.id
-    const params = { parentId: row.id }
-    if (articleId) {
-      params.articleId = articleId
-    }
-    const { data } = await commentApi.children(params)
-    const list = data?.data?.list || data?.data || data || []
-    childrenMap[row.id] = list
-  } finally {
-    loadingChildren[row.id] = false
-  }
-}
 
-// 高亮已展开的父行
-const rowClassName = ({ row }) => {
-  return expandedRowKeys.value.includes(row.id) ? 'expanded-row' : ''
-}
 
 // 顶/状态切换
 const toggleTop = async (row, topVal) => {
@@ -441,16 +264,7 @@ const replyComment = row => {
 
 const commentReplyClose = val => {
   if (val) {
-    // 回复成功后，只刷新该条主评论的子级
-    // 找到对应的主评论ID
-    const parentId = commentReplyInfo.info.parentId || commentReplyInfo.info.id
-    // 清除该主评论的子级缓存
-    childrenMap[parentId] = undefined
-    // 重新加载该主评论的子级
-    const parentRow = tableData.value.find(row => row.id === parentId)
-    if (parentRow) {
-      onExpandChange(parentRow, true)
-    }
+    getList(query)
   }
   commentReplyInfo.isShow = false
 }
@@ -462,8 +276,4 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @use './index.scss' as *;
-/* 高亮已展开的父行：深度作用于 el-table 内部生成的 tr/td */
-:deep(.expanded-row) > td {
-  background-color: var(--el-color-primary-light-9) !important;
-}
 </style>
