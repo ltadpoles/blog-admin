@@ -237,11 +237,6 @@ const selectionChange = val => {
   multipleSelection.value = val
 }
 
-
-
-
-
-
 // 顶/状态切换
 const toggleTop = async (row, topVal) => {
   await commentApi.update({ id: row.id, top: topVal })

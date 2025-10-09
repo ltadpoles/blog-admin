@@ -16,7 +16,9 @@
         </el-form-item>
         <el-form-item>
           <el-button @click="cancel(borderFormRef)">取消</el-button>
-          <el-button v-if="boardForm.parentId === 0" type="primary" @click="submit(borderFormRef)" :loading="loading">确认</el-button>
+          <el-button v-if="boardForm.parentId === 0" type="primary" @click="submit(borderFormRef)" :loading="loading">
+            确认
+          </el-button>
         </el-form-item>
       </el-form>
     </v-dialog>
