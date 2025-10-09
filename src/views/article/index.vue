@@ -230,9 +230,13 @@ const delData = () => {
 }
 
 const delConfirm = async row => {
-  await del({ id: row.id })
-  ElMessage.success('删除成功')
-  getList(query)
+  try {
+    await del({ id: row.id })
+    ElMessage.success('删除成功')
+    getList(query)
+  } catch {
+    // 错误已由全局HTTP拦截器处理
+  }
 }
 
 const topChange = async row => {

@@ -203,18 +203,26 @@ const delData = () => {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    const id = multipleSelection.value.map(i => i.id)
-    await ipApi.deleteIP({ id: id.join(',') })
-    ElMessage.success('删除成功')
-    getList(query)
   })
+    .then(async () => {
+      const id = multipleSelection.value.map(i => i.id)
+      await ipApi.deleteIP({ id: id.join(',') })
+      ElMessage.success('删除成功')
+      getList(query)
+    })
+    .catch(() => {
+      // 用户取消操作
+    })
 }
 
 const delConfirm = async row => {
-  await ipApi.deleteIP(row.id)
-  ElMessage.success('删除成功')
-  getList(query)
+  try {
+    await ipApi.deleteIP({ id: row.id })
+    ElMessage.success('删除成功')
+    getList(query)
+  } catch {
+    // 错误已由全局HTTP拦截器处理
+  }
 }
 
 const multipleSelection = ref([])
@@ -232,12 +240,16 @@ const batchBlock = () => {
     cancelButtonText: '取消',
     inputPattern: /.+/,
     inputErrorMessage: '封禁原因不能为空'
-  }).then(async ({ value }) => {
-    const ips = multipleSelection.value.map(i => i.ip)
-    await ipApi.batchBlockIP({ ips, reason: value })
-    ElMessage.success('批量封禁成功')
-    getList(query)
   })
+    .then(async ({ value }) => {
+      const ips = multipleSelection.value.map(i => i.ip)
+      await ipApi.batchBlockIP({ ips, reason: value })
+      ElMessage.success('批量封禁成功')
+      getList(query)
+    })
+    .catch(() => {
+      // 用户取消操作
+    })
 }
 
 // 批量解封
@@ -249,12 +261,16 @@ const batchUnblock = () => {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    const ips = multipleSelection.value.map(i => i.ip)
-    await ipApi.batchUnblockIP({ ips })
-    ElMessage.success('批量解封成功')
-    getList(query)
   })
+    .then(async () => {
+      const ips = multipleSelection.value.map(i => i.ip)
+      await ipApi.batchUnblockIP({ ips })
+      ElMessage.success('批量解封成功')
+      getList(query)
+    })
+    .catch(() => {
+      // 用户取消操作
+    })
 }
 
 // 单个封禁
@@ -264,18 +280,26 @@ const blockIp = async row => {
     cancelButtonText: '取消',
     inputPattern: /.+/,
     inputErrorMessage: '封禁原因不能为空'
-  }).then(async ({ value }) => {
-    await ipApi.blockIP({ ip: row.ip, reason: value })
-    ElMessage.success('封禁成功')
-    getList(query)
   })
+    .then(async ({ value }) => {
+      await ipApi.blockIP({ ip: row.ip, reason: value })
+      ElMessage.success('封禁成功')
+      getList(query)
+    })
+    .catch(() => {
+      // 用户取消操作
+    })
 }
 
 // 单个解封
 const unblockIp = async row => {
-  await ipApi.unblockIP({ ip: row.ip })
-  ElMessage.success('解封成功')
-  getList(query)
+  try {
+    await ipApi.unblockIP({ ip: row.ip })
+    ElMessage.success('解封成功')
+    getList(query)
+  } catch {
+    // 错误已由全局HTTP拦截器处理
+  }
 }
 
 // 清理过期IP记录
@@ -284,11 +308,15 @@ const cleanupExpired = () => {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    await ipApi.cleanupExpiredIPs()
-    ElMessage.success('清理成功')
-    getList(query)
   })
+    .then(async () => {
+      await ipApi.cleanupExpiredIPs()
+      ElMessage.success('清理成功')
+      getList(query)
+    })
+    .catch(() => {
+      // 用户取消操作
+    })
 }
 
 onMounted(() => {

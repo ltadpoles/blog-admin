@@ -163,18 +163,30 @@ const delData = () => {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    let ids = multipleSelection.value.map(item => item.id).join()
-    await del({ id: ids })
-    ElMessage.success('删除成功')
-    getList(query)
   })
+    .then(async () => {
+      try {
+        let ids = multipleSelection.value.map(item => item.id).join()
+        await del({ id: ids })
+        ElMessage.success('删除成功')
+        getList(query)
+      } catch {
+        // 失败
+      }
+    })
+    .catch(() => {
+      // 用户取消删除，不做处理
+    })
 }
 
 const delConfirm = async row => {
-  await del({ id: row.id })
-  ElMessage.success('删除成功')
-  getList(query)
+  try {
+    await del({ id: row.id })
+    ElMessage.success('删除成功')
+    getList(query)
+  } catch {
+    // 失败
+  }
 }
 
 const multipleSelection = ref([])

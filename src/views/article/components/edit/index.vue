@@ -70,6 +70,7 @@
                       :show-file-list="false"
                       :on-success="handleAvatarSuccess"
                       :before-upload="beforeAvatarUpload"
+                      :on-error="handleAvatarError"
                     >
                       <img v-if="infoData.coverImgId" :src="ImgUrl + infoData.coverImgId" class="avatar" />
                       <el-icon v-else class="avatar-uploader-icon">
@@ -193,6 +194,19 @@ const getCateGoryList = async () => {
 
 const handleAvatarSuccess = file => {
   infoData.coverImgId = file.data.fileId
+}
+
+const handleAvatarError = err => {
+  try {
+    if (err?.message) {
+      const errorData = JSON.parse(err.message)
+      ElMessage.error(errorData?.msg || '图片上传失败，请重试')
+    } else {
+      ElMessage.error('图片上传失败，请重试')
+    }
+  } catch {
+    ElMessage.error(err?.message || '图片上传失败，请重试')
+  }
 }
 
 // 封面图片上传前验证和压缩
@@ -335,31 +349,38 @@ const onUploadImg = async (files, callback) => {
       })
     )
 
-    const res = await Promise.all(
+    const res = await Promise.allSettled(
       compressedFiles.map(file => {
-        return new Promise((rev, rej) => {
-          const form = new FormData()
-          form.append('file', file)
-
-          upload(form)
-            .then(res => {
-              rev(res)
-            })
-            .catch(err => {
-              rej(err)
-            })
-        })
+        const form = new FormData()
+        form.append('file', file)
+        return upload(form)
       })
     )
 
+    // 检查是否有上传失败的图片
+    const failedUploads = res.filter(result => result.status === 'rejected')
+    if (failedUploads.length > 0) {
+      // 如果有上传失败的图片，显示错误信息
+      // 注意：全局HTTP拦截器已经显示了具体的错误消息
+      // 这里只显示统计信息
+      ElMessage.error(`${failedUploads.length} 张图片上传失败`)
+    }
+
+    // 只处理成功的上传结果
+    const successfulUploads = res.filter(result => result.status === 'fulfilled').map(result => result.value)
+
     callback(
-      res.map(item => ({
+      successfulUploads.map(item => ({
         url: ImgUrl + item.data.data.fileId,
         alt: 'IMG.ALT'
       }))
     )
-  } catch {
-    ElMessage.error('图片上传失败，请重试')
+  } catch (error) {
+    // 如果错误已经被全局HTTP拦截器处理，则不显示额外消息
+    // 否则显示通用错误消息
+    if (!error?.response) {
+      ElMessage.error('图片上传失败，请重试')
+    }
   }
 }
 

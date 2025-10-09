@@ -7,7 +7,7 @@
       <div class="login-container-right">
         <div class="login-content">
           <div class="login-content-title">后台管理系统</div>
-          <el-form class="login-form" ref="formRef" :model="form" :rules="rules">
+          <el-form class="login-form" ref="formRef" :model="form" :rules="rules" @submit.prevent="submitForm(formRef)">
             <el-form-item label="" prop="username">
               <el-input v-model="form.username" :prefix-icon="User" size="large" placeholder="请输入用户名" clearable />
             </el-form-item>
@@ -20,6 +20,7 @@
                 placeholder="请输入密码"
                 show-password
                 clearable
+                @keyup.enter="submitForm(formRef)"
               />
             </el-form-item>
             <el-form-item>
