@@ -38,20 +38,13 @@
         </div>
       </div>
     </div>
-    <bar-echart />
 
-    <div class="echart-list">
-      <div class="echart-list-item">
+    <div class="echart-grid">
+      <div class="echart-item">
         <line-echart />
       </div>
-      <div class="echart-list-item">
-        <pie-echart />
-      </div>
-      <div class="echart-list-item">
-        <scatter-echart />
-      </div>
-      <div class="echart-list-item">
-        <pictorial-bar-echart />
+      <div class="echart-item">
+        <pie-echart :category-data="info.categories" />
       </div>
     </div>
   </div>
@@ -59,11 +52,8 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import barEchart from './bar/index.vue'
 import lineEchart from './line/index.vue'
 import pieEchart from './pie/index.vue'
-import scatterEchart from './scatter/index.vue'
-import pictorialBarEchart from './pictorial-bar/index.vue'
 import { countArticlesByType } from '@/api/article'
 import { websiteInfo } from '@/api'
 
@@ -93,4 +83,18 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @use './index.scss' as *;
+
+.echart-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+
+  .echart-item {
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
 </style>

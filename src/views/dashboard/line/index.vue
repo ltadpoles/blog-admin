@@ -1,14 +1,29 @@
 <template>
-  <div class="echart-content" ref="echartLineRef"></div>
+  <div class="echart-container">
+    <div class="echart-header">
+      <h3 class="echart-title">用户访问趋势</h3>
+      <div class="echart-controls">
+        <div class="period-tabs">
+          <div class="period-tab" :class="{ active: selectedPeriod === '7' }" @click="handlePeriodClick('7')">7天</div>
+          <div class="period-tab" :class="{ active: selectedPeriod === '30' }" @click="handlePeriodClick('30')">
+            30天
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="echart-content" ref="echartLineRef"></div>
+  </div>
 </template>
 
 <script setup>
-import { useTemplateRef, onMounted, onUnmounted, watch } from 'vue'
+import { useTemplateRef, onMounted, onUnmounted, watch, nextTick, ref } from 'vue'
 import { useSettingStore } from '@/stores/modules/setting'
+import { getVisitTrend } from '@/api'
 import * as echarts from 'echarts'
 
 const settingStore = useSettingStore()
 const echartLineRef = useTemplateRef('echartLineRef')
+const selectedPeriod = ref('7')
 
 let timer = null
 let chartRef = null
@@ -16,56 +31,109 @@ let chartRef = null
 const chartResize = () => {
   chartRef && chartRef.resize({ animation: { duration: 200 } })
 }
-const initChart = () => {
+
+const initChart = async () => {
+  if (!echartLineRef.value) {
+    return
+  }
   chartRef = echarts.init(echartLineRef.value)
-  chartRef.setOption({
-    tooltip: {
-      trigger: 'axis'
-    },
-    legend: {
-      data: ['邮件营销', '联盟广告', '视频广告'],
-      textStyle: {
-        color: '#666'
-      }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
-    toolbox: {
-      feature: {
-        saveAsImage: {}
-      }
-    },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [
-      {
-        name: '邮件营销',
-        type: 'line',
-        data: [120, 132, 101, 134, 90, 230, 210]
+
+  try {
+    // 获取访问趋势数据
+    const { data } = await getVisitTrend({ days: selectedPeriod.value })
+    const trendData = data?.data || data
+
+    // 解析数据格式
+    let dates = []
+    let visits = []
+
+    if (trendData?.trend && Array.isArray(trendData.trend)) {
+      // 接口返回格式: { trend: [{ date: '2025-10-04', count: 0 }, ...] }
+      dates = trendData.trend.map(item => item.date || '')
+      visits = trendData.trend.map(item => item.count || 0)
+    } else if (Array.isArray(trendData)) {
+      // 直接数组格式: [{ date: '2024-01-01', count: 120 }, ...]
+      dates = trendData.map(item => item.date || item.time || item.day || '')
+      visits = trendData.map(item => item.count || item.visits || item.value || 0)
+    } else if (trendData?.dates && trendData?.visits) {
+      // 对象格式: { dates: [...], visits: [...] }
+      dates = trendData.dates
+      visits = trendData.visits
+    }
+
+    chartRef.setOption({
+      tooltip: {
+        trigger: 'axis'
       },
-      {
-        name: '联盟广告',
-        type: 'line',
-        data: [220, 182, 191, 234, 290, 330, 310]
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
       },
-      {
-        name: '视频广告',
-        type: 'line',
-        data: [150, 232, 201, 154, 190, 330, 410]
-      }
-    ]
-  })
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: dates
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          name: '访问量',
+          type: 'line',
+          smooth: true,
+          data: visits,
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
+                { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
+              ]
+            }
+          },
+          lineStyle: {
+            width: 2,
+            color: '#409EFF'
+          },
+          itemStyle: {
+            color: '#409EFF'
+          }
+        }
+      ]
+    })
+  } catch {
+    // 加载失败时显示空图表
+    chartRef.setOption({
+      xAxis: {
+        type: 'category',
+        data: []
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          type: 'line',
+          data: []
+        }
+      ]
+    })
+  }
+
   window.addEventListener('resize', chartResize)
+}
+
+// 处理时间段点击
+const handlePeriodClick = period => {
+  selectedPeriod.value = period
+  initChart()
 }
 
 watch(
@@ -77,7 +145,8 @@ watch(
   }
 )
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick()
   initChart()
 })
 

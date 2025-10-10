@@ -1,4 +1,21 @@
-.echart-content {
-  width: 100%;
-  height: 100%;
+.echart-container {
+  .echart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 0 10px;
+
+    .echart-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: #303133;
+    }
+  }
+
+  .echart-content {
+    width: 100%;
+    height: 300px;
+  }
 }
