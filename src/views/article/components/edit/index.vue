@@ -205,7 +205,7 @@ const handleAvatarError = err => {
       ElMessage.error('图片上传失败，请重试')
     }
   } catch {
-    ElMessage.error(err?.message || '图片上传失败，请重试')
+    //
   }
 }
 

@@ -128,9 +128,8 @@ const submit = async formEl => {
         loading.value = false
         ElMessage.success(res.data.msg || '回复成功')
         close(true)
-      } catch (error) {
+      } catch {
         loading.value = false
-        ElMessage.error(error.msg || '回复失败')
       }
     } else {
       Promise.reject(fields)

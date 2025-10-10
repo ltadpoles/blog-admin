@@ -158,8 +158,6 @@ const getList = async () => {
     const payload = data?.data || data
     tableData.value = payload?.records || payload?.list || []
     pageQuery.total = payload?.total || 0
-  } catch {
-    ElMessage.error('获取数据失败')
   } finally {
     loading.value = false
   }

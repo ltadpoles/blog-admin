@@ -35,6 +35,7 @@
           :show-file-list="false"
           :on-success="handleLogoSuccess"
           :before-upload="beforeLogoUpload"
+          :on-error="handleLogoError"
         >
           <img v-if="localLogo" :src="ImgUrl + localLogo" class="logo" />
           <el-icon v-else class="logo-uploader-icon">
@@ -109,6 +110,22 @@ const handleLogoSuccess = file => {
     ...props.formData,
     siteLogo: file.data.fileId
   })
+}
+
+// Logo上传错误处理
+const handleLogoError = err => {
+  try {
+    // 尝试解析错误信息
+    if (err?.message) {
+      const errorData = JSON.parse(err.message)
+      ElMessage.error(errorData?.msg || 'Logo上传失败，请重试')
+    } else {
+      ElMessage.error('Logo上传失败，请重试')
+    }
+  } catch {
+    // JSON 解析失败时的降级处理
+    ElMessage.error(err?.message || 'Logo上传失败，请重试')
+  }
 }
 
 // Logo上传前验证和压缩

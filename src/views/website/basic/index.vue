@@ -176,7 +176,7 @@ const getWebsiteInfo = async () => {
       }
     }
   } catch {
-    ElMessage.error('获取网站信息失败')
+    //
   } finally {
     loading.value = false
   }
@@ -209,10 +209,8 @@ const saveForm = async () => {
     ElMessage.success('保存成功')
     // 重新获取信息以更新统计
     await getWebsiteInfo()
-  } catch (error) {
-    if (error !== false) {
-      ElMessage.error('保存失败')
-    }
+  } catch {
+    //
   } finally {
     loading.value = false
   }

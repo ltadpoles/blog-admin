@@ -9,6 +9,7 @@
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
+          :on-error="handleAvatarError"
         >
           <img v-if="localAvatar" :src="ImgUrl + localAvatar" class="avatar" />
           <el-icon v-else class="avatar-uploader-icon">
@@ -126,6 +127,22 @@ const handleAvatarSuccess = file => {
   })
 }
 
+// 头像上传错误处理
+const handleAvatarError = err => {
+  try {
+    // 尝试解析错误信息
+    if (err?.message) {
+      const errorData = JSON.parse(err.message)
+      ElMessage.error(errorData?.msg || '头像上传失败，请重试')
+    } else {
+      ElMessage.error('头像上传失败，请重试')
+    }
+  } catch {
+    // JSON 解析失败时的降级处理
+    ElMessage.error(err?.message || '头像上传失败，请重试')
+  }
+}
+
 // 头像上传前验证和压缩
 const beforeAvatarUpload = async file => {
   const isImage = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/svg+xml'
@@ -239,7 +256,7 @@ const onUploadImg = async (files, callback) => {
       }))
     )
   } catch {
-    ElMessage.error('图片上传失败，请重试')
+    //
   }
 }
 
