@@ -32,7 +32,6 @@
           <el-button icon="Delete" type="danger" @click="delData">删除</el-button>
           <el-button icon="Lock" type="warning" @click="batchBlock">批量封禁</el-button>
           <el-button icon="Unlock" type="success" @click="batchUnblock">批量解封</el-button>
-          <el-button icon="Delete" type="info" @click="cleanupExpired">清理过期</el-button>
         </div>
         <div class="view-base-form-btn-right">
           <el-button icon="Refresh" @click="reset(formRef)">重置</el-button>
@@ -300,23 +299,6 @@ const unblockIp = async row => {
   } catch {
     // 错误已由全局HTTP拦截器处理
   }
-}
-
-// 清理过期IP记录
-const cleanupExpired = () => {
-  ElMessageBox.confirm('确认清理过期的IP记录？', '提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(async () => {
-      await ipApi.cleanupExpiredIPs()
-      ElMessage.success('清理成功')
-      getList(query)
-    })
-    .catch(() => {
-      // 用户取消操作
-    })
 }
 
 onMounted(() => {

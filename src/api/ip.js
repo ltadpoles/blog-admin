@@ -34,8 +34,3 @@ export const batchUnblockIP = data => {
 export const deleteIP = params => {
   return http.get('/ip/delete', { params })
 }
-
-// 清理过期IP记录
-export const cleanupExpiredIPs = () => {
-  return http.post('/ip/cleanup')
-}
